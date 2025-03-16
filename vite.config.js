@@ -5,6 +5,9 @@ import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 import mdx from "@mdx-js/rollup"
 
+import { createHtmlPlugin } from "vite-plugin-html"
+import SitemapPlugin from "vite-plugin-sitemap"
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~
 import remarkGfm from "remark-gfm"
 import remarkParse from "remark-parse"
@@ -35,7 +38,7 @@ import { DEFAULT_REHYPE_PRETTY_CODE_OPTIONS, rehypeAttachCodeMeta, rehypeParseCo
 // ~~~~~~~~~~~~~~~~~~~~~~~~
 
 export default defineConfig({
-    base: '/',
+    base: "/",
     plugins: [
         mdx({
             providerImportSource: "@mdx-js/react",
@@ -92,6 +95,8 @@ export default defineConfig({
         }),
         tailwindcss(),
         react(),
+        createHtmlPlugin(),
+        SitemapPlugin({ hostname: "https://mattergen.pages.dev" }),
     ],
     resolve: {
         alias: {

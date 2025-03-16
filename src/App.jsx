@@ -1,14 +1,9 @@
-import RootLayout from "./layout"
+import RootLayout from "../components/layout/layout"
 import { RouterProvider, createBrowserRouter } from "react-router-dom"
 import { lazy } from "react"
+import { router } from "./routes/routes"
 
-import Home from "./routes/theme/page.mdx"
-const About = lazy(() => import("./routes/about/page.mdx"))
-const Contact = lazy(() => import("./routes/contact/page.mdx"))
-const Markdown = lazy(() => import("./routes/markdown/page.mdx"))
-const Sample = lazy(() => import("./routes/sample/page.mdx"))
-const Table = lazy(() => import("./routes/table/page.mdx"))
-const Theme = lazy(() => import("./routes/home/page.mdx"))
+
 // import Home from "./routes/home/page.mdx"
 // import About from "./routes/about/page.mdx"
 // import Contact from "./routes/contact/page.mdx"
@@ -24,21 +19,7 @@ const Theme = lazy(() => import("./routes/home/page.mdx"))
 // const Table = lazy(() => import("./routes/table/page.mdx"))
 // const Theme = lazy(() => import("./routes/home/page.mdx"))
 
-const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <RootLayout />,
-        children: [
-            { index: true, element: <Home /> },
-            { path: "/about", element: <About /> },
-            { path: "/contact", element: <Contact /> },
-            { path: "/markdown", element: <Markdown /> },
-            { path: "/sample", element: <Sample /> },
-            { path: "/table", element: <Table /> },
-            { path: "/theme", element: <Theme /> },
-        ],
-    },
-])
+
 
 function App() {
     return (
