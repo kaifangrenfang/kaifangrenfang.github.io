@@ -60,7 +60,6 @@
         "yaml": "^2.7.0"
     },
     "devDependencies": {
-        "@cloudflare/vite-plugin": "^0.1.11",
         "@eslint/eslintrc": "^3",
         "@shikijs/rehype": "^3.2.1",
         "@tailwindcss/postcss": "^4",
@@ -74,7 +73,7 @@
         "prettier": "3.5.3",
         "tailwindcss": "^4.0.14",
         "vite": "^6.2.2",
-        "wrangler": "^4.0.0"
+        "vite-ssg": "^25.2.0"
     },
     "optionalDependencies": {
         "@tailwindcss/oxide-linux-x64-gnu": "^4.0.14",
