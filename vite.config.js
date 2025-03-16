@@ -96,7 +96,11 @@ export default defineConfig({
         tailwindcss(),
         react(),
         createHtmlPlugin(),
-        SitemapPlugin({ hostname: "https://mattergen.pages.dev" }),
+        SitemapPlugin({
+            hostname: "https://mattergen.pages.dev",
+            dynamicRoutes: ["/about", "/contact", "/markdown", "/sample", "/table", "/home"],
+            // dynamicRoutes: routesList.map((route) => route.path).filter((path) => !path.includes(":"))
+        }),
     ],
     resolve: {
         alias: {

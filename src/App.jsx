@@ -1,7 +1,7 @@
 import RootLayout from "../components/layout/layout"
 import { RouterProvider, createBrowserRouter } from "react-router-dom"
 import { lazy } from "react"
-import { router } from "./routes/routes"
+import { routesList } from "./routes/routes"
 
 
 // import Home from "./routes/home/page.mdx"
@@ -34,7 +34,7 @@ function App() {
         //         <Route path="/theme" element={<Theme />} />
         //     </Route>
         // </Routes>
-        <RouterProvider router={router} />
+        <RouterProvider router={routesList} />
     )
 }
 

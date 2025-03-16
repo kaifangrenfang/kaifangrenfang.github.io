@@ -10,7 +10,7 @@ const Sample = lazy(() => import("./sample/page.mdx"))
 const Table = lazy(() => import("./table/page.mdx"))
 const Theme = lazy(() => import("./home/page.mdx"))
 
-const router = createBrowserRouter([
+const routesList = createBrowserRouter([
     {
         path: "/",
         element: <RootLayout />,
@@ -26,4 +26,4 @@ const router = createBrowserRouter([
     },
 ])
 
-export { router }
+export { routesList }
