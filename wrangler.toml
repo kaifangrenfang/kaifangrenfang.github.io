@@ -1,0 +1,8 @@
+name = "mattergen"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "out"
+compatibility_date = "2025-02-22"
+
+[env.production.vars]
+NODE_VERSION = "22.14.0"
+ENVIRONMENT = "production"

@@ -1,0 +1,178 @@
+@import "tailwindcss";
+@import "./files.css";
+@import "katex/dist/katex.min.css";
+@import "./custom.css";
+/* @import "../styles/code-block.css"; */
+@import "./subheading-anchor.css";
+@import "./scrollbar.css";
+@import "./steps.css";
+@import "./cards.css";
+@import "./hamburger.css";
+@import "./typesetting-article.css";
+@import "./utilities.css";
+
+@layer base {
+    :root {
+        /* --openhuman-primary-hue: 220;
+    --openhuman-primary-saturation: 90%; */
+
+        --openhuman-primary-hue: 212deg;
+        --openhuman-primary-saturation: 100%;
+        --openhuman-navbar-height: 3.5rem;
+        --openhuman-menu-height: 3.75rem;
+        --openhuman-banner-height: 2.5rem;
+        --openhuman-bg: 255, 255, 255;
+    }
+
+    *,
+    :after,
+    :before {
+        box-sizing: border-box;
+        border: 0 solid #e5e7eb;
+    }
+
+    html {
+        font-feature-settings:
+            "rlig" 1,
+            "calt" 1,
+            "ss01" 1,
+            "ss06" 1 !important;
+        font-family:
+            Segoe UI,
+            ui-sans-serif,
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            Roboto,
+            Noto Sans,
+            Ubuntu,
+            Cantarell,
+            Helvetica Neue,
+            Arial,
+            sans-serif,
+            Apple Color Emoji,
+            Segoe UI Emoji,
+            Segoe UI Symbol,
+            Noto Color Emoji;
+    }
+
+    html {
+        scroll-padding-top: 4rem;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-feature-settings:
+            "rlig" 1,
+            "calt" 1,
+            "ss01" 1;
+        -webkit-tap-highlight-color: transparent;
+        font-size: 1rem;
+    }
+
+    html {
+        tab-size: 4;
+        font-feature-settings: normal;
+        font-variation-settings: normal;
+        line-height: 1.5;
+    }
+}
+
+@theme {
+    /* Screens (as CSS custom properties) */
+    --screen-sm: 640px;
+    --screen-md: 768px;
+    --screen-lg: 1024px;
+    --screen-xl: 1280px;
+    --screen-2xl: 1536px;
+
+    /* Font Sizes */
+    --font-xs: 0.75rem;
+    --font-sm: 0.875rem;
+    --font-base: 1rem;
+    --font-lg: 1.125rem;
+    --font-xl: 1.25rem;
+    --font-2xl: 1.5rem;
+    --font-3xl: 1.875rem;
+    --font-4xl: 2.25rem;
+    --font-5xl: 3rem;
+    --font-6xl: 4rem;
+
+    /* Letter Spacing */
+    --tracking-tight: -0.015em;
+
+    /* Colors */
+    --color-transparent: transparent;
+    --color-current: currentColor;
+    --color-black: #000;
+    --color-white: #fff;
+    --color-dark: #111;
+
+    /* Primary Colors */
+    --color-primary-50: hsl(var(--openhuman-primary-hue) var(--openhuman-primary-saturation) 97%);
+    --color-primary-100: hsl(var(--openhuman-primary-hue) var(--openhuman-primary-saturation) 94%);
+    --color-primary-200: hsl(var(--openhuman-primary-hue) var(--openhuman-primary-saturation) 86%);
+    --color-primary-300: hsl(var(--openhuman-primary-hue) var(--openhuman-primary-saturation) 77%);
+    --color-primary-400: hsl(var(--openhuman-primary-hue) var(--openhuman-primary-saturation) 66%);
+    --color-primary-500: hsl(var(--openhuman-primary-hue) var(--openhuman-primary-saturation) 50%);
+    --color-primary-600: hsl(var(--openhuman-primary-hue) var(--openhuman-primary-saturation) 45%);
+    --color-primary-700: hsl(var(--openhuman-primary-hue) var(--openhuman-primary-saturation) 39%);
+    --color-primary-750: hsl(var(--openhuman-primary-hue) var(--openhuman-primary-saturation) 35%);
+    --color-primary-800: hsl(var(--openhuman-primary-hue) var(--openhuman-primary-saturation) 32%);
+    --color-primary-900: hsl(var(--openhuman-primary-hue) var(--openhuman-primary-saturation) 24%);
+
+    --animate-fade-in: fade-in 0.3s ease forwards;
+
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+}
+
+@layer components {
+    code:not([class*="twoslash-"]) {
+        box-decoration-break: slice;
+        font-feature-settings:
+            "rlig" 1,
+            "calt" 1,
+            "ss01" 1;
+        @apply break-words rounded-md py-0.5 px-1 text-sm dark:border-white/10 dark:bg-white/10;
+    }
+
+    pre code:not([class*="twoslash-"]) {
+        @apply grid text-sm;
+
+        &[data-line-numbers] > span {
+            @apply pl-2;
+            &::before {
+                counter-increment: line;
+                content: counter(line);
+                @apply float-left pr-4 text-right min-w-[2.6rem] text-gray-500;
+            }
+        }
+
+        & > span {
+            @apply px-4;
+
+            &[data-highlighted-line] {
+                @apply bg-primary-600/10 dark:bg-primary-600/20 text-primary-600/80 shadow-[inset_2px_0_currentColor];
+            }
+
+            [data-highlighted-chars] {
+                @apply rounded-sm ring-2 ring-primary-600/20 dark:ring-primary-600/40 bg-primary-600/20 dark:bg-primary-600/40;
+            }
+        }
+    }
+
+    .openhuman-copy-icon {
+        @apply animate-fade-in;
+    }
+}
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+}
