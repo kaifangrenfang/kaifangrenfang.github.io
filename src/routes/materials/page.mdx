@@ -74,7 +74,7 @@ The appearance of a material using the standard model is controlled using the pr
 | **microThickness**      | Thickness of the thin layer of refractive objects                                                                                                 |
 | **thickness**           | Thickness of the solid volume of refractive objects                                                                                               |
 
-**Table 1:** Properties of the standard model
+> **Table 1:** Properties of the standard model
 
 The type and range of each property is described in [Table 2](#table_standardpropertiestypes).
 
@@ -102,7 +102,7 @@ The type and range of each property is described in [Table 2](#table_standardpro
 | **microThickness**      | float  | [0..n]               |                                                                    |
 | **thickness**           | float  | [0..n]               |                                                                    |
 
-**Table 2:** Range and type of the standard model's properties
+> **Table 2:** Range and type of the standard model's properties
 
 ### About Linear RGB
 
@@ -143,7 +143,7 @@ Defines the diffuse color of the surface. Real-world values are typically found 
 | Sand       | 0.69, 0.66, 0.52 | #b1a884     | <span style={{ backgroundColor: "#b1a884", padding: "10px 20px", display: "inline-block" }}></span> |
 | Concrete   | 0.75, 0.75, 0.73 | #c0bfbb     | <span style={{ backgroundColor: "#c0bfbb", padding: "10px 20px", display: "inline-block" }}></span> |
 
-**Table 3:** `baseColor` for common non-metals
+> **Table 3:** `baseColor` for common non-metals
 
 #### Metals (Conductors)
 
@@ -160,7 +160,7 @@ Defines the specular color of the surface. Real-world values are typically found
 | Brass    | 0.98, 0.90, 0.59 | #f9e596     | <span style={{ backgroundColor: "#f9e596", padding: "10px 20px", display: "inline-block" }}></span> |
 | Copper   | 0.97, 0.74, 0.62 | #f7bc9e     | <span style={{ backgroundColor: "#f7bc9e", padding: "10px 20px", display: "inline-block" }}></span> |
 
-**Table 4:** `baseColor` for common metals
+> **Table 4:** `baseColor` for common metals
 
 ### Metallic
 
@@ -172,7 +172,7 @@ The effect of `metallic` is shown in [Figure 1](#figure_metallicproperty) (click
 
 ![Metallic Property](../images/materials/metallic.png)
 
-**Figure 1:** `metallic` varying from 0.0
+> **Figure 1:** `metallic` varying from 0.0
 
 ### Roughness
 
@@ -184,7 +184,7 @@ The effect of `roughness` on non-metallic surfaces is shown in [Figure 2](#figur
 
 ![Dielectric Roughness](../images/materials/dielectric_roughness.png)
 
-**Figure 2:** Dielectric `roughness` varying from 0.0
+> **Figure 2:** Dielectric `roughness` varying from 0.0
 
 #### Metals
 
@@ -192,7 +192,7 @@ The effect of `roughness` on metallic surfaces is shown in [Figure 3](#figure_ro
 
 ![Conductor Roughness](../images/materials/conductor_roughness.png)
 
-**Figure 3:** Conductor `roughness` varying from 0.0
+> **Figure 3:** Conductor `roughness` varying from 0.0
 
 ### Refraction
 
@@ -200,7 +200,7 @@ When refraction through an object is enabled (using a `refractonType` of `thin` 
 
 ![Refractive Sphere with Roughness](../images/materials/refraction_roughness.png)
 
-**Figure 4:** Refractive sphere with `roughness` varying from 0.0
+> **Figure 4:** Refractive sphere with `roughness` varying from 0.0
 
 ### Reflectance
 
@@ -210,13 +210,13 @@ The effect of `reflectance` on non-metallic surfaces is shown in [Figure 5](#fig
 
 ![Reflectance Property](../images/materials/reflectance.png)
 
-**Figure 5:** `reflectance` varying from 0.0 (left)
+> **Figure 5:** `reflectance` varying from 0.0 (left)
 
 [Figure 6](#figure_reflectance) shows common values and how they relate to the mapping function.
 
 ![Common Reflectance Values](../images/diagram_reflectance.png)
 
-**Figure 6:** Common reflectance values
+> **Figure 6:** Common reflectance values
 
 [Table 5](#table_commonmatreflectance) describes acceptable reflectance values for various types of materials (no real-world material has a value under 2%).
 
@@ -234,7 +234,7 @@ The effect of `reflectance` on non-metallic surfaces is shown in [Figure 5](#fig
 | Teeth                      | 5.8%        | 1.63         | 0.6          |
 | Default value              | 4%          | 1.5          | 0.5          |
 
-**Table 5:** Reflectance of common materials
+> **Table 5:** Reflectance of common materials
 
 Note that the `reflectance` property also defines the index of refraction of the surface. When this property is defined it is not necessary to define the `ior` property. Setting either of these properties will automatically compute the other property. It is possible to specify both, in which case their values are kept as-is, which can lead to physically impossible materials, however, this might be desirable for artistic reasons.
 
@@ -252,7 +252,7 @@ The effect of `sheenColor` is shown in [Figure 7](#figure_materialsheencolor) (c
 
 ![Sheen Color Example](../images/screenshot_sheen_color.png)
 
-**Figure 7:** Different sheen colors
+> **Figure 7:** Different sheen colors
 
 If you do not need the other properties offered by the standard lit material model but want to create a cloth-like or fabric-like appearance, it is more efficient to use the dedicated cloth model described in section [3.3](#toc3.3).
 
@@ -264,7 +264,7 @@ The effect of `sheenRoughness` on a rough metal is shown in [Figure 8](#figure_s
 
 ![Sheen Roughness Example](../images/materials/sheen_roughness.png)
 
-**Figure 8:** `sheenRoughness` varying from 0.0
+> **Figure 8:** `sheenRoughness` varying from 0.0
 
 ### Clear Coat
 
@@ -274,7 +274,7 @@ The `clearCoat` property can be used to describe materials with two layers. The 
 
 ![Carbon Fiber Material](../images/material_carbon_fiber.png)
 
-**Figure 9:** Comparison of a carbon-fiber material under the standard material model
+> **Figure 9:** Comparison of a carbon-fiber material under the standard material model
 
 The `clearCoat` property controls the strength of the clear coat layer. This should be treated as a binary value, set to either 0 or 1. Intermediate values are useful to control transitions between parts of the surface that have a clear coat layers and parts that don't.
 
@@ -282,7 +282,7 @@ The effect of `clearCoat` on a rough metal is shown in [Figure 10](#figure_clear
 
 ![Clear Coat Example](../images/materials/clear_coat.png)
 
-**Figure 10:** `clearCoat` varying from 0.0
+> **Figure 10:** `clearCoat` varying from 0.0
 
 The clear coat layer effectively doubles the cost of specular computations. Do not assign a value, even 0.0, to the clear coat property if you don't need this second layer.
 
@@ -296,7 +296,7 @@ The effect of `clearCoatRoughness` on a rough metal is shown in [Figure 11](#fig
 
 ![Clear Coat Roughness Example](../images/materials/clear_coat_roughness.png)
 
-**Figure 11:** `clearCoatRoughness` varying from 0.0
+> **Figure 11:** `clearCoatRoughness` varying from 0.0
 
 ### Anisotropy
 
@@ -304,19 +304,19 @@ Many real-world materials, such as brushed metal, can only be replicated using a
 
 ![Anisotropic Material](../images/material_anisotropic.png)
 
-**Figure 12:** Comparison of isotropic material
+> **Figure 12:** Comparison of isotropic material
 
 The effect of `anisotropy` on a rough metal is shown in [Figure 13](#figure_anisotropyproperty) (click on the image to see a larger version).
 
 ![Anisotropy Example](../images/materials/anisotropy.png)
 
-**Figure 13:** `anisotropy` varying from 0.0
+> **Figure 13:** `anisotropy` varying from 0.0
 
 The [Figure 14](#figure_anisotropydir) below shows how the direction of the anisotropic highlights can be controlled by using either positive or negative values: positive values define anisotropy in the tangent direction and negative values in the bitangent direction.
 
 ![Anisotropy Direction](../images/screenshot_anisotropy_direction.png)
 
-**Figure 14:** Positive (left) vs negative
+> **Figure 14:** Positive (left) vs negative
 
 The anisotropic material model is slightly more expensive than the standard material model. Do not assign a value (even 0.0) to the `anisotropy` property if you don't need anisotropy.
 
@@ -328,13 +328,13 @@ The effect of `anisotropyDirection` on a metal is shown in [figure 16](#figure_a
 
 ![screenshot_anisotropy.png](../images/screenshot_anisotropy.png)
 
-**Figure 15:** Anisotropic metal rendered
+> **Figure 15:** Anisotropic metal rendered
 
 The result shown in [figure 16](#figure_anisotropydirectionproperty) was obtained using the direction map shown in [figure 16](#figure_anisotropydirectionproperty).
 
 ![screenshot_anisotropy_map.jpg](../images/screenshot_anisotropy_map.jpg)
 
-**Figure 16:** Example of Lighting: specularAmbientOcclusiona direction map
+> **Figure 16:** Example of Lighting: specularAmbientOcclusiona direction map
 
 ### Ambient occlusion
 
@@ -342,7 +342,7 @@ The `ambientOcclusion` property defines how much of the ambient light is accessi
 
 ![screenshot_ao.jpg](../images/screenshot_ao.jpg)
 
-**Figure 17:** Comparison of materials without diffuse ambient occlusion
+> **Figure 17:** Comparison of materials without diffuse ambient occlusion
 
 ### Normal
 
@@ -354,7 +354,7 @@ Note that the `normal` property affects the _base layer_ and not the clear coat 
 
 ![screenshot_normal_mapping.jpg](../images/screenshot_normal_mapping.jpg)
 
-**Figure 18:** Low-poly mesh without normal mapping (left)
+> **Figure 18:** Low-poly mesh without normal mapping (left)
 
 Using a normal map increases the runtime cost of the material model.
 
@@ -366,7 +366,7 @@ Bent normals can greatly increase the visual fidelity of an asset with various c
 
 ![material_bent_normal.gif](../images/material_bent_normal.gif)
 
-**Figure 19:** Example of a model rendered with and without a bent normal map. Both
+> **Figure 19:** Example of a model rendered with and without a bent normal map. Both
 
 ### Clear coat normal
 
@@ -374,7 +374,7 @@ The `clearCoatNormal` property defines the normal of the clear coat layer at a g
 
 ![screenshot_clear_coat_normal.jpg](../images/screenshot_clear_coat_normal.jpg)
 
-**Figure 20:** A material with a clear coat normal
+> **Figure 20:** A material with a clear coat normal
 
 Using a clear coat normal map increases the runtime cost of the material model.
 
@@ -413,7 +413,7 @@ The index of refraction (or refractive index) of a material is a dimensionless n
 | Plastics, glass            | 1.5 to 1.58  |
 | Other dielectric materials | 1.33 to 1.58 |
 
-**Table 6:** Index of refraction of common materials
+> **Table 6:** Index of refraction of common materials
 
 The appearance of a refractive material will greatly depend on the `refractionType` and `refractionMode` settings of the material. Refer to section [4.2.21](#toc4.2.21) and section [4.2.20](#toc4.2.20) for more information.
 
@@ -421,13 +421,13 @@ The effect of `ior` when `refractionMode` is set to `cubemap` and `refractionTyp
 
 ![materials/iorpng)](../images/materials/ior.png)
 
-**Figure 21:** `transmission` varying from 1.0
+> **Figure 21:** `transmission` varying from 1.0
 
 [Figure 22](#figure_iorproperty) shows the comparison of a sphere of `ior` 1.0 with a sphere of `ior` 1.33, with the `refractionMode` set to `screenspace` and the `refractionType` set to `solid` (click on the image to see a larger version).
 
 ![material_ior.png](../images/material_ior.png)
 
-**Figure 22:** `ior` of 1.0 (left) and 1.33 (right)
+> **Figure 22:** `ior` of 1.0 (left) and 1.33 (right)
 
 Note that the `ior` property also defines the reflectance (or specular intensity) of the surface. When this property is defined it is not necessary to define the `reflectance` property. Setting either of these properties will automatically compute the other property. It is possible to specify both, in which case their values are kept as-is, which can lead to physically impossible materials, however, this might be desirable for artistic reasons.
 
@@ -445,7 +445,7 @@ The effect of `transmission` on a glossy dielectric (`ior` of 1.5, `refractionMo
 
 ![materials/transmissionpng)](../images/materials/transmission.png)
 
-**Figure 23:** `transmission` varying from 0.0
+> **Figure 23:** `transmission` varying from 0.0
 
 The `transmission` property is useful to create decals, paint, etc. at the surface of refractive materials.
 
@@ -455,25 +455,31 @@ The `absorption` property defines the absorption coefficients of light transmitt
 
 ![material_absorption.png](../images/material_absorption.png)
 
-**Figure 24:** Refracting object without (left)
+> **Figure 24:** Refracting object without (left)
 
 Transmittance through a volume is exponential with respect to the optical depth (defined either with `microThickness` or `thickness`). The computed color follows the following formula:
 
-$$color \\cdot e^{-absorption \\cdot distance}$$
+$$
+color \cdot e^{-absorption \cdot distance}
+$$
 
 Where `distance` is either `microThickness` or `thickness`, that is the distance light will travel through the material at a given point. If no thickness/distance is specified, the computed color follows this formula instead:
 
-$$color \\cdot (1 - absorption)$$
+$$
+color \cdot (1 - absorption)
+$$
 
 The effect of varying the `absorption` coefficients is shown in [figure 25](#figure_absorptionproperty) (click on the image to see a larger version). In this picture, the object has a fixed `thickness` of 4.5 and an index of refraction set to 1.3.
 
 ![materials/absorptionpng)](../images/materials/absorption.png)
 
-**Figure 25:** `absorption` varying from (0.0, 0.02, 0.14)
+> **Figure 25:** `absorption` varying from (0.0, 0.02, 0.14)
 
 Setting the absorption coefficients directly can be unintuitive which is why we recommend working with a _transmittance color_ and a _“at distance”_ factor instead. These two parameters allow an artist to specify the precise color the material should have at a specified distance through the volume. The value to pass to `absorption` can be computed this way:
 
-$$absorption = -\frac{ln(transmittanceColor)}{atDistance}$$
+$$
+absorption = -\frac{ln(transmittanceColor)}{atDistance}
+$$
 
 While this computation can be done in the material itself we recommend doing it offline whenever possible. Filament provides an API for this purpose, `Color::absorptionAtDistance()`.
 
@@ -491,13 +497,13 @@ The effect `thickness` in a solid volume with `refractionMode` set to `screenSpa
 
 ![materials/thicknesspng)](../images/materials/thickness.png)
 
-**Figure 26:** `thickness` varying from 0.0
+> **Figure 26:** `thickness` varying from 0.0
 
 [Figure 27](#figure_varyingthickness) shows what a prism with spatially varying `thickness` looks like when the `refractionType` is set to `solid` and `absorption` coefficients are set.
 
 ![material_thickness.png](../images/material_thickness.png)
 
-**Figure 27:** `thickness` varying from 0.0 at the top of the prism to 3.0 at the
+> **Figure 27:** `thickness` varying from 0.0 at the top of the prism to 3.0 at the
 
 ## Subsurface model
 
@@ -515,13 +521,13 @@ All the material models described previously are designed to simulate dense surf
 
 ![screenshot_cloth.png](../images/screenshot_cloth.png)
 
-**Figure 28:** Comparison of denim fabric rendered using the standard model
+> **Figure 28:** Comparison of denim fabric rendered using the standard model
 
 Velvet is an interesting use case for a cloth material model. As shown in [figure 29](#figure_materialvelvet) this type of fabric exhibits strong rim lighting due to forward and backward scattering. These scattering events are caused by fibers standing straight at the surface of the fabric. When the incident light comes from the direction opposite to the view direction, the fibers will forward scatter the light. Similarly, when the incident light from the same direction as the view direction, the fibers will scatter the light backward.
 
 ![screenshot_cloth_velvet.png](../images/screenshot_cloth_velvet.png)
 
-**Figure 29:** Velvet fabric showcasing forward and
+> **Figure 29:** Velvet fabric showcasing forward and
 
 It is important to note that there are types of fabrics that are still best modeled by hard surface material models. For instance, leather, silk and satin can be recreated using the standard or anisotropic material models.
 
@@ -532,7 +538,7 @@ The cloth material model encompasses all the parameters previously defined for t
 | **sheenColor**      | Specular tint to create two-tone specular fabrics (defaults to $\sqrt{baseColor}$) |
 | **subsurfaceColor** | Tint for the diffuse color after scattering and absorption through the material    |
 
-**Table 7:** Cloth model parameters
+> **Table 7:** Cloth model parameters
 
 The type and range of each property is described in [table 8](#table_clothpropertiestypes).
 
@@ -541,7 +547,7 @@ The type and range of each property is described in [table 8](#table_clothproper
 | **sheenColor**      | float3 | $0..1$ | Linear RGB |
 | **subsurfaceColor** | float3 | $0..1$ | Linear RGB |
 
-**Table 8:** Range and type of the cloth model's properties
+> **Table 8:** Range and type of the cloth model's properties
 
 To create a velvet-like material, the base color can be set to black (or a dark color). Chromaticity information should instead be set on the sheen color. To create more common fabrics such as denim, cotton, etc. use the base color for chromaticity and use the default sheen color or set the sheen color to the luminance of the base color.
 
@@ -557,7 +563,7 @@ The effect of `sheenColor` is shown in [figure 30](#figure_materialclothsheen) (
 
 ![screenshot_cloth_sheen.png](../images/screenshot_cloth_sheen.png)
 
-**Figure 30:** Blue fabric without (left) and with (right) sheen
+> **Figure 30:** Blue fabric without (left) and with (right) sheen
 
 ### Subsurface color
 
@@ -569,7 +575,7 @@ The effect of `subsurfaceColor` is shown in [figure 31](#figure_materialclothsub
 
 ![screenshot_cloth_subsurface.png](../images/screenshot_cloth_subsurface.png)
 
-**Figure 31:** White cloth (left column) vs white cloth with
+> **Figure 31:** White cloth (left column) vs white cloth with
 
 ## Unlit model
 
@@ -581,7 +587,7 @@ The unlit material model can be used to turn off all lighting computations. Its 
 | **emissive**          | Additional diffuse color to simulate emissive surfaces. This property is mostly useful in an HDR pipeline with a bloom pass |
 | **postLightingColor** | Additional color to blend with base color and emissive                                                                      |
 
-**Table 9:** Properties of the standard model
+> **Table 9:** Properties of the standard model
 
 The type and range of each property is described in [table 10](#table_unlitpropertiestypes).
 
@@ -591,7 +597,7 @@ The type and range of each property is described in [table 10](#table_unlitprope
 | **emissive**          | float4 | rgb=$0..n$, a=$0..1$ | Linear RGB intensity in nits, alpha encodes the exposure weight |
 | **postLightingColor** | float4 | $0..1$               | Pre-multiplied linear RGB                                       |
 
-**Table 10:** Range and type of the unlit model's properties
+> **Table 10:** Range and type of the unlit model's properties
 
 The value of `postLightingColor` is blended with the sum of `emissive` and `baseColor` according to the blending mode specified by the `postLightingBlending` material option.
 
@@ -599,7 +605,7 @@ The value of `postLightingColor` is blended with the sum of `emissive` and `base
 
 ![screenshot_unlit.jpg](../images/screenshot_unlit.jpg)
 
-**Figure 32:** The unlit model is used to render debug information
+> **Figure 32:** The unlit model is used to render debug information
 
 ## Specular glossiness
 
@@ -613,7 +619,7 @@ This model encompasses the parameters previously defined for the standard lit mo
 | **specularColor** | Specular tint (defaults to black) |
 | **glossiness**    | Glossiness (defaults to 0.0)      |
 
-**Table 11:** Properties of the specular-glossiness shading model
+> **Table 11:** Properties of the specular-glossiness shading model
 
 The type and range of each property is described in [table 12](#table_glossinesspropertiestypes).
 
@@ -623,7 +629,7 @@ The type and range of each property is described in [table 12](#table_glossiness
 | **specularColor** | float3 | $0..1$ | Linear RGB                |
 | **glossiness**    | float  | $0..1$ | Inverse of roughness      |
 
-**Table 12:** Range and type of the specular-glossiness model's properties
+> **Table 12:** Range and type of the specular-glossiness model's properties
 
 # Material definitions
 
@@ -761,7 +767,7 @@ material {
 | 2     | 9 textures per material, cubemap arrays, ESSL 3.10  |
 | 3     | 12 textures per material, cubemap arrays, ESSL 3.10 |
 
-**Table 13:** Feature levels
+> **Table 13:** Feature levels
 
 Description
 
@@ -836,7 +842,7 @@ Each entry is an object with the properties `name` and `type`, both of `string` 
 | samplerExternal | External texture (platform-specific) |
 | samplerCubemap  | Cubemap texture                      |
 
-**Table 14:** Material parameter types
+> **Table 14:** Material parameter types
 
 Samplers
 
@@ -890,39 +896,21 @@ material.reflectance = materialParams.metallicReflectance.y;
 
 ### General: constants
 
-Type
+**Type**
 
-array of constant objects
+- array of constant objects
 
-Value
+**Value**
 
-Each entry is an object with the properties `name` and `type`, both of `string` type. The name must be a valid GLSL identifier. Entries also have an optional `default`, which can either be a `bool` or `number`, depending on the `type` of the constant. The type must be one of the types described in [table 15](#table_materialconstantstypes).
+- Each entry is an object with the properties `name` and `type`, both of `string` type. The name must be a valid GLSL identifier. Entries also have an optional `default`, which can either be a `bool` or `number`, depending on the `type` of the constant. The type must be one of the types described in [table 15](#table_materialconstantstypes).
 
-Type
+| Type  | Description                   | Default |
+| ----- | ----------------------------- | ------- |
+| int   | A signed, 32-bit GLSL int     | 0       |
+| float | A single-precision GLSL float | 0.0     |
+| bool  | A GLSL bool                   | false   |
 
-Description
-
-Default
-
-int
-
-A signed, 32 bit GLSL int
-
-0
-
-float
-
-A single-precision GLSL float
-
-0.0
-
-bool
-
-A GLSL bool
-
-false
-
-**Table 15:** Material constants types
+> **Table 15:** Material constants types
 
 Description
 
@@ -1001,11 +989,11 @@ Value
 
 `true` or `false`. Defaults to `true`.
 
-Description
+> **Description**
+>
+> When set to `true` (default value), the Y coordinate of UV attributes will be flipped when read by this material's vertex shader. Flipping is equivalent to `y = 1.0 - y`. When set to `false`, flipping is disabled and the UV attributes are read as is.
 
-When set to `true` (default value), the Y coordinate of UV attributes will be flipped when read by this material's vertex shader. Flipping is equivalent to `y = 1.0 - y`. When set to `false`, flipping is disabled and the UV attributes are read as is.
-
-```
+```cpp
 material {
     flipUV : false
 }
@@ -1318,15 +1306,15 @@ transparency : twoPassesOneSide
 
 ![screenshot_transparency_default.png](../images/screenshot_transparency_default.png)
 
-**Figure 33:** This double sided model shows the type of sorting issues transparent
+> **Figure 33:** This double sided model shows the type of sorting issues transparent
 
 ![screenshot_twopasses_oneside.png](../images/screenshot_twopasses_oneside.png)
 
-**Figure 34:** In `twoPassesOneSide` mode, only one set of faces is visible
+> **Figure 34:** In `twoPassesOneSide` mode, only one set of faces is visible
 
 ![screenshot_twopasses_twosides.png](../images/screenshot_twopasses_twosides.png)
 
-**Figure 35:** In `twoPassesTwoSides` mode, both set of faces are visible
+> **Figure 35:** In `twoPassesTwoSides` mode, both set of faces are visible
 
 ### Blending and transparency: maskThreshold
 
@@ -1613,7 +1601,7 @@ fragment {
 
 ![screenshot_transparent_shadows.jpg](../images/screenshot_transparent_shadows.jpg)
 
-**Figure 36:** Objects rendered with transparent shadows and blurry VSM with a
+> **Figure 36:** Objects rendered with transparent shadows and blurry VSM with a
 
 ### Lighting: clearCoatIorChange
 
@@ -1637,7 +1625,7 @@ When adding a clear coat layer, the change in index of refraction (IoR) is taken
 
 ![screenshot_clear_coat_ior_change.jpg](../images/screenshot_clear_coat_ior_change.jpg)
 
-**Figure 37:** The same rough metallic ball with a clear coat layer rendered
+> **Figure 37:** The same rough metallic ball with a clear coat layer rendered
 
 ### Lighting: multiBounceAmbientOcclusion
 
@@ -1661,11 +1649,11 @@ Multi-bounce ambient occlusion takes into account interreflections when applying
 
 ![screenshot_multi_bounce_ao.jpg](../images/screenshot_multi_bounce_ao.jpg)
 
-**Figure 38:** Brick texture amient occlusion map rendered with multi-bounce ambient
+> **Figure 38:** Brick texture amient occlusion map rendered with multi-bounce ambient
 
 ![screenshot_multi_bounce_ao.gif](../images/screenshot_multi_bounce_ao.gif)
 
-**Figure 39:** Brick texture rendered with multi-bounce ambient
+> **Figure 39:** Brick texture rendered with multi-bounce ambient
 
 ### Lighting: specularAmbientOcclusion
 
@@ -1689,7 +1677,7 @@ Static ambient occlusion maps and dynamic ambient occlusion (SSAO, etc.) apply t
 
 ![screenshot_specular_ao.gif](../images/screenshot_specular_ao.gif)
 
-**Figure 40:** Comparison of specular ambient occlusion on and off. The effect is
+> **Figure 40:** Comparison of specular ambient occlusion on and off. The effect is
 
 ### Anti-aliasing: specularAntiAliasing
 
@@ -2095,7 +2083,7 @@ The result can be seen in [figure 41](#figure_toonshading).
 
 ![screenshot_toon_shading.png](../images/screenshot_toon_shading.png)
 
-**Figure 41:** simple toon shading implemented with custom
+> **Figure 41:** simple toon shading implemented with custom
 
 ## Shader public APIs
 
@@ -2247,7 +2235,7 @@ The command line flags relevant to application development are described in [tab
 | **\-r**, **—reflect**        | parameters         | Outputs the specified metadata as JSON                          |
 | **\-v**, **—variant-filter** | \[variant\]        | Filters out the specified, comma-separated variants             |
 
-**Table 16:** List of `matc` flags
+> **Table 16:** List of `matc` flags
 
 `matc` offers a few other flags that are irrelevant to application developers and for internal use only.
 
