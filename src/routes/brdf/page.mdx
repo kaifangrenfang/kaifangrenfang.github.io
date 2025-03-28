@@ -981,7 +981,7 @@ The isotropic specular BRDF described previously can be modified to handle aniso
 
 $$
 \begin{equation}
-D_{aniso}(h,\alpha) = \frac{1}{\pi \alpha_t \alpha_b} \frac{1}{((\frac{t \cdot h}{\alpha_t})^2 + (\frac{b \cdot h}{\alpha_b})^2 + (\NoH)^2)^2}
+D_{aniso}(h,\alpha) = \frac{1}{\pi \alpha_t \alpha_b} \frac{1}{((\frac{t \cdot h}{\alpha_t})^2 + (\frac{b \cdot h}{\alpha_b})^2 + ( n \cdot h )^2)^2}
 \end{equation}
 $$
 
@@ -2159,21 +2159,21 @@ Now, let's substitute the fresnel term into equation [iblFV](iblFV):
 
 $$
 \begin{equation}
-F(f_0, f_{90}, \left<\VoH\right>) = f_0 (1 - F_c(\left<\VoH\right>)) + f_{90} F_c(\left<\VoH\right>) \\
-F_c(\left<\VoH\right>) = (1 - \left<\VoH\right>)^5
+F(f_0, f_{90}, \left< v \cdot h \right>) = f_0 (1 - F_c(\left< v \cdot h \right>)) + f_{90} F_c(\left< v \cdot h \right>) \\
+F_c(\left< v \cdot h \right>) = (1 - \left< v \cdot h \right>)^5
 \end{equation}
 $$
 
 $$
 \begin{equation}
-I(f(n, v, \alpha))  \equiv \frac{4}{N}\sum_i^N \left[\color{green}{f_0 (1 - F_c(\left<\VoH\right>)) + f_{90} F_c(\left<\VoH\right>)}\right] V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<n \cdot l\right> \\
+I(f(n, v, \alpha))  \equiv \frac{4}{N}\sum_i^N \left[\color{green}{f_0 (1 - F_c(\left< v \cdot h \right>)) + f_{90} F_c(\left< v \cdot h \right>)}\right] V(l_i, v, \alpha)\frac{\left< v \cdot h \right>}{\left< n \cdot h \right>} \left<n \cdot l\right> \\
 \end{equation}
 $$
 
 $$
 \begin{align*}
-I(f(n, v, \alpha))  \equiv & \color{green}{f_0   } \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left<\VoH\right>))} V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
-                    +      & \color{green}{f_{90}} \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left<\VoH\right>) } V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right>
+I(f(n, v, \alpha))  \equiv & \color{green}{f_0   } \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left< v \cdot h \right>))} V(l_i, v, \alpha)\frac{\left< v \cdot h \right>}{\left< n \cdot h \right>} \left<n \cdot l\right> \\
+                    +      & \color{green}{f_{90}} \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left< v \cdot h \right>) } V(l_i, v, \alpha)\frac{\left< v \cdot h \right>}{\left< n \cdot h \right>} \left<n \cdot l\right>
 \end{align*}
 $$
 
@@ -2181,9 +2181,9 @@ And finally, we extract the equations that can be calculated off-line (i.e.: the
 
 $$
 \begin{equation}
-DFG_1(\alpha, \left<\NoV\right>) = \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left<\VoH\right>))} V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
-DFG_2(\alpha, \left<\NoV\right>) = \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left<\VoH\right>) } V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
-I(f(n, v, \alpha))  \equiv   \color{green}{f_0} \color{red}{DFG_1(\alpha, \left<\NoV\right>)} + \color{green}{f_{90}} \color{red}{DFG_2(\alpha, \left<\NoV\right>)}
+DFG_1(\alpha, \left<n \cdot v\right>) = \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left< v \cdot h \right>))} V(l_i, v, \alpha)\frac{\left< v \cdot h \right>}{\left< n \cdot h \right>} \left<n \cdot l\right> \\
+DFG_2(\alpha, \left<n \cdot v\right>) = \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left< v \cdot h \right>) } V(l_i, v, \alpha)\frac{\left< v \cdot h \right>}{\left< n \cdot h \right>} \left<n \cdot l\right> \\
+I(f(n, v, \alpha))  \equiv   \color{green}{f_0} \color{red}{DFG_1(\alpha, \left<n \cdot v\right>)} + \color{green}{f_{90}} \color{red}{DFG_2(\alpha, \left<n \cdot v\right>)}
 \end{equation}
 $$
 
@@ -2193,9 +2193,9 @@ Putting everything back together:
 
 $$
 \begin{align*}
-\Lout(n,v,\alpha,f_0,f_{90})     &\simeq \big[ f_0 \color{red}{DFG_1( n \cdot v , \alpha)} + f_{90} \color{red}{DFG_2( n \cdot v , \alpha)} \big] \times LD(n, \alpha) \\
-DFG_1(\alpha, \left< n \cdot v \right>) &=      \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left<\VoH\right>))} V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<n \cdot l\right> \\
-DFG_2(\alpha, \left< n \cdot v \right>) &=      \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left<\VoH\right>) } V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<n \cdot l\right> \\
+L_{out}(n,v,\alpha,f_0,f_{90})     &\simeq \big[ f_0 \color{red}{DFG_1( n \cdot v , \alpha)} + f_{90} \color{red}{DFG_2( n \cdot v , \alpha)} \big] \times LD(n, \alpha) \\
+DFG_1(\alpha, \left< n \cdot v \right>) &=      \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left< v \cdot h \right>))} V(l_i, v, \alpha)\frac{\left< v \cdot h \right>}{\left< n \cdot h \right>} \left<n \cdot l\right> \\
+DFG_2(\alpha, \left< n \cdot v \right>) &=      \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left< v \cdot h \right>) } V(l_i, v, \alpha)\frac{\left< v \cdot h \right>}{\left< n \cdot h \right>} \left<n \cdot l\right> \\
 LD(n, \alpha)                    &=      \frac{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>\Lt(l_i) }{\sum_i^N \left<n \cdot l\right>}
 \end{align*}
 $$
