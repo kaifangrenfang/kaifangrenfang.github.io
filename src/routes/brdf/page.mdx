@@ -635,8 +635,8 @@ Disney's material model described in [Burley12](#citation-burley12) is a good st
 
 It is important to understand the type and range of the different parameters of our material model, described in [table 3](#table_standardparameterstypes).
 
-| Parameter             | Type and Range                          |
-| --------------------- | --------------------------------------- |
+| Parameter             | Type and Range                              |
+| --------------------- | ------------------------------------------- |
 | **BaseColor**         | Linear RGB $[0..1]$                         |
 | **Metallic**          | Scalar $[0..1]$                             |
 | **Roughness**         | Scalar $[0..1]$                             |
@@ -644,7 +644,7 @@ It is important to understand the type and range of the different parameters of 
 | **Emissive**          | Linear RGB $[0..1]$ + exposure compensation |
 | **Ambient occlusion** | Scalar $[0..1]$                             |
 
-**Table 3:** Range and type of the standard model's parameters
+> **Table 3:** Range and type of the standard model's parameters
 
 Note that the types and ranges described here are what the shader will expect. The API and/or tools UI could and should allow to specify the parameters using other types and ranges when they are more intuitive for artists.
 
@@ -698,161 +698,34 @@ $$
 
 [Table 4](#table_commonmatreflectance) describes acceptable Fresnel reflectance values for various types of materials (no real world material has a value under 2%).
 
-Material
-
-Reflectance
-
-IOR
-
-Linear value
-
-Water
-
-2%
-
-1.33
-
-0.35
-
-Fabric
-
-4% to 5.6%
-
-1.5 to 1.62
-
-0.5 to 0.59
-
-Common liquids
-
-2% to 4%
-
-1.33 to 1.5
-
-0.35 to 0.5
-
-Common gemstones
-
-5% to 16%
-
-1.58 to 2.33
-
-0.56 to 1.0
-
-Plastics, glass
-
-4% to 5%
-
-1.5 to 1.58
-
-0.5 to 0.56
-
-Other dielectric materials
-
-2% to 5%
-
-1.33 to 1.58
-
-0.35 to 0.56
-
-Eyes
-
-2.5%
-
-1.38
-
-0.39
-
-Skin
-
-2.8%
-
-1.4
-
-0.42
-
-Hair
-
-4.6%
-
-1.55
-
-0.54
-
-Teeth
-
-5.8%
-
-1.63
-
-0.6
-
-Default value
-
-4%
-
-1.5
-
-0.5
+| Material                   | Reflectance | IOR          | Linear Value |
+| -------------------------- | ----------- | ------------ | ------------ |
+| Water                      | 2%          | 1.33         | 0.35         |
+| Fabric                     | 4% to 5.6%  | 1.5 to 1.62  | 0.5 to 0.59  |
+| Common liquids             | 2% to 4%    | 1.33 to 1.5  | 0.35 to 0.5  |
+| Common gemstones           | 5% to 16%   | 1.58 to 2.33 | 0.56 to 1.0  |
+| Plastics, glass            | 4% to 5%    | 1.5 to 1.58  | 0.5 to 0.56  |
+| Other dielectric materials | 2% to 5%    | 1.33 to 1.58 | 0.35 to 0.56 |
+| Eyes                       | 2.5%        | 1.38         | 0.39         |
+| Skin                       | 2.8%        | 1.4          | 0.42         |
+| Hair                       | 4.6%        | 1.55         | 0.54         |
+| Teeth                      | 5.8%        | 1.63         | 0.6          |
+| Default value              | 4%          | 1.5          | 0.5          |
 
 **Table 4:** Reflectance of common materials (source: Real-Time Rendering 4th Edition)
 
 [Table 5](#table_fnormalmetals) lists the $f_{0}$ values for a few metals. The values are given in sRGB and must be used as the base color in our material model. Please refer to the annex, section [9.1](#toc9.1), for an explanation of how these sRGB colors are computed from measured data.
 
-Metal
-
-$f_{0}$ in sRGB
-
-Hexadecimal
-
-Color
-
-Silver
-
-0.97, 0.96, 0.91
-
-#f7f4e8
-
-Aluminum
-
-0.91, 0.92, 0.92
-
-#e8eaea
-
-Titanium
-
-0.76, 0.73, 0.69
-
-#c1baaf
-
-Iron
-
-0.77, 0.78, 0.78
-
-#c4c6c6
-
-Platinum
-
-0.83, 0.81, 0.78
-
-#d3cec6
-
-Gold
-
-1.00, 0.85, 0.57
-
-#ffd891
-
-Brass
-
-0.98, 0.90, 0.59
-
-#f9e596
-
-Copper
-
-0.97, 0.74, 0.62
-
-#f7bc9e
+| Metal    | $f_{0}$ in sRGB  | Hexadecimal | Color                                                                                             |
+| -------- | ---------------- | ----------- | ------------------------------------------------------------------------------------------------- |
+| Silver   | 0.97, 0.96, 0.91 | `#f7f4e8`   | <span style={{backgroundColor:"#f7f4e8"}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> |
+| Aluminum | 0.91, 0.92, 0.92 | `#e8eaea`   | <span style={{backgroundColor:"#e8eaea"}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> |
+| Titanium | 0.76, 0.73, 0.69 | `#c1baaf`   | <span style={{backgroundColor:"#c1baaf"}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> |
+| Iron     | 0.77, 0.78, 0.78 | `#c4c6c6`   | <span style={{backgroundColor:"#c4c6c6"}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> |
+| Platinum | 0.83, 0.81, 0.78 | `#d3cec6`   | <span style={{backgroundColor:"#d3cec6"}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> |
+| Gold     | 1.00, 0.85, 0.57 | `#ffd891`   | <span style={{backgroundColor:"#ffd891"}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> |
+| Brass    | 0.98, 0.90, 0.59 | `#f9e596`   | <span style={{backgroundColor:"#f9e596"}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> |
+| Copper   | 0.97, 0.74, 0.62 | `#f7bc9e`   | <span style={{backgroundColor:"#f7bc9e"}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> |
 
 **Table 5:** $f_{0}$ for common metals
 
@@ -879,7 +752,7 @@ $$
 [Listing 12](#listing_fnormal) shows how $f_{0}$ is computed for both dielectric and metallic materials. It shows that the color of the specular reflectance is derived from the base color in the metallic case.
 
 ```cpp
-    vec3 f0 = 0.16 * reflectance * reflectance * (1.0 - metallic) + baseColor * metallic;
+vec3 f0 = 0.16 * reflectance * reflectance * (1.0 - metallic) + baseColor * metallic;
 ```
 
 **Listing 12:** Computing $f_{0}$ for dielectric and metallic materials in GLSL
@@ -940,27 +813,27 @@ Crafting physically based materials
 
 In addition, here is a quick summary of how to use our material model:
 
-All materials
+**All materials**
 
-**Base color** should be devoid of lighting information, except for micro-occlusion.
+- **Base color** should be devoid of lighting information, except for micro-occlusion.
 
-**Metallic** is almost a binary value. Pure conductors have a metallic value of 1 and pure dielectrics have a metallic value of 0. You should try to use values close at or close to 0 and 1. Intermediate values are meant for transitions between surface types (metal to rust for instance).
+- **Metallic** is almost a binary value. Pure conductors have a metallic value of 1 and pure dielectrics have a metallic value of 0. You should try to use values close at or close to 0 and 1. Intermediate values are meant for transitions between surface types (metal to rust for instance).
 
-Non-metallic materials
+**Non-metallic materials**
 
-**Base color** represents the reflected color and should be an sRGB value in the range 50-240 (strict range) or 30-240 (tolerant range).
+- **Base color** represents the reflected color and should be an sRGB value in the range 50-240 (strict range) or 30-240 (tolerant range).
 
-**Metallic** should be 0 or close to 0.
+- **Metallic** should be 0 or close to 0.
 
-**Reflectance** should be set to 127 sRGB (0.5 linear, 4% reflectance) if you cannot find a proper value. Do not use values under 90 sRGB (0.35 linear, 2% reflectance).
+- **Reflectance** should be set to 127 sRGB (0.5 linear, 4% reflectance) if you cannot find a proper value. Do not use values under 90 sRGB (0.35 linear, 2% reflectance).
 
-Metallic materials
+**Metallic materials**
 
-**Base color** represents both the specular color and reflectance. Use values with a luminosity of 67% to 100% (170-255 sRGB). Oxidized or dirty metals should use a lower luminosity than clean metals to take into account the non-metallic components.
+- **Base color** represents both the specular color and reflectance. Use values with a luminosity of 67% to 100% (170-255 sRGB). Oxidized or dirty metals should use a lower luminosity than clean metals to take into account the non-metallic components.
 
-**Metallic** should be 1 or close to 1.
+- **Metallic** should be 1 or close to 1.
 
-**Reflectance** is ignored (calculated from the base color).
+- **Reflectance** is ignored (calculated from the base color).
 
 ## Clear coat model
 
@@ -992,10 +865,10 @@ This masking-shadowing function is not physically based, as shown in [Heitz14](#
 
 In summary, our clear coat BRDF is a Cook-Torrance specular microfacet model, with a GGX normal distribution function, a Kelemen visibility function, and a Schlick Fresnel function. [Listing 13](#listing_kelemen) shows how trivial the GLSL implementation is.
 
-```cpp
-    float V_Kelemen(float LoH) {
-        return 0.25 / (LoH * LoH);
-    }
+```glsl
+float V_Kelemen(float LoH) {
+    return 0.25 / (LoH * LoH);
+}
 ```
 
 **Listing 13:** Implementation of the Kelemen visibility term in GLSL
@@ -1024,17 +897,10 @@ Where $F_c$ is the Fresnel term of the clear coat BRDF and $f_c$ the clear coat 
 
 The clear coat material model encompasses all the parameters previously defined for the standard material mode, plus two parameters described in [table 6](#table_clearcoatparameters).
 
-Parameter
-
-Definition
-
-**ClearCoat**
-
-Strength of the clear coat layer. Scalar between 0 and 1
-
-**ClearCoatRoughness**
-
-Perceived smoothness or roughness of the clear coat layer. Scalar between 0 and 1
+| Parameter              | Definition                                                                        |
+| ---------------------- | --------------------------------------------------------------------------------- |
+| **ClearCoat**          | Strength of the clear coat layer. Scalar between 0 and 1                          |
+| **ClearCoatRoughness** | Perceived smoothness or roughness of the clear coat layer. Scalar between 0 and 1 |
 
 **Table 6:** Clear coat model parameters
 
@@ -1198,15 +1064,11 @@ The term $ \hat{\Lambda}\_v $ is the same for every light and can be computed on
 
 The anisotropic material model encompasses all the parameters previously defined for the standard material mode, plus an extra parameter described in [table 7](#table_anisotropicparameters).
 
-Parameter
+| Parameter      | Definition                                        |
+| -------------- | ------------------------------------------------- |
+| **Anisotropy** | Amount of anisotropy. Scalar between $-1$ and $1$ |
 
-Definition
-
-**Anisotropy**
-
-Amount of anisotropy. Scalar between −1 and 1
-
-**Table 7:** Anisotropic model parameters
+> **Table 7:** Anisotropic model parameters
 
 No further remapping is required. Note that negative values will align the anisotropy with the bitangent direction instead of the tangent direction. [Figure 28](#figure_anisotropyparameter) shows how the anisotropy parameter affect the appearance of a rough metallic surface.
 
@@ -1368,19 +1230,12 @@ The complete implementation of our cloth BRDF, including sheen color and optiona
 
 The cloth material model encompasses all the parameters previously defined for the standard material mode except for _metallic_ and _reflectance_. Two extra parameters described in [table 8](#table_clothparameters) are also available.
 
-Parameter
+| Parameter           | Definition                                                                                             |
+| ------------------- | ------------------------------------------------------------------------------------------------------ |
+| **SheenColor**      | Specular tint to create two-tone specular fabrics (defaults to 0.04 to match the standard reflectance) |
+| **SubsurfaceColor** | Tint for the diffuse color after scattering and absorption through the material                        |
 
-Definition
-
-**SheenColor**
-
-Specular tint to create two-tone specular fabrics (defaults to 0.04 to match the standard reflectance)
-
-**SubsurfaceColor**
-
-Tint for the diffuse color after scattering and absorption through the material
-
-**Table 8:** Cloth model parameters
+> **Table 8:** Cloth model parameters
 
 To create a velvet-like material, the base color can be set to black (or a dark color). Chromaticity information should instead be set on the sheen color. To create more common fabrics such as denim, cotton, etc. use the base color for chromaticity and use the default sheen color or set the sheen color to the luminance of the base color.
 
@@ -1402,55 +1257,17 @@ Our goal is therefore to make all lighting correct by default, while giving arti
 
 The following sections will discuss how to implement various types of lights and the proposed equations make use of different symbols and units summarized in [table 9](#table_lightunits).
 
-Photometric term
+| Photometric Term    | Notation | Unit                              |
+| ------------------- | -------- | --------------------------------- |
+| Luminous power      | $\Phi$   | Lumen ($lm$)                      |
+| Luminous intensity  | $I$      | Candela ($cd$) or $\frac{lm}{sr}$ |
+| Illuminance         | $E$      | Lux ($lx$) or $\frac{lm}{m^2}$    |
+| Luminance           | $L$      | Nit ($nt$) or $\frac{cd}{m^2}$    |
+| Radiant power       | $\Phi_e$ | Watt ($W$)                        |
+| Luminous efficacy   | $\eta$   | Lumens per watt ($\frac{lm}{W}$)  |
+| Luminous efficiency | $V$      | Percentage (%)                    |
 
-Notation
-
-Unit
-
-Luminous power
-
-$\Phi$
-
-Lumen ($lm$)
-
-Luminous intensity
-
-$I$
-
-Candela ($cd$) or $\frac{lm}{sr}$
-
-Illuminance
-
-$E$
-
-Lux ($lx$) or $\frac{lm}{m^2}$
-
-Luminance
-
-$L$
-
-Nit ($nt$) or $\frac{cd}{m^2}$
-
-Radiant power
-
-$\Phi_e$
-
-Watt ($W$)
-
-Luminous efficacy
-
-$\eta$
-
-Lumens per watt ($\frac{lm}{W}$)
-
-Luminous efficiency
-
-$V$
-
-Percentage (%)
-
-**Table 9:** Photometric units
+> **Table 9:** Photometric units
 
 To get properly coherent lighting, we must use light units that respect the ratio between various light intensities found in real-world scenes. These intensities can vary greatly, from around 800 $lm$ for a household light bulb to 120,000 $lx$ for a daylight sky and sun illumination.
 
@@ -1458,39 +1275,17 @@ The easiest way to achieve lighting coherency is to adopt physical light units. 
 
 [Table 10](#table_lighttypesunits) shows the light unit associated with each type of light we intend to support.
 
-Light type
+| Light Type               | Unit                                   |
+| ------------------------ | -------------------------------------- |
+| Directional light        | Illuminance ($lx$ or $\frac{lm}{m^2}$) |
+| Point light              | Luminous power ($lm$)                  |
+| Spot light               | Luminous power ($lm$)                  |
+| Photometric light        | Luminous intensity ($cd$)              |
+| Masked photometric light | Luminous power ($lm$)                  |
+| Area light               | Luminous power ($lm$)                  |
+| Image based light        | Luminance ($\frac{cd}{m^2}$)           |
 
-Unit
-
-Directional light
-
-Illuminance ($lx$ or $\frac{lm}{m^2}$)
-
-Point light
-
-Luminous power ($lm$)
-
-Spot light
-
-Luminous power ($lm$)
-
-Photometric light
-
-Luminous intensity ($cd$)
-
-Masked photometric light
-
-Luminous power ($lm$)
-
-Area light
-
-Luminous power ($lm$)
-
-Image based light
-
-Luminance ($\frac{cd}{m^2}$)
-
-**Table 10:** Intensity unity for each light type
+> **Table 10:** Intensity unity for each light type
 
 **Notes about the radiant power unit**
 
@@ -1510,31 +1305,13 @@ $$
 
 [Table 11](#table_lighttypesefficacy) can be used as a reference to convert watts to lumens using either the luminous efficacy or the luminous efficiency of various types of lights. More specific values are available on Wikipedia's [luminous efficacy](http://en.wikipedia.org/wiki/Luminous_efficacy) page.
 
-Light type
+| Light Type   | Efficacy $\eta$ ($\frac{lm}{W}$) | Efficiency $V$ (%) |
+| ------------ | -------------------------------- | ------------------ |
+| Incandescent | 14-35                            | 2-5%               |
+| LED          | 28-100                           | 4-15%              |
+| Fluorescent  | 60-100                           | 9-15%              |
 
-Efficacy $\eta$
-
-Efficiency $V$
-
-Incandescent
-
-14-35
-
-2-5%
-
-LED
-
-28-100
-
-4-15%
-
-Fluorescent
-
-60-100
-
-9-15%
-
-**Table 11:** Efficacy and efficiency of various light types
+> **Table 11:** Efficacy and efficiency of various light types
 
 ### Light units validation
 
@@ -1598,50 +1375,24 @@ In the simplified luminance equation [directionalLuminanceEquation](directionalL
 
 [Table 12](#table_sunskyilluminance) provides useful reference values for the sun and sky illumination, measured[3](#endnote-illuminancemeasures) on a clear day in March, in California.
 
-Light
+| Light                     | 10am    | 12pm    | 5:30pm |
+| ------------------------- | ------- | ------- | ------ |
+| $Sky_{\bot} + Sun_{\bot}$ | 120,000 | 130,000 | 90,000 |
+| $Sky_{\bot}$              | 20,000  | 25,000  | 9,000  |
+| $Sun_{\bot}$              | 100,000 | 105,000 | 81,000 |
 
-10am
-
-12pm
-
-5:30pm
-
-$Sky_{\bot} + Sun_{\bot}$
-
-120,000
-
-130,000
-
-90,000
-
-$Sky_{\bot}$
-
-20,000
-
-25,000
-
-9,000
-
-$Sun_{\bot}$
-
-100,000
-
-105,000
-
-81,000
-
-**Table 12:** Illuminance values in $lx$ (a full moon has an illuminance of 1 $lx$)
+> **Table 12:** Illuminance values in $lx$ (a full moon has an illuminance of 1 $lx$)
 
 Dynamic directional lights are particularly cheap to evaluate at runtime, as shown in [listing 20](#listing_glsldirectionallight).
 
-```cpp
-    vec3 l = normalize(-lightDirection);
-    float NoL = clamp(dot(n, l), 0.0, 1.0);
+```glsl
+vec3 l = normalize(-lightDirection);
+float NoL = clamp(dot(n, l), 0.0, 1.0);
 
-    // lightIntensity is the illuminance
-    // at perpendicular incidence in lux
-    float illuminance = lightIntensity * NoL;
-    vec3 luminance = BSDF(v, l) * illuminance;
+// lightIntensity is the illuminance
+// at perpendicular incidence in lux
+float illuminance = lightIntensity * NoL;
+vec3 luminance = BSDF(v, l) * illuminance;
 ```
 
 **Listing 20:** Implementation of directional lights in GLSL
@@ -1923,59 +1674,22 @@ Similarly to the parameterization of the standard material model, our goal is to
 
 The full list of light parameters is presented in [table 13](#table_lightparameters).
 
-Parameter
+| Parameter                  | Definition                                                                                                                                                                                                                                                                                                                               |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Type**                   | Directional, point, spot, or area                                                                                                                                                                                                                                                                                                        |
+| **Direction**              | Used for directional lights, spot lights, photometric point lights, and linear and tubular area lights (orientation)                                                                                                                                                                                                                     |
+| **Color**                  | The color of emitted light, as a linear RGB color. Can be specified as an sRGB color or a color temperature in the tools                                                                                                                                                                                                                 |
+| **Intensity**              | The light's brightness. The unit depends on the type of light                                                                                                                                                                                                                                                                            |
+| **Falloff radius**         | Maximum distance of influence                                                                                                                                                                                                                                                                                                            |
+| **Inner angle**            | Angle of the inner cone for spot lights, in degrees                                                                                                                                                                                                                                                                                      |
+| **Outer angle**            | Angle of the outer cone for spot lights, in degrees                                                                                                                                                                                                                                                                                      |
+| **Length**                 | Length of the area light, used to create linear or tubular lights                                                                                                                                                                                                                                                                        |
+| **Radius**                 | Radius of the area light, used to create spherical or tubular lights                                                                                                                                                                                                                                                                     |
+| **Photometric profile**    | Texture representing a photometric light profile, works only for punctual lights                                                                                                                                                                                                                                                         |
+| **Masked profile**         | Boolean indicating whether the IES profile is used as a mask or not. When used as a mask, the light's brightness will be multiplied by the ratio between the user-specified intensity and the integrated IES profile intensity. When not used as a mask, the user-specified intensity is ignored, but the IES multiplier is used instead |
+| **Photometric multiplier** | Brightness multiplier for photometric lights (if IES as mask is turned off)                                                                                                                                                                                                                                                              |
 
-Definition
-
-**Type**
-
-Directional, point, spot or area
-
-**Direction**
-
-Used for directional lights, spot lights, photometric point lights, and linear and tubular area lights (orientation)
-
-**Color**
-
-The color of emitted light, as a linear RGB color. Can be specified as an sRGB color or a color temperature in the tools
-
-**Intensity**
-
-The light's brightness. The unit depends on the type of light
-
-**Falloff radius**
-
-Maximum distance of influence
-
-**Inner angle**
-
-Angle of the inner cone for spot lights, in degrees
-
-**Outer angle**
-
-Angle of the outer cone for spot lights, in degrees
-
-**Length**
-
-Length of the area light, used to create linear or tubular lights
-
-**Radius**
-
-Radius of the area light, used to create spherical or tubular lights
-
-**Photometric profile**
-
-Texture representing a photometric light profile, works only for punctual lights
-
-**Masked profile**
-
-Boolean indicating whether the IES profile is used as a mask or not. When used as a mask, the light's brightness will be multiplied by the ratio between the user specified intensity and the integrated IES profile intensity. When not used as a mask, the user specified intensity is ignored but the IES multiplier is used instead
-
-**Photometric multiplier**
-
-Brightness multiplier for photometric lights (if IES as mask is turned off)
-
-**Table 13:** Light types parameters
+> **Table 13:** Light types parameters
 
 **Note**: to simplify the implementation, all luminous powers will converted to luminous intensities ($cd$) before being sent to the shader. The conversion is light dependent and is explained in the previous sections.
 
