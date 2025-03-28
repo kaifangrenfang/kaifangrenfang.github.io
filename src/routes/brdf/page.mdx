@@ -73,7 +73,7 @@ The equations found throughout this document use the symbols described in [table
 | $ \left< n \cdot l \right> $ | Dot product clamped to $[0..1]$                            |
 | $ \left< a \right> $         | Saturated value (clamped to $[0..1]$)                      |
 
-**Table 1:** Symbols definitions
+> **Table 1:** Symbols definitions
 
 # Material system
 
@@ -208,7 +208,7 @@ $$
 
 The GLSL implementation of the NDF, shown in [listing 1](#listing_speculard), is simple and efficient.
 
-```cpp
+```glsl
     float D_GGX(float NoH, float roughness) {
         float a = NoH * roughness;
         float k = roughness / (1.0 - NoH * NoH + a * a);
@@ -216,7 +216,7 @@ The GLSL implementation of the NDF, shown in [listing 1](#listing_speculard), is
     }
 ```
 
-**Listing 1:** Implementation of the specular D term in GLSL
+> **Listing 1:** Implementation of the specular D term in GLSL
 
 We can improve this implementation by using half precision floats. This optimization requires changes to the original equation as there are two problems when computing $1 - (n \cdot h)^2$ in half-floats. First, this computation suffers from floating point cancellation when $(n \cdot h)^2$ is close to 1 (highlights). Secondly $n \cdot h$ does not have enough precision around 1.
 
@@ -228,7 +228,7 @@ $$
 
 Since both $n$ and $h$ are unit vectors, $|n \times h|^2 = 1 - (n \cdot h)^2$. This allows us to compute $1 - (n \cdot h)^2$ directly with half precision floats by using a simple cross product. [Listing 2](#listing_speculardfp16) shows the final optimized implementation.
 
-```cpp
+```glsl
     #define MEDIUMP_FLT_MAX    65504.0
     #define saturateMediump(x) min(x, MEDIUMP_FLT_MAX)
 
@@ -241,7 +241,7 @@ Since both $n$ and $h$ are unit vectors, $|n \times h|^2 = 1 - (n \cdot h)^2$. T
     }
 ```
 
-**Listing 2:** Implementation of the specular D term in GLSL optimized for fp16
+> **Listing 2:** Implementation of the specular D term in GLSL optimized for fp16
 
 ### Geometric shadowing (specular G)
 
@@ -305,7 +305,7 @@ $$
 
 The GLSL implementation of the visibility term, shown in [listing 3](#listing_specularv), is a bit more expensive than we would like since it requires two `sqrt` operations.
 
-```cpp
+```glsl
     float V_SmithGGXCorrelated(float NoV, float NoL, float roughness) {
         float a2 = roughness * roughness;
         float GGXV = NoL * sqrt(NoV * NoV * (1.0 - a2) + a2);
@@ -314,7 +314,7 @@ The GLSL implementation of the visibility term, shown in [listing 3](#listing_sp
     }
 ```
 
-**Listing 3:** Implementation of the specular V term in GLSL
+> **Listing 3:** Implementation of the specular V term in GLSL
 
 We can optimize this visibility function by using an approximation after noticing that all the terms under the square roots are squares and that all the terms are in the $0..1$ range:
 
@@ -324,7 +324,7 @@ $$
 
 This approximation is mathematically wrong but saves two square root operations and is good enough for real-time mobile applications, as shown in [listing 4](#listing_approximatedspecularv).
 
-```cpp
+```glsl
     float V_SmithGGXCorrelatedFast(float NoV, float NoL, float roughness) {
         float a = roughness;
         float GGXV = NoL * (NoV * (1.0 - a) + a);
@@ -333,7 +333,7 @@ This approximation is mathematically wrong but saves two square root operations 
     }
 ```
 
-**Listing 4:** Implementation of the approximated specular V term in GLSL
+> **Listing 4:** Implementation of the approximated specular V term in GLSL
 
 [Hammon17](#citation-hammon17) proposes the same approximation based on the same observation that the square root can be removed. It does so by rewriting the expressions as _lerps_:
 
@@ -359,26 +359,26 @@ $$
 
 The constant $f_{0}$ represents the specular reflectance at normal incidence and is achromatic for dielectrics, and chromatic for metals. The actual value depends on the index of refraction of the interface. The GLSL implementation of this term requires the use of a `pow`, as shown in [listing 5](#listing_specularf), which can be replaced by a few multiplications.
 
-```cpp
+```glsl
     vec3 F_Schlick(float u, vec3 f0, float f90) {
         return f0 + (vec3(f90) - f0) * pow(1.0 - u, 5.0);
     }
 ```
 
-**Listing 5:** Implementation of the specular F term in GLSL
+> **Listing 5:** Implementation of the specular F term in GLSL
 
 This Fresnel function can be seen as interpolating between the incident specular reflectance and the reflectance at grazing angles, represented here by $f_{90}$. Observation of real world materials show that both dielectrics and conductors exhibit achromatic specular reflectance at grazing angles and that the Fresnel reflectance is 1.0 at 90°. A more correct $f_{90}$ is discussed in section [5.6.2](#toc5.6.2).
 
 Using $f_{90}$ set to 1, the Schlick approximation for the Fresnel term can be optimized for scalar operations by refactoring the code slightly. The result is shown in [listing 6](#listing_scalarspecularf).
 
-```cpp
+```glsl
     vec3 F_Schlick(float u, vec3 f0) {
         float f = pow(1.0 - u, 5.0);
         return f + f0 * (1.0 - f);
     }
 ```
 
-**Listing 6:** Scalar optimization of the specular F term in GLSL
+> **Listing 6:** Scalar optimization of the specular F term in GLSL
 
 ## Diffuse BRDF
 
@@ -396,7 +396,7 @@ $$
 
 In practice, the diffuse reflectance $\sigma$ is multiplied later, as shown in [listing 8](#listing_diffusebrdf).
 
-```cpp
+```glsl
     float Fd_Lambert() {
         return 1.0 / PI;
     }
@@ -404,7 +404,7 @@ In practice, the diffuse reflectance $\sigma$ is multiplied later, as shown in [
     vec3 Fd = diffuseColor * Fd_Lambert();
 ```
 
-**Listing 7:** Implementation of the diffuse Lambertian BRDF in GLSL
+> **Listing 7:** Implementation of the diffuse Lambertian BRDF in GLSL
 
 The Lambertian BRDF is obviously extremely efficient and delivers results close enough to more complex models.
 
@@ -422,7 +422,7 @@ $$
  f_{90}=0.5 + 2 \cdot \alpha cos^2(\theta_d)
 $$
 
-```cpp
+```glsl
 float F_Schlick(float u, float f0, float f90) {
     return f0 + (f90 - f0) * pow(1.0 - u, 5.0);
 }
@@ -435,7 +435,7 @@ float Fd_Burley(float NoV, float NoL, float LoH, float roughness) {
 }
 ```
 
-**Listing 8:** Implementation of the diffuse Disney BRDF in GLSL
+> **Listing 8:** Implementation of the diffuse Disney BRDF in GLSL
 
 [Figure 11](#figure_lambert_vs_disney) shows a comparison between a simple Lambertian diffuse BRDF and the higher quality Disney diffuse BRDF, using a fully rough dielectric material. For comparison purposes, the right sphere was mirrored. The surface response is very similar with both BRDFs but the Disney one exhibits some nice retro-reflections at grazing angles (look closely at the left edge of the spheres).
 
@@ -453,7 +453,7 @@ We could allow artists/developers to choose the Disney diffuse BRDF depending on
 
 The full GLSL implementation of the standard model is shown in [listing 9](#listing_glslbrdf).
 
-```cpp
+```glsl
     float D_GGX(float NoH, float a) {
         float a2 = a * a;
         float f = (NoH * a2 - NoH) * NoH + 1.0;
@@ -500,7 +500,7 @@ The full GLSL implementation of the standard model is shown in [listing 9](#list
     }
 ```
 
-**Listing 9:** Evaluation of the BRDF in GLSL
+> **Listing 9:** Evaluation of the BRDF in GLSL
 
 ## Improving the BRDFs
 
@@ -596,13 +596,13 @@ $$
 
 We can implement specular energy compensation at a negligible cost if we store $r$ in the DFG lookup table presented in section [5.3](#toc5.3). [Listing 10](#listing_energycompensationimpl) shows that the implementation is a direct conversion of equation [scaledEnergyCompensationLobe](scaledEnergyCompensationLobe).
 
-```cpp
+```glsl
     vec3 energyCompensation = 1.0 + f0 * (1.0 / dfg.y - 1.0);
     // Scale the specular lobe to account for multiscattering
     Fr *= pixel.energyCompensation;
 ```
 
-**Listing 10:** Implementation of the energy compensation specular lobe
+> **Listing 10:** Implementation of the energy compensation specular lobe
 
 Please refer to section [5.3](#toc5.3) and section [5.3.4.7](#toc5.3.4.7) to learn how the DFG lookup table is derived and computed.
 
@@ -623,7 +623,7 @@ Disney's material model described in [Burley12](#citation-burley12) is a good st
 | **Emissive**          | Additional diffuse albedo to simulate emissive surfaces (such as neons, etc.). This parameter is mostly useful in an HDR pipeline with a bloom pass                                                                  |
 | **Ambient occlusion** | Defines how much of the ambient light is accessible to a surface point. It is a per-pixel shadowing factor between 0.0 and 1.0. This parameter will be discussed in more detail in the [lighting](#lighting) section |
 
-**Table 2:** Parameters of the standard model
+> **Table 2:** Parameters of the standard model
 
 [Figure 17](#figure_material_parameters) shows how the metallic, roughness and reflectance parameters affect the appearance of a surface.
 
@@ -662,11 +662,11 @@ The base color of a material is affected by the “metallicness” of said mater
 
 The lighting equations must therefore use the diffuse color and $f_{0}$ instead of the base color. The diffuse color can easily be computed from the base color, as show in [listing 11](#listing_basecolortodiffuse).
 
-```cpp
+```glsl
     vec3 diffuseColor = (1.0 - metallic) * baseColor.rgb;
 ```
 
-**Listing 11:** Conversion of base color to diffuse in GLSL
+> **Listing 11:** Conversion of base color to diffuse in GLSL
 
 #### Reflectance remapping
 
@@ -712,7 +712,7 @@ $$
 | Teeth                      | 5.8%        | 1.63         | 0.6          |
 | Default value              | 4%          | 1.5          | 0.5          |
 
-**Table 4:** Reflectance of common materials (source: Real-Time Rendering 4th Edition)
+> **Table 4:** Reflectance of common materials (source: Real-Time Rendering 4th Edition)
 
 [Table 5](#table_fnormalmetals) lists the $f_{0}$ values for a few metals. The values are given in sRGB and must be used as the base color in our material model. Please refer to the annex, section [9.1](#toc9.1), for an explanation of how these sRGB colors are computed from measured data.
 
@@ -727,7 +727,7 @@ $$
 | Brass    | 0.98, 0.90, 0.59 | `#f9e596`   | <span style={{backgroundColor:"#f9e596"}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> |
 | Copper   | 0.97, 0.74, 0.62 | `#f7bc9e`   | <span style={{backgroundColor:"#f7bc9e"}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> |
 
-**Table 5:** $f_{0}$ for common metals
+> **Table 5:** $f_{0}$ for common metals
 
 All materials have a Fresnel reflectance of 100% at grazing angles so we will set $f_{90}$ in the following way when evaluating the specular BRDF $f_r$:
 
@@ -751,11 +751,11 @@ $$
 
 [Listing 12](#listing_fnormal) shows how $f_{0}$ is computed for both dielectric and metallic materials. It shows that the color of the specular reflectance is derived from the base color in the metallic case.
 
-```cpp
+```glsl
 vec3 f0 = 0.16 * reflectance * reflectance * (1.0 - metallic) + baseColor * metallic;
 ```
 
-**Listing 12:** Computing $f_{0}$ for dielectric and metallic materials in GLSL
+> **Listing 12:** Computing $f_{0}$ for dielectric and metallic materials in GLSL
 
 #### Roughness remapping and clamping
 
@@ -871,7 +871,7 @@ float V_Kelemen(float LoH) {
 }
 ```
 
-**Listing 13:** Implementation of the Kelemen visibility term in GLSL
+> **Listing 13:** Implementation of the Kelemen visibility term in GLSL
 
 **Note on the Fresnel term**
 
@@ -902,7 +902,7 @@ The clear coat material model encompasses all the parameters previously defined 
 | **ClearCoat**          | Strength of the clear coat layer. Scalar between 0 and 1                          |
 | **ClearCoatRoughness** | Perceived smoothness or roughness of the clear coat layer. Scalar between 0 and 1 |
 
-**Table 6:** Clear coat model parameters
+> **Table 6:** Clear coat model parameters
 
 The clear coat roughness parameter is remapped and clamped in a similar way to the roughness parameter of the standard material.
 
@@ -918,7 +918,7 @@ The clear coat roughness parameter is remapped and clamped in a similar way to t
 
 [Listing 14](#listing_clearcoatbrdf) shows the GLSL implementation of the clear coat material model after remapping, parameterization and integration in the standard surface response.
 
-```cpp
+```glsl
     void BRDF(...) {
         // compute Fd and Fr from standard model
 
@@ -937,7 +937,7 @@ The clear coat roughness parameter is remapped and clamped in a similar way to t
     }
 ```
 
-**Listing 14:** Implementation of the clear coat BRDF in GLSL
+> **Listing 14:** Implementation of the clear coat BRDF in GLSL
 
 ### Base layer modification
 
@@ -1003,7 +1003,7 @@ Note that this NDF requires the tangent and bitangent directions in addition to 
 
 The resulting implementation is described in [listing 15](#listing_anisotropicbrdf).
 
-```cpp
+```glsl
     float at = max(roughness * (1.0 + anisotropy), 0.001);
     float ab = max(roughness * (1.0 - anisotropy), 0.001);
 
@@ -1019,7 +1019,7 @@ The resulting implementation is described in [listing 15](#listing_anisotropicbr
     }
 ```
 
-**Listing 15:** Implementation of Burley's anisotropic NDF in GLSL
+> **Listing 15:** Implementation of Burley's anisotropic NDF in GLSL
 
 In addition, [Heitz14](#citation-heitz14) presents an anisotropic masking-shadowing function to match the height-correlated GGX distribution. The masking-shadowing term can be greatly simplified by using the visibility function instead:
 
@@ -1045,7 +1045,7 @@ $$
 
 The term $ \hat{\Lambda}\_v $ is the same for every light and can be computed only once if needed. The resulting implementation is described in [listing 16](#listing_anisotropicv).
 
-```cpp
+```glsl
     float at = max(roughness * (1.0 + anisotropy), 0.001);
     float ab = max(roughness * (1.0 - anisotropy), 0.001);
 
@@ -1058,7 +1058,7 @@ The term $ \hat{\Lambda}\_v $ is the same for every light and can be computed on
     }
 ```
 
-**Listing 16:** Implementation of the anisotropic visibility function in GLSL
+> **Listing 16:** Implementation of the anisotropic visibility function in GLSL
 
 ### Anisotropic parameterization
 
@@ -1130,7 +1130,7 @@ $$
 
 The implementation of the velvet NDF is presented in [listing 17](#listing_clothbrdf), optimized to properly fit in half float formats and to avoid computing a costly cotangent, relying instead on trigonometric identities. Note that we removed the Fresnel component from this BRDF.
 
-```cpp
+```glsl
     float D_Ashikhmin(float roughness, float NoH) {
         // Ashikhmin 2007, "Distribution-based BRDFs"
      float a2 = roughness * roughness;
@@ -1142,7 +1142,7 @@ The implementation of the velvet NDF is presented in [listing 17](#listing_cloth
     }
 ```
 
-**Listing 17:** Implementation of Ashikhmin's velvet NDF in GLSL
+> **Listing 17:** Implementation of Ashikhmin's velvet NDF in GLSL
 
 In [Estevez17](#citation-estevez17) Estevez and Kulla propose a different NDF (called the “Charlie” sheen) that is based on an exponentiated sinusoidal instead of an inverted Gaussian. This NDF is appealing for several reasons: its parameterization feels more natural and intuitive, it provides a softer appearance and, as shown in equation [charlieNDF](charlieNDF), its implementation is simpler:
 
@@ -1152,7 +1152,7 @@ $$
 
 [Estevez17](#citation-estevez17) also presents a new shadowing term that we omit here because of its cost. We instead rely on the visibility term from [Neubelt13](#citation-neubelt13) (shown in equation [clothSpecularBRDF](clothSpecularBRDF) above). The implementation of this NDF is presented in [listing 18](#listing_clothcharliebrdf), optimized to properly fit in half float formats.
 
-```cpp
+```glsl
     float D_Charlie(float roughness, float NoH) {
         // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
         float invAlpha  = 1.0 / roughness;
@@ -1162,7 +1162,7 @@ $$
     }
 ```
 
-**Listing 18:** Implementation of the “Charlie” NDF in GLSL
+> **Listing 18:** Implementation of the “Charlie” NDF in GLSL
 
 #### Sheen color
 
@@ -1198,7 +1198,7 @@ Where $w$ is a value between 0 and 1 defining by how much the diffuse light shou
 
 The complete implementation of our cloth BRDF, including sheen color and optional subsurface scattering, can be found in [listing 19](#listing_clothfullbrdf).
 
-```cpp
+```glsl
     // specular BRDF
     float D = distributionCloth(roughness, NoH);
     float V = visibilityCloth(NoV, NoL);
@@ -1224,7 +1224,7 @@ The complete implementation of our cloth BRDF, including sheen color and optiona
     #endif
 ```
 
-**Listing 19:** Implementation of our cloth BRDF in GLSL
+> **Listing 19:** Implementation of our cloth BRDF in GLSL
 
 ### Cloth parameterization
 
@@ -1395,7 +1395,7 @@ float illuminance = lightIntensity * NoL;
 vec3 luminance = BSDF(v, l) * illuminance;
 ```
 
-**Listing 20:** Implementation of directional lights in GLSL
+> **Listing 20:** Implementation of directional lights in GLSL
 
 [Figure 35](#figure_directionallighttest) shows the effect of lighting a simple scene with a directional light setup to approximate a midday Sun (illuminance set to 110,000 $lx$). For illustration purposes, only direct lighting is shown.
 
@@ -1526,7 +1526,7 @@ $$
 
 [Listing 21](#listing_glslpunctuallight) demonstrates how to implement physically based punctual lights in GLSL. Note that the light intensity used in this piece of code is the luminous intensity $I$ in $cd$, converted from the luminous power CPU-side. This snippet is not optimized and some of the computations can be offloaded to the CPU (for instance the square of the light's inverse falloff radius, or the spot scale and angle).
 
-```cpp
+```glsl
     float getSquareFalloffAttenuation(vec3 posToLight, float lightInvRadius) {
         float distanceSquare = dot(posToLight, posToLight);
         float factor = distanceSquare * lightInvRadius * lightInvRadius;
@@ -1560,7 +1560,7 @@ $$
     }
 ```
 
-**Listing 21:** Implementation of punctual lights in GLSL
+> **Listing 21:** Implementation of punctual lights in GLSL
 
 ### Photometric lights
 
@@ -1616,7 +1616,7 @@ The term $ \Psi(l) $ is the photometric attenuation function. It depends on the 
 
 The photometric attenuation function can be easily implemented in GLSL by adding a new attenuation factor to the implementation of punctual lights ([listing 21](#listing_glslpunctuallight)). The modified implementation is show in [listing 22](#listing_glslphotometricpunctuallight).
 
-```cpp
+```glsl
     float getPhotometricAttenuation(vec3 posToLight, vec3 lightDir) {
         float cosTheta = dot(-posToLight, lightDir);
         float angle = acos(cosTheta) * (1.0 / PI);
@@ -1638,11 +1638,11 @@ The photometric attenuation function can be easily implemented in GLSL by adding
     }
 ```
 
-**Listing 22:** Implementation of attenuation from photometric profiles in GLSL
+> **Listing 22:** Implementation of attenuation from photometric profiles in GLSL
 
 The light intensity is computed CPU-side ([listing 23](#listing_photometriclightintensity)) and depends on whether the photometric profile is used as a mask.
 
-```cpp
+```glsl
     float multiplier;
     // Photometric profile used as a mask
     if (photometricLight.isMasked()) {
@@ -1660,7 +1660,7 @@ The light intensity is computed CPU-side ([listing 23](#listing_photometriclight
     float lightIntensity = photometricLight.getMaxIntensity() * multiplier;
 ```
 
-**Listing 23:** Computing the intensity of a photometric light on the CPU
+> **Listing 23:** Computing the intensity of a photometric light on the CPU
 
 4 The XArrow profile declares a luminous intensity of 1,750 lm but a Monte-Carlo integration shows an intensity of only 350 lm.
 
@@ -1773,77 +1773,26 @@ For reference, [figure 47](#figure_colortemperaturescalecctclamped) shows the ra
 
 [Table 14](#table_colortemperaturesamples) presents the correlated color temperature of various common light sources as sRGB color swatches. These colors are relative to the $ D\_{65} $ white point, so their perceived hue might vary based on your display's white point. See [What colour is the Sun?](http://jila.colorado.edu/~ajsh/colour/Tspectrum.html) for more information.
 
-Temperature (K)
+| Temperature (K) | Light Source                 | Color |
+| --------------- | ---------------------------- | ----- |
+| 1,700-1,800     | Match flame                  |       |
+| 1,850-1,930     | Candle flame                 |       |
+| 2,000-3,000     | Sun at sunrise/sunset        |       |
+| 2,500-2,900     | Household tungsten lightbulb |       |
+| 3,000           | Tungsten lamp 1K             |       |
+| 3,200-3,500     | Quartz lights                |       |
+| 3,200-3,700     | Fluorescent lights           |       |
+| 3,275           | Tungsten lamp 2K             |       |
+| 3,380           | Tungsten lamp 5K, 10K        |       |
+| 5,000-5,400     | Sun at noon                  |       |
+| 5,500-6,500     | Daylight (sun + sky)         |       |
+| 5,500-6,500     | Sun through clouds/haze      |       |
+| 6,000-7,500     | Overcast sky                 |       |
+| 6,500           | RGB monitor white point      |       |
+| 7,000-8,000     | Shaded areas outdoors        |       |
+| 8,000-10,000    | Partly cloudy sky            |       |
 
-Light source
-
-Color
-
-1,700-1,800
-
-Match flame
-
-1,850-1,930
-
-Candle flame
-
-2,000-3,000
-
-Sun at sunrise/sunset
-
-2,500-2,900
-
-Household tungsten lightbulb
-
-3,000
-
-Tungsten lamp 1K
-
-3,200-3,500
-
-Quartz lights
-
-3,200-3,700
-
-Fluorescent lights
-
-3,275
-
-Tungsten lamp 2K
-
-3,380
-
-Tungsten lamp 5K, 10K
-
-5,000-5,400
-
-Sun at noon
-
-5,500-6,500
-
-Daylight (sun + sky)
-
-5,500-6,500
-
-Sun through clouds/haze
-
-6,000-7,500
-
-Overcast sky
-
-6,500
-
-RGB monitor white point
-
-7,000-8,000
-
-Shaded areas outdoors
-
-8,000-10,000
-
-Partly cloudy sky
-
-**Table 14:** Normalized correlated color temperatures for common light sources
+> **Table 14:** Normalized correlated color temperatures for common light sources
 
 ### Pre-exposed lights
 
@@ -1851,11 +1800,11 @@ Physically based rendering and physical light units pose an interesting challeng
 
     fragColor = luminance * camera.exposure;
 
-**Listing 24:** The output of the lighting pass is pre-exposed to fit in half-float buffers
+> **Listing 24:** The output of the lighting pass is pre-exposed to fit in half-float buffers
 
 This solution solves the storage problem but requires intermediate computations to be performed with single precision floats. We would instead prefer to perform all (or at least most) of the lighting work using half precision floats instead. Doing so can greatly improve performance and power usage, particularly on mobile devices. Half precision floats are however ill-suited for this kind of work as common illuminance and luminance values (for the sun for instance) can exceed their range. The solution is to simply pre-expose the lights themselves instead of the result of the lighting pass. This can be done efficiently on the CPU if updating a light's constant buffer is cheap. This can also be done on the GPU, as shown in [listing 25](#listing_preexposedlights).
 
-```cpp
+```glsl
     // The inputs must be highp/single precision,
     // both for range (intensity) and precision (exposure)
     // The output is mediump/half precision
@@ -1878,7 +1827,7 @@ This solution solves the storage problem but requires intermediate computations 
     }
 ```
 
-**Listing 25:** Pre-exposing lights allows the entire shading pipeline to use half precision floats
+> **Listing 25:** Pre-exposing lights allows the entire shading pipeline to use half precision floats
 
 In practice we pre-expose the following lights:
 
@@ -2000,7 +1949,7 @@ In practice only 4 or 9 coefficients (i.e.: 2 or 3 bands) are enough for $\left<
 
 In practice we pre-convolve $L_{\bot}$ with $\left< \cos \theta \right> $ and pre-scale these coefficients by the basis scaling factors $K_l^m$ so that the reconstruction code is as simple as possible in the shader:
 
-```cpp
+```glsl
     vec3 irradianceSH(vec3 n) {
         // uniform vec3 sphericalHarmonics[9]
         // We can use only the first 2 bands for better performance
@@ -2017,7 +1966,7 @@ In practice we pre-convolve $L_{\bot}$ with $\left< \cos \theta \right> $ and pr
     }
 ```
 
-**Listing 26:** GLSL code to reconstruct the irradiance from the pre-scaled SH
+> **Listing 26:** GLSL code to reconstruct the irradiance from the pre-scaled SH
 
 Note that with 2 bands, the computation above becomes a single $4 \times 4$ matrix-by-vector multiply.
 
@@ -2216,70 +2165,42 @@ $$
 
 Both $DFG_1$ and $DFG_2$ can either be pre-calculated in a regular 2D texture indexed by $(n \cdot v, \alpha)$ and sampled bilinearly, or computed at runtime using an analytic approximation of the surfaces. See sample code in the annex. The pre-calculated textures are shown in [table 15](#table_texturedfg). A C++ implementation of the pre-computation can be found in section [9.5](#toc9.5).
 
-$DFG_1$
+| $DFG_1$                               | $DFG_2$                               | ${ DFG_1, DFG_2, 0 }$               |
+| ------------------------------------- | ------------------------------------- | ----------------------------------- |
+| ![ibl/dfg1.png](/images/ibl/dfg1.png) | ![ibl/dfg2.png](/images/ibl/dfg2.png) | ![ibl/dfg.png](/images/ibl/dfg.png) |
 
-$DFG_2$
-
-${ DFG_1, DFG_2, 0 }$
-
-![ibl/dfg1.png](/images/ibl/dfg1.png)
-
-![ibl/dfg2.png](/images/ibl/dfg2.png)
-
-![ibl/dfg.png](/images/ibl/dfg.png)
-
-**Table 15:** Y axis: $\alpha$. X axis: $cos \theta$
+> **Table 15:** Y axis: $\alpha$. X axis: $cos \theta$
 
 $DFG_1$ and $DFG_2$ are conveniently within the $0, 1$ range, however 8-bits textures don't have enough precision and will cause problems. Unfortunately, on mobile, 16-bits or float textures are not ubiquitous and there are a limited number of samplers. Despite the attractive simplicity of the shader code using a texture, it might be better to use an analytic approximation. Note however that since we only need to store two terms, OpenGL ES 3.0's RG16F texture format is a good candidate.
 
 Such analytic approximation is described in [Karis14](#citation-karis14), itself based on [Lazarov13](#citation-lazarov13). [Narkowicz14](#citation-narkowicz14) is another interesting approximation. Note that these two approximations are not compatible with the energy compensation term presented in section [5.3.4.7](#toc5.3.4.7). [Table 16](#table_textureapproxdfg) presents a visual representation of these approximations.
 
-$DFG_1$
+| $DFG_1$ (Approx)                                    | $DFG_2$ (Approx)                                    | ${ DFG_1, DFG_2, 0 }$ (Approx)                    |
+| --------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------- |
+| ![ibl/dfg1_approx.png](/images/ibl/dfg1_approx.png) | ![ibl/dfg2_approx.png](/images/ibl/dfg2_approx.png) | ![ibl/dfg_approx.png](/images/ibl/dfg_approx.png) |
 
-$DFG_2$
-
-${ DFG_1, DFG_2, 0 }$
-
-![ibl/dfg1_approx.png](/images/ibl/dfg1_approx.png)
-
-![ibl/dfg2_approx.png](/images/ibl/dfg2_approx.png)
-
-![ibl/dfg_approx.png](/images/ibl/dfg_approx.png)
-
-**Table 16:** Y axis: $\alpha$. X axis: $cos \theta$
+> **Table 16:** Y axis: $\alpha$. X axis: $cos \theta$
 
 #### The $LD$ term visualized
 
 $LD$ is the convolution of the environment by a function that only depends on the $\alpha$ parameter (itself related to the roughness, see section [4.8.3.3](#toc4.8.3.3)). $LD$ can conveniently be stored in a mip-mapped cubemap where increasing LODs receive the environment pre-filtered with increasing roughness. This works well because this convolution is a powerful low-pass filter. To make good use of each mipmap level, it is necessary to remap $\alpha$; we find that using a power remapping with $\gamma = 2$ works well and is convenient.
 
 $$
-
-\alpha &= perceptualRoughness^2 \\ lod_{\alpha} &= \alpha^{\frac{1}{2}} = perceptualRoughness \\
-
-
+\begin{align*}
+    \alpha       &= perceptualRoughness^2                        \\
+    lod_{\alpha} &= \alpha^{\frac{1}{2}} = perceptualRoughness   \\
+\end{align*}
 $$
 
 See an example below:
 
-![ibl/ibl_river_roughness_m0.png](/images/ibl/ibl_river_roughness_m0.png)
-
-$\alpha=0.0$
-
-![ibl/ibl_river_roughness_m1.png](/images/ibl/ibl_river_roughness_m1.png)
-
-$\alpha=0.2$
-
-![ibl/ibl_river_roughness_m2.png](/images/ibl/ibl_river_roughness_m2.png)
-
-$\alpha=0.4$
-
-![ibl/ibl_river_roughness_m3.png](/images/ibl/ibl_river_roughness_m3.png)
-
-$0.6$
-
-![ibl/ibl_river_roughness_m4.png](/images/ibl/ibl_river_roughness_m4.png)
-
-$0.8$
+| Roughness ($\alpha$) | Image                                                                     |
+| -------------------- | ------------------------------------------------------------------------- |
+| $\alpha=0.0$         | ![ibl/ibl_river_roughness_m0.png](/images/ibl/ibl_river_roughness_m0.png) |
+| $\alpha=0.2$         | ![ibl/ibl_river_roughness_m1.png](/images/ibl/ibl_river_roughness_m1.png) |
+| $\alpha=0.4$         | ![ibl/ibl_river_roughness_m2.png](/images/ibl/ibl_river_roughness_m2.png) |
+| $\alpha=0.6$         | ![ibl/ibl_river_roughness_m3.png](/images/ibl/ibl_river_roughness_m3.png) |
+| $\alpha=0.8$         | ![ibl/ibl_river_roughness_m4.png](/images/ibl/ibl_river_roughness_m4.png) |
 
 #### Indirect specular and indirect diffuse components visualized
 
@@ -2293,7 +2214,7 @@ $0.8$
 
 [Listing 27](#listing_iblevaluation) presents a GLSL implementation to evaluate the IBL, using the various textures described in the previous sections.
 
-```cpp
+```glsl
     vec3 ibl(vec3 n, vec3 v, vec3 diffuseColor, vec3 f0, vec3 f90,
             float perceptualRoughness) {
         vec3 r = reflect(n);
@@ -2306,11 +2227,11 @@ $0.8$
     }
 ```
 
-**Listing 27:** GLSL implementation of image based lighting evaluation
+> **Listing 27:** GLSL implementation of image based lighting evaluation
 
 We can however save a couple of texture lookups by using Spherical Harmonics instead of an irradiance cubemap and the analytical approximation of the $DFG$ LUT, as shown in [listing 28](#listing_optimizediblevaluation).
 
-```cpp
+```glsl
     vec3 irradianceSH(vec3 n) {
         // uniform vec3 sphericalHarmonics[9]
         // We can use only the first 2 bands for better performance
@@ -2362,7 +2283,7 @@ We can however save a couple of texture lookups by using Spherical Harmonics ins
     }
 ```
 
-**Listing 28:** GLSL implementation of image based lighting evaluation
+> **Listing 28:** GLSL implementation of image based lighting evaluation
 
 #### Pre-integration for multiscattering
 
@@ -2397,23 +2318,23 @@ $$
 
 These two new $DFG$ terms simply need to replace the ones used in the implementation shown in section [9.5](#toc9.5):
 
-```cpp
+```glsl
     float Fc = pow(1 - VoH, 5.0f);
     r.x += Gv * Fc;
     r.y += Gv;
 ```
 
-**Listing 29:** C++ implementation of the $L_{DFG}$ term for multiscattering
+> **Listing 29:** C++ implementation of the $L_{DFG}$ term for multiscattering
 
 To perform the reconstruction we need to slightly modify [listing 30](#listing_multiscatteriblevaluation):
 
-```cpp
+```glsl
     vec2 dfg = textureLod(dfgLut, vec2(dot(n, v), perceptualRoughness), 0.0).xy;
     // (1 - f0) * dfg.x + f0 * dfg.y
     vec3 specularColor = mix(dfg.xxx, dfg.yyy, f0);
 ```
 
-**Listing 30:** GLSL implementation of image based lighting evaluation, with multiscattering LUT
+> **Listing 30:** GLSL implementation of image based lighting evaluation, with multiscattering LUT
 
 #### Summary
 
@@ -2451,7 +2372,7 @@ In order to calculate the specular contribution of distant image-based lights, w
 
 When sampling the IBL, the clear coat layer is calculated as a second specular lobe. This specular lobe is oriented along the view direction since we cannot reasonably integrate over the hemisphere. [Listing 31](#listing_clearcoatibl) demonstrates this approximation in practice. It also shows the energy conservation step. It is important to note that this second specular lobe is computed exactly the same way as the main specular lobe, using the same DFG approximation.
 
-```cpp
+```glsl
     // clearCoat_NoV == shading_NoV if the clear coat layer doesn't have its own normal map
     float Fc = F_Schlick(0.04, 1.0, clearCoat_NoV) * clearCoat;
     // base layer attenuation for energy compensation
@@ -2460,7 +2381,7 @@ When sampling the IBL, the clear coat layer is calculated as a second specular l
     iblSpecular += specularIBL(r, clearCoatPerceptualRoughness) * Fc;
 ```
 
-**Listing 31:** GLSL implementation of the clear coat specular lobe for image-based lighting
+> **Listing 31:** GLSL implementation of the clear coat specular lobe for image-based lighting
 
 ### Anisotropy
 
@@ -2476,18 +2397,18 @@ When sampling the IBL, the clear coat layer is calculated as a second specular l
 
 The implementation of this technique is straightforward, as demonstrated in [listing 32](#listing_bentreflectionvector).
 
-```cpp
+```glsl
     vec3 anisotropicTangent = cross(bitangent, v);
     vec3 anisotropicNormal = cross(anisotropicTangent, bitangent);
     vec3 bentNormal = normalize(mix(n, anisotropicNormal, anisotropy));
     vec3 r = reflect(-v, bentNormal);
 ```
 
-**Listing 32:** GLSL implementation of the bent reflection vector
+> **Listing 32:** GLSL implementation of the bent reflection vector
 
 This technique can be made more useful by accepting negative `anisotropy` values, as shown in [listing 33](#listing_bentreflectionvectordirection). When the anisotropy is negative, the highlights are not in the direction of the tangent, but in the direction of the bitangent instead.
 
-```cpp
+```glsl
     vec3 anisotropicDirection = anisotropy >= 0.0 ? bitangent : tangent;
     vec3 anisotropicTangent = cross(anisotropicDirection, v);
     vec3 anisotropicNormal = cross(anisotropicTangent, anisotropicDirection);
@@ -2495,7 +2416,7 @@ This technique can be made more useful by accepting negative `anisotropy` values
     vec3 r = reflect(-v, bentNormal);
 ```
 
-**Listing 33:** GLSL implementation of the bent reflection vector
+> **Listing 33:** GLSL implementation of the bent reflection vector
 
 [Figure 61](#figure_anisotropicdirection) demonstrates this modified implementation in practice.
 
@@ -2519,7 +2440,7 @@ The DG term is generated using uniform sampling as recommended in [Estevez17](#c
 
 The remainder of the image-based lighting implementation follows the same steps as the implementation of regular lights, including the optional subsurface scattering term and its wrap diffuse component. Just as with the clear coat IBL implementation, we cannot integrate over the hemisphere and use the view direction as the dominant light direction to compute the wrap diffuse component.
 
-```cpp
+```glsl
     float diffuse = Fd_Lambert() * ambientOcclusion;
     #if defined(SHADING_MODEL_CLOTH)
     #if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
@@ -2535,7 +2456,7 @@ The remainder of the image-based lighting implementation follows the same steps 
     vec3 ibl = diffuseColor * indirectDiffuse + indirectSpecular * specularColor;
 ```
 
-**Listing 34:** GLSL implementation of the DFG approximation for the cloth NDF
+> **Listing 34:** GLSL implementation of the DFG approximation for the cloth NDF
 
 It is important to note that this only addresses part of the IBL problem. The pre-filtered specular environment maps described earlier are convolved with the standard shading model's BRDF, which differs from the cloth BRDF. To get accurate result we should in theory provide one set of IBLs per BRDF used in the engine. Providing a second set of IBLs is however not practical for our use case so we decided to rely on the existing IBLs instead.
 
@@ -2579,7 +2500,7 @@ $$
 
 The GLSL implementation of these equations is presented in [listing 35](#listing_surfacetransparency).
 
-```cpp
+```glsl
     // baseColor has already been premultiplied
     vec4 shadeSurface(vec4 baseColor) {
         float alpha = baseColor.a;
@@ -2591,7 +2512,7 @@ The GLSL implementation of these equations is presented in [listing 35](#listing
     }
 ```
 
-**Listing 35:** Implementation of lit surface transparency in GLSL
+> **Listing 35:** Implementation of lit surface transparency in GLSL
 
 ### Translucency
 
@@ -2677,14 +2598,14 @@ In practice, baked ambient occlusion is stored as a grayscale texture which can 
 
 Applying baked diffuse ambient occlusion in a GLSL shader is straightforward, as shown in [listing 36](#listing_bakeddiffuseao).
 
-```cpp
+```glsl
     // diffuse indirect
     vec3 indirectDiffuse = max(irradianceSH(n), 0.0) * Fd_Lambert();
     // ambient occlusion
     indirectDiffuse *= texture2D(aoMap, outUV).r;
 ```
 
-**Listing 36:** Implementation of baked diffuse ambient occlusion in GLSL
+> **Listing 36:** Implementation of baked diffuse ambient occlusion in GLSL
 
 Note how the ambient occlusion term is only applied to indirect lighting.
 
@@ -2692,19 +2613,19 @@ Note how the ambient occlusion term is only applied to indirect lighting.
 
 Specular micro-occlusion can be derived from $f_{0}$, itself derived from the diffuse color. The derivation is based on the knowledge that no real-world material has a reflectance lower than 2%. Values in the 0-2% range can therefore be treated as pre-baked specular occlusion used to smoothly extinguish the Fresnel term.
 
-```cpp
+```glsl
     float f90 = clamp(dot(f0, 50.0 * 0.33), 0.0, 1.0);
     // cheap luminance approximation
     float f90 = clamp(50.0 * f0.g, 0.0, 1.0);
 ```
 
-**Listing 37:** Pre-baked specular occlusion in GLSL
+> **Listing 37:** Pre-baked specular occlusion in GLSL
 
 The derivations mentioned earlier for ambient occlusion assume Lambertian surfaces and are only valid for indirect diffuse lighting. The lack of information about surface accessibility is particularly harmful to the reconstruction of indirect specular lighting. It usually manifests itself as light leaks.
 
 Sébastien Lagarde proposes an empirical approach to derive the specular occlusion term from the diffuse occlusion term in [Lagarde14](#citation-lagarde14). The result does not have any physical basis but produces visually pleasant results. The goal of his formulation is return the diffuse occlusion term unmodified for rough surfaces. For smooth surfaces, the formulation, implemented in [listing 38](#listing_specularocclusion), reduces the influence of occlusion at normal incidence and increases it at grazing angles.
 
-```cpp
+```glsl
     float computeSpecularAO(float NoV, float ao, float roughness) {
         return clamp(pow(NoV + ao, exp2(-16.0 * roughness - 1.0)) - 1.0 + ao, 0.0, 1.0);
     }
@@ -2716,7 +2637,7 @@ Sébastien Lagarde proposes an empirical approach to derive the specular occlusi
     indirectSpecular *= computeSpecularAO(NoV, ao, roughness);
 ```
 
-**Listing 38:** Implementation of Lagarde's specular occlusion factor in GLSL
+> **Listing 38:** Implementation of Lagarde's specular occlusion factor in GLSL
 
 Note how the specular occlusion factor is only applied to indirect lighting.
 
@@ -2726,7 +2647,7 @@ When computing the specular IBL contribution for a surface that uses a normal ma
 
 The key idea is to occlude light coming from behind the surface. This can easily be achieved since a negative dot product between the reflected vector and the surface's normal indicates a reflection vector pointing towards the surface. Our implementation shown in [listing 39](#listing_horizonocclusion) is similar to Russell's, albeit without the artist controlled horizon fading factor.
 
-```cpp
+```glsl
     // specular indirect
     vec3 indirectSpecular = evaluateSpecularIBL(r, perceptualRoughness);
 
@@ -2735,7 +2656,7 @@ The key idea is to occlude light coming from behind the surface. This can easily
     indirectSpecular *= horizon * horizon;
 ```
 
-**Listing 39:** Implementation of horizon specular occlusion in GLSL
+> **Listing 39:** Implementation of horizon specular occlusion in GLSL
 
 Horizon specular occlusion fading is cheap but can easily be omitted to improve performance as needed.
 
@@ -2767,14 +2688,14 @@ Colin Barré-Brisebois and Stephen Hill propose in [Hill12](#citation-hill12) a 
 
 Following the simplifications described in [Hill12](#citation-hill12), we can produce the GLSL implementation shown in [listing 40](#listing_reorientednormalmapping).
 
-```cpp
+```glsl
     vec3 t = texture(baseMap,   uv).xyz * vec3( 2.0,  2.0, 2.0) + vec3(-1.0, -1.0,  0.0);
     vec3 u = texture(detailMap, uv).xyz * vec3(-2.0, -2.0, 2.0) + vec3( 1.0,  1.0, -1.0);
     vec3 r = normalize(t * dot(t, u) - u * t.z);
     return r;
 ```
 
-**Listing 40:** Implementation of reoriented normal mapping in GLSL
+> **Listing 40:** Implementation of reoriented normal mapping in GLSL
 
 Note that this implementation assumes that the normals are stored uncompressed and in the 0..1 range in the source textures.
 
@@ -2790,14 +2711,14 @@ Since this technique is slightly more expensive than the one described below, we
 
 The technique called UDN blending, described in [Hill12](#citation-hill12), is a variant of the partial derivative blending technique. Its main advantage is the low number of shader instructions it requires (see [listing 41](#listing_udnblending)). While it leads to a reduction in details over flat areas, UDN blending is interesting if blending must be performed at runtime.
 
-```cpp
+```glsl
     vec3 t = texture(baseMap,   uv).xyz * 2.0 - 1.0;
     vec3 u = texture(detailMap, uv).xyz * 2.0 - 1.0;
     vec3 r = normalize(t.xy + u.xy, t.z);
     return r;
 ```
 
-**Listing 41:** Implementation of UDN blending in GLSL
+> **Listing 41:** Implementation of UDN blending in GLSL
 
 The results are visually close to Reoriented Normal Mapping but a careful comparison of the data shows that UDN is indeed less correct. [Figure 71](#figure_blendednormalmapsudn) presents the result of the UDN blending approach using the same source data as in the previous examples.
 
@@ -3039,7 +2960,7 @@ $$
 
 [Listing 42](#listing_fragmentexposure) shows how the exposure term can be applied directly to the pixel color computed in a fragment shader.
 
-```cpp
+```glsl
     // Computes the camera's EV100 from exposure settings
     // aperture in f-stops
     // shutterSpeed in seconds
@@ -3061,7 +2982,7 @@ $$
     color.rgb *= exposure;
 ```
 
-**Listing 42:** Implementation of exposure in GLSL
+> **Listing 42:** Implementation of exposure in GLSL
 
 In practice the exposure factor can be pre-computed on the CPU to save shader instructions.
 
@@ -3148,7 +3069,7 @@ $$
 
 Equation [bloomEV](bloomEV) can be used in a fragment shader to implement emissive blooms, as shown in [listing 43](#listing_fragmentemissive).
 
-```cpp
+```glsl
     vec4 surfaceShading() {
         vec4 color = evaluateLights();
         // rgb = color, w = exposure compensation
@@ -3159,7 +3080,7 @@ Equation [bloomEV](bloomEV) can be used in a fragment shader to implement emissi
     }
 ```
 
-**Listing 43:** Implementation of emissive bloom in GLSL
+> **Listing 43:** Implementation of emissive bloom in GLSL
 
 ## Optics post-processing
 
@@ -3286,7 +3207,7 @@ See the annex for the source code of a GPU implementation (point lights only).
 
 #### CPU lights assignment
 
-On non-OpenGL ES 3.1 devices, lights assignment can be performed efficiently on the CPU. The algorithm is different from the GPU implementation. Instead of iterating over every light for each froxel, the engine will “rasterize” each light as froxels. For instance, given a point light’s center and radius, it is trivial to compute the list of froxels it intersects with.
+On non-OpenGL ES 3.1 devices, lights assignment can be performed efficiently on the CPU. The algorithm is different from the GPU implementation. Instead of iterating over every light for each froxel, the engine will “rasterize” each light as froxels. For instance, given a point light's center and radius, it is trivial to compute the list of froxels it intersects with.
 
 This technique has the added benefit of providing tighter culling than in the GPU variant. The CPU implementation can also more easily generate a packed list of lights.
 
@@ -3336,7 +3257,7 @@ This simplification is important because we pass the linear z value to a `log2` 
 
 All put together, computing the froxel index of a given fragment can be implemented fairly easily as shown in [listing 44](#listing_fragcoordtofroxel).
 
-```cpp
+```glsl
     #define MAX_LIGHT_COUNT 16 // max number of lights per froxel
 
     uniform uvec4 froxels; // res x, res y, count y, count y
@@ -3362,11 +3283,11 @@ All put together, computing the froxel index of a given fragment can be implemen
     // Compute lighting...
 ```
 
-**Listing 44:** GLSL implementation to compute a froxel index from a fragment's screen coordinates
+> **Listing 44:** GLSL implementation to compute a froxel index from a fragment's screen coordinates
 
 Several uniforms must be pre-computed for perform the index evaluation efficiently. The code used to pre-compute these uniforms can be found in listing ?.
 
-```cpp
+```glsl
     froxels[0] = TILE_RESOLUTION_IN_PX;
     froxels[1] = TILE_RESOLUTION_IN_PX;
     froxels[2] = numberOfTilesInX;
@@ -3413,7 +3334,7 @@ With emissive materials and IBLs, it is fairly easy to obtain a scene in which s
 
 **Figure 84:** Visualizing luminance by color coding the stops: cyan is middle gray, blue is 1 stop darker, green 1 stop brighter, etc.
 
-```cpp
+```glsl
     vec3 Tonemap_DisplayRange(const vec3 x) {
         // The 5th color in the array (cyan) represents middle gray (18%)
         // Every stop above or below middle gray causes a color shift
@@ -3443,7 +3364,7 @@ With emissive materials and IBLs, it is fairly easy to obtain a scene in which s
     );
 ```
 
-**Listing 45:** GLSL implementation of a custom debug tone-mapping operator for luminance visualization
+> **Listing 45:** GLSL implementation of a custom debug tone-mapping operator for luminance visualization
 
 ### Reference renderings
 
@@ -3578,7 +3499,7 @@ To achieve the desired result we used the ICE 1931 2° CMFs, from 360nm to 830nm
 
 Our implementation is presented in [listing 46](#listing_specularcolorimpl), with the actual data omitted for brevity.
 
-```cpp
+```glsl
     // CIE 1931 2-deg color matching functions (CMFs), from 360nm to 830nm,
     // at 1nm intervals
     //
@@ -3680,7 +3601,7 @@ Our implementation is presented in [listing 46](#listing_specularcolorimpl), wit
     }
 ```
 
-**Listing 46:** C++ implementation to compute the base color of a metallic surface from spectral data
+> **Listing 46:** C++ implementation to compute the base color of a metallic surface from spectral data
 
 Special thanks to Naty Hoffman for his valuable help on this topic.
 
@@ -3743,7 +3664,7 @@ Typically, $ (\zeta*{\phi},\zeta*{\theta}) $ are chosen using the Hammersley uni
 
 ### Pre-filtered importance sampling
 
-Importance sampling considers only the PDF to generate important directions; in particular, it is oblivious to the actual content of the IBL. If the latter contains high frequencies in areas without a lot of samples, the integration won’t be accurate. This can be somewhat mitigated by using a technique called _pre-filtered importance sampling_, in addition this allows the integral to converge with many fewer samples.
+Importance sampling considers only the PDF to generate important directions; in particular, it is oblivious to the actual content of the IBL. If the latter contains high frequencies in areas without a lot of samples, the integration won't be accurate. This can be somewhat mitigated by using a technique called _pre-filtered importance sampling_, in addition this allows the integral to converge with many fewer samples.
 
 Pre-filtered importance sampling uses several images of the environment increasingly low-pass filtered. This is typically implemented very efficiently with mipmaps and a box filter. The LOD is selected based on the sample importance, that is, low probability samples use a higher LOD index (more filtered).
 
@@ -3768,29 +3689,13 @@ Cubemap sampling is done using seamless trilinear filtering. It is extremely imp
 
 **Figure 90:** Importance sampling image reference
 
-Samples
+| Samples | Importance Sampling                             | Pre-filtered Importance Sampling                  |
+| ------- | ----------------------------------------------- | ------------------------------------------------- |
+| 4096    | ![image_is_4096.png](/images/image_is_4096.png) |                                                   |
+| 1024    | ![image_is_1024.png](/images/image_is_1024.png) | ![image_fis_1024.png](/images/image_fis_1024.png) |
+| 32      | ![image_is_32.png](/images/image_is_32.png)     | ![image_fis_32.png](/images/image_fis_32.png)     |
 
-Importance sampling
-
-Pre-filtered importance sampling
-
-4096
-
-![image_is_4096.png](/images/image_is_4096.png)
-
-1024
-
-![image_is_1024.png](/images/image_is_1024.png)
-
-![image_fis_1024.png](/images/image_fis_1024.png)
-
-32
-
-![image_is_32.png](/images/image_is_32.png)
-
-![image_fis_32.png](/images/image_fis_32.png)
-
-**Table 17:** Importance sampling vs pre-filtered importance sampling with $\alpha = 0.4$
+> **Table 17:** Importance sampling vs pre-filtered importance sampling with $\alpha = 0.4$
 
 The reference renderer used in the comparison below performs no approximation. In particular, it does not assume $v = n$ and does not perform the split sum approximation. The pre-filtered renderer uses all the techniques discussed in this section: pre-filtered cubemaps, the analytic formulation of the DFG term, and of course the split sum approximation.
 
@@ -3872,7 +3777,7 @@ $$
 
 ## Hammersley sequence
 
-```cpp
+```glsl
     vec2f hammersley(uint i, float numSamples) {
         uint bits = i;
         bits = (bits << 16) | (bits >> 16);
@@ -3890,7 +3795,7 @@ C++ implementation of a Hammersley sequence generator
 
 The term $ L*{DFG} $ is only dependent on $ n \cdot v $. Below, the normal is arbitrarily set to $ n=\left0, 0, 1\right $ and $v$ is chosen to satisfy $ n \cdot v $. The vector $ h_i $ is the $ D*{GGX}(\alpha) $ important direction sample $i$.
 
-```cpp
+```glsl
     float GDFG(float NoV, float NoL, float a) {
         float a2 = a * a;
         float GGXL = NoV * sqrt((-NoL * a2 + NoL) * NoL + a2);
@@ -3930,27 +3835,14 @@ C++ implementation of the $ L\_{DFG} $ term
 
 ## Spherical Harmonics
 
-Symbol
+| Symbol     | Definition                                                        |
+| ---------- | ----------------------------------------------------------------- |
+| $K^m_l$    | Normalization factors                                             |
+| $P^m_l(x)$ | Associated Legendre polynomials                                   |
+| $y^m_l$    | Spherical harmonics bases, or SH bases                            |
+| $L^m_l$    | SH coefficients of the $L(s)$ function defined on the unit sphere |
 
-Definition
-
-$K^m_l$
-
-Normalization factors
-
-$P^m_l(x)$
-
-Associated Legendre polynomials
-
-$y^m_l$
-
-Spherical harmonics bases, or SH bases
-
-$L^m_l$
-
-SH coefficients of the $L(s)$ function defined on the unit sphere
-
-**Table 18:** Spherical harmonics symbols definitions
+> **Table 18:** Spherical harmonics symbols definitions
 
 ### Basis functions
 
@@ -3985,47 +3877,29 @@ The normalization factors are given by:
 
 $$
 
- K^m_l = \sqrt{\frac{(2l + 1)(l - |m|)!}{4 \pi (l + |m|)!}}
-
-
+K^m_l = \sqrt{\frac{(2l + 1)(l - |m|)!}{4 \pi (l + |m|)!}}
 $$
 
 The associated Legendre polynomials $P^{|m|}_l$ can be calculated from the following recursions:
 
 $$
-
- P^0_0(x) = 1 \\ P^0_1(x) = x \\ P^l_l(x) = (-1)^l (2l - 1)!! (1 - x^2)^{\frac{l}{2}} \\ P^m_l(x) = \frac{((2l - 1) x P^m_{l - 1} - (l + m - 1) P^m_{l - 2})}{l - m} \\
-
-
+P^0_0(x) = 1 \\ P^0_1(x) = x \\ P^l_l(x) = (-1)^l (2l - 1)!! (1 - x^2)^{\frac{l}{2}} \\ P^m_l(x) = \frac{((2l - 1) x P^m_{l - 1} - (l + m - 1) P^m_{l - 2})}{l - m} \\
 $$
 
 Computing $y^{|m|}_l$ requires to compute $P^{|m|}_l(z)$ first. This can be accomplished fairly easily using the recursions in equation [shRecursions](shRecursions). The third recursion can be used to “move diagonally” in [table 20](#table_basisfunctions), i.e. calculating $y^0_0$, $y^1_1$, $y^2_2$ etc. Then, the fourth recursion can be used to move vertically.
 
-Band index
+| Band index ($l$) | Basis functions ($-l \leq m \leq l$)              |
+| ---------------- | ------------------------------------------------- |
+| $l = 0$          | $y^0_0$                                           |
+| $l = 1$          | $y^{-1}_1$, $y^0_1$, $y^1_1$                      |
+| $l = 2$          | $y^{-2}_2$, $y^{-1}_2$, $y^0_2$, $y^1_2$, $y^2_2$ |
 
-Basis functions $-l <= m <= l$
+> **Table 19:** Basis functions per band
 
-$l = 0$
-
-$y^0_0$
-
-$l = 1$
-
-$y^{-1}_1$ $y^0_1$ $y^1_1$
-
-$l = 2$
-
-$y^{-2}_2$ $y^{-1}_2$ $y^0_2$ $y^1_2$ $y^2_2$
-
-**Table 19:** Basis functions per band
-
-It’s also fairly easy to compute the trigonometric terms recursively:
+It's also fairly easy to compute the trigonometric terms recursively:
 
 $$
-
 C_m &\equiv cos(m \phi)sin(\theta)^m \\ S_m &\equiv sin(m \phi)sin(\theta)^m \\ \{ x, y, z \} &= \{ cos \phi sin \theta, sin \phi sin \theta, cos \theta \}
-
-
 $$
 
 Using the angle sum trigonometric identities:
@@ -4039,7 +3913,7 @@ $$
 
 [Listing 47](#listing_nonnormalizedshbasis) shows the C++ code to compute the non-normalized SH basis $\frac{y^m_l(s)}{\sqrt{2} K^m_l}$:
 
-```cpp
+```glsl
     static inline size_t SHindex(ssize_t m, size_t l) {
         return l * (l + 1) + m;
     }
@@ -4096,54 +3970,27 @@ $$
     }
 ```
 
-**Listing 47:** C++ implementation to compute a non-normalized SH basis
+> **Listing 47:** C++ implementation to compute a non-normalized SH basis
 
 Normalized SH basis functions $y^m_l(s)$ for the first 3 bands:
 
-Band
+| Band ($l$) | $m = -2$                             | $m = -1$                              | $m = 0$                                             | $m = 1$                               | $m = 2$                                       |
+| ---------- | ------------------------------------ | ------------------------------------- | --------------------------------------------------- | ------------------------------------- | --------------------------------------------- |
+| $l = 0$    |                                      |                                       | $\frac{1}{2}\sqrt{\frac{1}{\pi}}$                   |                                       |                                               |
+| $l = 1$    |                                      | $-\frac{1}{2}\sqrt{\frac{3}{\pi}}y$   | $\frac{1}{2}\sqrt{\frac{3}{\pi}}z$                  | $-\frac{1}{2}\sqrt{\frac{3}{\pi}}x$   |                                               |
+| $l = 2$    | $\frac{1}{2}\sqrt{\frac{15}{\pi}}xy$ | $-\frac{1}{2}\sqrt{\frac{15}{\pi}}yz$ | $\frac{1}{4}\sqrt{\frac{5}{\pi}}(2z^2 - x^2 - y^2)$ | $-\frac{1}{2}\sqrt{\frac{15}{\pi}}xz$ | $\frac{1}{4}\sqrt{\frac{15}{\pi}}(x^2 - y^2)$ |
 
-$m = -2$
-
-$m = -1$
-
-$m = 0$
-
-$m = 1$
-
-$m = 2$
-
-$l = 0$
-
-$\frac{1}{2}\sqrt{\frac{1}{\pi}}$
-
-$l = 1$
-
-$-\frac{1}{2}\sqrt{\frac{3}{\pi}}y$
-
-$\frac{1}{2}\sqrt{\frac{3}{\pi}}z$
-
-$-\frac{1}{2}\sqrt{\frac{3}{\pi}}x$
-
-$l = 2$
-
-$\frac{1}{2}\sqrt{\frac{15}{\pi}}xy$
-
-$-\frac{1}{2}\sqrt{\frac{15}{\pi}}yz$
-
-$\frac{1}{4}\sqrt{\frac{5}{\pi}}(2z^2 - x^2 - y^2)$
-
-$-\frac{1}{2}\sqrt{\frac{15}{\pi}}xz$
-
-$\frac{1}{4}\sqrt{\frac{15}{\pi}}(x^2 - y^2)$
-
-**Table 20:** Normalized basis functions per band
+> **Table 20:** Normalized basis functions per band
 
 ### Decomposition and reconstruction
 
 A function $L(s)$ defined on a sphere is projected to the SH basis as follows:
 
 $$
- L^m_l = \int_\Omega L(s) y^m_l(s) ds \\ L^m_l = \int_{\theta = 0}^{\pi} \int_{\phi = 0}^{2\pi} L(\theta, \phi) y^m_l(\theta, \phi) sin \theta d\theta d\phi
+\begin{equation}
+L^{m_l} = \int_\Omega L(s) y^m_l(s) ds \\
+L^{m_l} = \int_{\theta = 0}^{\pi} \int_{\phi = 0}^{2\pi} L(\theta, \phi) y^m_l(\theta, \phi) sin \theta d\theta d\phi
+\end{equation}
 $$
 
 Note that each $L^m_l$ is a vector of 3 values, one for each RGB color channel.
@@ -4159,19 +4006,33 @@ $$
 Since $\left< cos \theta \right>$ does not depend on $\phi$ (azimuthal independence), the integral simplifies to:
 
 $$
-C^0_l &= 2\pi \int_0^{\pi} \left< cos \theta \right> y^0_l(\theta) sin \theta d\theta \\ C^0_l &= 2\pi K^m_l \int_0^{\frac{\pi}{2}} P^0_l(cos \theta) cos \theta sin \theta d\theta \\ C^m_l &= 0, m != 0
+\begin{align*}
+C^0_l &= 2\pi \int_0^{\pi} \left< cos \theta \right> y^0_l(\theta) sin \theta d\theta \\
+C^0_l &= 2\pi K^m_l \int_0^{\frac{\pi}{2}} P^0_l(cos \theta) cos \theta sin \theta d\theta \\
+C^m_l &= 0, m != 0
+\end{align*}
 $$
 
 In [Ramamoorthi01](#citation-ramamoorthi01) an analytical solution to the integral is described:
 
 $$
-C_1 &= \sqrt{\frac{\pi}{3}} \\ C_{odd} &= 0 \\ C_{l, even} &= 2\pi \sqrt{\frac{2l + 1}{4\pi}} \frac{(-1)^{\frac{l}{2} - 1}}{(l + 2)(l - 1)} \frac{l!}{2^l (\frac{l!}{2})^2}
+\begin{align*}
+C_1 &= \sqrt{\frac{\pi}{3}} \\
+C_{odd} &= 0 \\
+C_{l, even} &= 2\pi \sqrt{\frac{2l + 1}{4\pi}} \frac{(-1)^{\frac{l}{2} - 1}}{(l + 2)(l - 1)} \frac{l!}{2^l (\frac{l!}{2})^2}
+\end{align*}
 $$
 
 The first few coefficients are:
 
 $$
-C_0 &= +0.88623 \\ C_1 &= +1.02333 \\ C_2 &= +0.49542 \\ C_3 &= +0.00000 \\ C_4 &= -0.11078
+\begin{align*}
+C_0 &= +0.88623 \\
+C_1 &= +1.02333 \\
+C_2 &= +0.49542 \\
+C_3 &= +0.00000 \\
+C_4 &= -0.11078
+\end{align*}
 $$
 
 Very few coefficients are needed to reasonably approximate $\left< cos \theta \right>$, as shown in [figure 91](#figure_shcosthetaapprox).
@@ -4196,7 +4057,7 @@ $$
 
 Here is the C++ code to compute $\hat{C}_l$:
 
-```cpp
+```glsl
 static double factorial(size_t n, size_t d = 1);
 
 // < cos(theta) > SH coefficients pre-multiplied by 1 / K(0,l)
@@ -4292,23 +4153,14 @@ double factorial(size_t n, size_t d ) {
 
 Assigning lights to froxels can be implemented on the GPU using two compute shaders. The first one, shown in [listing 48](#listing_froxelgeneration), creates the froxels data (4 planes + a min Z and max Z per froxel) in an SSBO and needs to be run only once. The shader requires the following uniforms:
 
-Projection matrix
+| Parameter                     | Definition                                                                                                                                                                     |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Projection matrix**         | The projection matrix used to render the scene (view space to clip space transformation).                                                                                      |
+| **Inverse projection matrix** | The inverse of the projection matrix used to render the scene (clip space to view space transformation).                                                                       |
+| **Depth parameters**          | $-log2(\frac{z_{near}}{z_{far}}) \frac{1}{maxSlices-1}$, maximum number of depth slices, Z near and Z far.                                                                     |
+| **Clip space size**           | $\frac{F_x \times F_r}{w} \times 2$, with $F_x$ the number of tiles on the X axis, $F_r$ the resolution in pixels of a tile, and $w$ the width in pixels of the render target. |
 
-The projection matrix used to render the scene (view space to clip space transformation).
-
-Inverse projection matrix
-
-The inverse of the projection matrix used to render the scene (clip space to view space transformation).
-
-Depth parameters
-
-$-log2(\frac{z_{lighnear}}{z_{far}}) \frac{1}{maxSlices-1}$, maximum number of depth slices, Z near and Z far.
-
-Clip space size
-
-$\frac{F_x \times F_r}{w} \times 2$, with $F_x$ the number of tiles on the X axis, $F_r$ the resolution in pixels of a tile and w the width in pixels of the render target.
-
-```cpp
+```glsl
 #version 310 es
 
 precision highp float;
@@ -4417,7 +4269,7 @@ void main() {
 }
 ```
 
-**Listing 48:** GLSL implementation of froxels data generation (compute shader)
+> **Listing 48:** GLSL implementation of froxels data generation (compute shader)
 
 The second compute shader, shown in [listing 49](#listing_froxelevaluation), runs every frame (if the camera and/or lights have changed) and assigns all the lights to their respective froxels. This shader relies only on a couple of uniforms (the number of point/spot lights and the view matrix) and four SSBOs:
 
@@ -4437,7 +4289,7 @@ Froxels buffer
 
 The list of froxels represented by planes, created by the previous compute shader.
 
-```cpp
+```glsl
 #version 310 es
 precision highp float;
 precision highp int;
@@ -4565,116 +4417,37 @@ void main() {
 }
 ```
 
-**Listing 49:** GLSL implementation of assigning lights to froxels (compute shader)
-
-# Revisions
-
-Friday
-3 August 2018
-
-**First public version**
-
-Tuesday
-7 August 2018
-
-**Cloth model**
-
-- Added description of the “Charlie” NDF
-
-Thursday
-9 August 2018
-
-**Lighting**
-
-- Added explanation about pre-exposed lights
-
-Wednesday
-15 August 2018
-
-**Fresnel**
-
-- Added a description of the Fresnel effect in section [4.4.3](#toc4.4.3)
-
-Friday
-17 August 2018
-
-**Specular color**
-
-- Added section [9.1](#toc9.1) to explain how the base color of various metals is computed
-
-Tuesday
-21 August 2018
-
-**Multiscattering**
-
-- Added section [4.7.2](#toc4.7.2) on how to compensate for energy loss in single scattering BRDFs
-
-Wednesday
-20 February 2019
-
-**Cloth shading**
-
-- Removed Fresnel term from the cloth BRDF
-- Removed cloth DFG approximations, replaced with a new channel in the DFG LUT
+> **Listing 49:** GLSL implementation of assigning lights to froxels (compute shader)
 
 # Bibliography
 
-**Ashdown98** Ian Ashdown. 1998. Parsing the IESNA LM-63 photometric data file. [http://lumen.iee.put.poznan.pl/kw/iesna.txt](http://lumen.iee.put.poznan.pl/kw/iesna.txt)
-
-**Ashikhmin00** Michael Ashikhmin, Simon Premoze and Peter Shirley. A Microfacet-based BRDF Generator. _SIGGRAPH '00 Proceedings_, 65-74.
-
-**Ashikhmin07** Michael Ashikhmin and Simon Premoze. 2007. Distribution-based BRDFs.
-
-**Burley12** Brent Burley. 2012. Physically Based Shading at Disney. _Physically Based Shading in Film and Game Production, ACM SIGGRAPH 2012 Courses_.
-
-**Estevez17** Alejandro Conty Estevez and Christopher Kulla. 2017. Production Friendly Microfacet Sheen BRDF. _ACM SIGGRAPH 2017_.
-
-**Hammon17** Earl Hammon. 217. PBR Diffuse Lighting for GGX+Smith Microsurfaces. _GDC 2017_.
-
-**Heitz14** Eric Heitz. 2014. Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs. _Journal of Computer Graphics Techniques_, 3 (2).
-
-**Heitz16** Eric Heitz et al. 2016. Multiple-Scattering Microfacet BSDFs with the Smith Model. _ACM SIGGRAPH 2016_.
-
-**Hill12** Colin Barré-Brisebois and Stephen Hill. 2012. Blending in Detail. [http://blog.selfshadow.com/publications/blending-in-detail/](http://blog.selfshadow.com/publications/blending-in-detail/)
-
-**Karis13a** Brian Karis. 2013. Specular BRDF Reference. [http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html](http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html)
-
-**Karis13b** Brian Karis, 2013. Real Shading in Unreal Engine 4. [https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf](https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf)
-
-**Karis14** Brian Karis. 2014. Physically Based Shading on Mobile. [https://www.unrealengine.com/blog/physically-based-shading-on-mobile](https://www.unrealengine.com/blog/physically-based-shading-on-mobile)
-
-**Kelemen01** Csaba Kelemen et al. 2001. A Microfacet Based Coupled Specular-Matte BRDF Model with Importance Sampling. _Eurographics Short Presentations_.
-
-**Krystek85** M. Krystek. 1985. An algorithm to calculate correlated color temperature. _Color Research & Application_, 10 (1), 38-40.
-
-**Krivanek08** Jaroslave Krivànek and Mark Colbert. 2008. Real-time Shading with Filtered Importance Sampling. _Eurographics Symposium on Rendering 2008_, Volume 27, Number 4.
-
-**Kulla17** Christopher Kulla and Alejandro Conty. 2017. Revisiting Physically Based Shading at Imageworks. _ACM SIGGRAPH 2017_
-
-**Lagarde14** Sébastien Lagarde and Charles de Rousiers. 2014. Moving Frostbite to PBR. _Physically Based Shading in Theory and Practice, ACM SIGGRAPH 2014 Courses_.
-
-**Lagarde18** Sébastien Lagarde and Evgenii Golubev. 2018. The road toward unified rendering with Unity’s high definition rendering pipeline. _Advances in Real-Time Rendering in Games, ACM SIGGRAPH 2018 Courses_.
-
-**Lazarov13** Dimitar Lazarov. 2013. Physically-Based Shading in Call of Duty: Black Ops. _Physically Based Shading in Theory and Practice, ACM SIGGRAPH 2013 Courses_.
-
-**McAuley15** Stephen McAuley. 2015. Rendering the World of Far Cry 4. _GDC 2015_.
-
-**McGuire10** Morgan McGuire. 2010. Ambient Occlusion Volumes. _High Performance Graphics_.
-
-**Narkowicz14** Krzysztof Narkowicz. 2014. Analytical DFG Term for IBL. [https://knarkowicz.wordpress.com/2014/12/27/analytical-dfg-term-for-ibl](https://knarkowicz.wordpress.com/2014/12/27/analytical-dfg-term-for-ibl)
-
-**Neubelt13** David Neubelt and Matt Pettineo. 2013. Crafting a Next-Gen Material Pipeline for The Order: 1886. _Physically Based Shading in Theory and Practice, ACM SIGGRAPH 2013 Courses_.
-
-**Oren94** Michael Oren and Shree K. Nayar. 1994. Generalization of lambert's reflectance model. _SIGGRAPH_, 239-246. ACM.
-
-**Pattanaik00** Sumanta Pattanaik00 et al. 2000. Time-Dependent Visual Adaptation For Fast Realistic Image Display. _SIGGRAPH '00 Proceedings of the 27th annual conference on Computer graphics and interactive techniques_, 47-54.
-
-**Ramamoorthi01** Ravi Ramamoorthi and Pat Hanrahan. 2001. On the relationship between radiance and irradiance: determining the illumination from images of a convex Lambertian object. _Journal of the Optical Society of America_, Volume 18, Number 10, October 2001.
-
-**Revie12** Donald Revie. 2012. Implementing Fur in Deferred Shading. _GPU Pro 2_, Chapter 2.
-
-**Russell15** Jeff Russell. 2015. Horizon Occlusion for Normal Mapped Reflections. [http://marmosetco.tumblr.com/post/81245981087](http://marmosetco.tumblr.com/post/81245981087)
-
-**Schlick94** Christophe Schlick. 1994. An Inexpensive BRDF Model for Physically-Based Rendering. _Computer Graphics Forum_, 13 (3), 233-246.
-
-**Walter07** Bruce Walter et al. 2007. Microfacet Models for Refraction through Rough Surfaces. _Proceedings of the Eurographics Symposium on Rendering_.
+- **Ashdown98** Ian Ashdown. 1998. Parsing the IESNA LM-63 photometric data file. [http://lumen.iee.put.poznan.pl/kw/iesna.txt](http://lumen.iee.put.poznan.pl/kw/iesna.txt)
+- **Ashikhmin00** Michael Ashikhmin, Simon Premoze and Peter Shirley. A Microfacet-based BRDF Generator. _SIGGRAPH '00 Proceedings_, 65-74.
+- **Ashikhmin07** Michael Ashikhmin and Simon Premoze. 2007. Distribution-based BRDFs.
+- **Burley12** Brent Burley. 2012. Physically Based Shading at Disney. _Physically Based Shading in Film and Game Production, ACM SIGGRAPH 2012 Courses_.
+- **Estevez17** Alejandro Conty Estevez and Christopher Kulla. 2017. Production Friendly Microfacet Sheen BRDF. _ACM SIGGRAPH 2017_.
+- **Hammon17** Earl Hammon. 217. PBR Diffuse Lighting for GGX+Smith Microsurfaces. _GDC 2017_.
+- **Heitz14** Eric Heitz. 2014. Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs. _Journal of Computer Graphics Techniques_, 3 (2).
+- **Heitz16** Eric Heitz et al. 2016. Multiple-Scattering Microfacet BSDFs with the Smith Model. _ACM SIGGRAPH 2016_.
+- **Hill12** Colin Barré-Brisebois and Stephen Hill. 2012. Blending in Detail. [http://blog.selfshadow.com/publications/blending-in-detail/](http://blog.selfshadow.com/publications/blending-in-detail/)
+- **Karis13a** Brian Karis. 2013. Specular BRDF Reference. [http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html](http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html)
+- **Karis13b** Brian Karis, 2013. Real Shading in Unreal Engine 4. [https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf](https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf)
+- **Karis14** Brian Karis. 2014. Physically Based Shading on Mobile. [https://www.unrealengine.com/blog/physically-based-shading-on-mobile](https://www.unrealengine.com/blog/physically-based-shading-on-mobile)
+- **Kelemen01** Csaba Kelemen et al. 2001. A Microfacet Based Coupled Specular-Matte BRDF Model with Importance Sampling. _Eurographics Short Presentations_.
+- **Krystek85** M. Krystek. 1985. An algorithm to calculate correlated color temperature. _Color Research & Application_, 10 (1), 38-40.
+- **Krivanek08** Jaroslave Krivànek and Mark Colbert. 2008. Real-time Shading with Filtered Importance Sampling. _Eurographics Symposium on Rendering 2008_, Volume 27, Number 4.
+- **Kulla17** Christopher Kulla and Alejandro Conty. 2017. Revisiting Physically Based Shading at Imageworks. _ACM SIGGRAPH 2017_
+- **Lagarde14** Sébastien Lagarde and Charles de Rousiers. 2014. Moving Frostbite to PBR. _Physically Based Shading in Theory and Practice, ACM SIGGRAPH 2014 Courses_.
+- **Lagarde18** Sébastien Lagarde and Evgenii Golubev. 2018. The road toward unified rendering with Unity's high definition rendering pipeline. _Advances in Real-Time Rendering in Games, ACM SIGGRAPH 2018 Courses_.
+- **Lazarov13** Dimitar Lazarov. 2013. Physically-Based Shading in Call of Duty: Black Ops. _Physically Based Shading in Theory and Practice, ACM SIGGRAPH 2013 Courses_.
+- **McAuley15** Stephen McAuley. 2015. Rendering the World of Far Cry 4. _GDC 2015_.
+- **McGuire10** Morgan McGuire. 2010. Ambient Occlusion Volumes. _High Performance Graphics_.
+- **Narkowicz14** Krzysztof Narkowicz. 2014. Analytical DFG Term for IBL. [https://knarkowicz.wordpress.com/2014/12/27/analytical-dfg-term-for-ibl](https://knarkowicz.wordpress.com/2014/12/27/analytical-dfg-term-for-ibl)
+- **Neubelt13** David Neubelt and Matt Pettineo. 2013. Crafting a Next-Gen Material Pipeline for The Order: 1886. _Physically Based Shading in Theory and Practice, ACM SIGGRAPH 2013 Courses_.
+- **Oren94** Michael Oren and Shree K. Nayar. 1994. Generalization of lambert's reflectance model. _SIGGRAPH_, 239-246. ACM.
+- **Pattanaik00** Sumanta Pattanaik00 et al. 2000. Time-Dependent Visual Adaptation For Fast Realistic Image Display. _SIGGRAPH '00 Proceedings of the 27th annual conference on Computer graphics and interactive techniques_, 47-54.
+- **Ramamoorthi01** Ravi Ramamoorthi and Pat Hanrahan. 2001. On the relationship between radiance and irradiance: determining the illumination from images of a convex Lambertian object. _Journal of the Optical Society of America_, Volume 18, Number 10, October 2001.
+- **Revie12** Donald Revie. 2012. Implementing Fur in Deferred Shading. _GPU Pro 2_, Chapter 2.
+- **Russell15** Jeff Russell. 2015. Horizon Occlusion for Normal Mapped Reflections. [http://marmosetco.tumblr.com/post/81245981087](http://marmosetco.tumblr.com/post/81245981087)
+- **Schlick94** Christophe Schlick. 1994. An Inexpensive BRDF Model for Physically-Based Rendering. _Computer Graphics Forum_, 13 (3), 233-246.
+- **Walter07** Bruce Walter et al. 2007. Microfacet Models for Refraction through Rough Surfaces. _Proceedings of the Eurographics Symposium on Rendering_.
