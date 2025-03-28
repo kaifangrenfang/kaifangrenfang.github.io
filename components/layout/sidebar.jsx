@@ -10,9 +10,13 @@ const menuItems = [
         title: "About",
         href: "/about",
     },
+    // {
+    //     title: "BRDF",
+    //     href: "/brdf",
+    // },
     {
-        title: "BRDF",
-        href: "/brdf",
+        title: "Materials",
+        href: "/materials",
     },
     {
         title: "Table",
