@@ -69,9 +69,9 @@ The equations found throughout this document use the symbols described in [table
 | $ \sigma $                   | Diffuse reflectance                                        |
 | $ \Omega $                   | Spherical domain                                           |
 | $ f_0 $                      | Reflectance at normal incidence                            |
-| $ f\_{90} $                  | Reflectance at grazing angle                               |
+| $ f_{90} $                  | Reflectance at grazing angle                               |
 | $ \chi^+(a) $                | Heaviside function (1 if $ a > 0 $, 0 otherwise)           |
-| $ n\_{ior} $                 | Index of refraction (IOR) of an interface                  |
+| $ n_{ior} $                 | Index of refraction (IOR) of an interface                  |
 | $ \left< n \cdot l \right> $ | Dot product clamped to $[0..1]$                            |
 | $ \left< a \right> $         | Saturated value (clamped to $[0..1]$)                      |
 
@@ -985,7 +985,7 @@ D_{aniso}(h,\alpha) = \frac{1}{\pi \alpha_t \alpha_b} \frac{1}{((\frac{t \cdot h
 \end{equation}
 $$
 
-This NDF unfortunately relies on two supplemental roughness terms noted $\alpha*b$, the roughness along the bitangent direction, and $\alpha_t$, the roughness along the tangent direction. Neubelt and Pettineo [Neubelt13](#citation-neubelt13) propose a way to derive $\alpha_b$ from $\alpha_t$ by using an \_anisotropy\* parameter that describes the relationship between the two roughness values for a material:
+This NDF unfortunately relies on two supplemental roughness terms noted $\alpha*b$, the roughness along the bitangent direction, and $\alpha_t$, the roughness along the tangent direction. Neubelt and Pettineo [Neubelt13](#citation-neubelt13) propose a way to derive $\alpha_b$ from $\alpha_t$ by using an _anisotropy\* parameter that describes the relationship between the two roughness values for a material:
 
 $$
 \begin{align*}
@@ -1056,7 +1056,7 @@ $$
  V_{aniso}(n \cdot l,n \cdot v,\alpha) = \frac{1}{2((n \cdot l)\hat{\Lambda}_v+(n \cdot v)\hat{\Lambda}_l)} \\ \hat{\Lambda}_v = \sqrt{\alpha^2_t(t \cdot v)^2+\alpha^2_b(b \cdot v)^2+(n \cdot v)^2} \\ \hat{\Lambda}_l = \sqrt{\alpha^2_t(t \cdot l)^2+\alpha^2_b(b \cdot l)^2+(n \cdot l)^2}
 $$
 
-The term $ \hat{\Lambda}\_v $ is the same for every light and can be computed only once if needed. The resulting implementation is described in [listing 16](#listing_anisotropicv).
+The term $ \hat{\Lambda}_v $ is the same for every light and can be computed only once if needed. The resulting implementation is described in [listing 16](#listing_anisotropicv).
 
 ```cpp
 float at = max(roughness * (1.0 + anisotropy), 0.001);
@@ -1471,7 +1471,7 @@ A spot light is defined by a position in space, a direction vector and two cone 
 
 > **Figure 38:** Interaction between a spot light and a surface. The attenuation depends on the distance to the light and the angle between the surface the spot light's direction vector
 
-Equation [spotLightLuminousPower](spotLightLuminousPower) describes how the luminous power of a spot light can be calculated in a similar fashion to point lights, using $ \theta\_{outer} $ the outer angle of the spot light's cone in the range 0..$\pi$.
+Equation [spotLightLuminousPower](spotLightLuminousPower) describes how the luminous power of a spot light can be calculated in a similar fashion to point lights, using $ \theta_{outer} $ the outer angle of the spot light's cone in the range 0..$\pi$.
 
 $$
  \Phi = \int_{\Omega} I dl = \int_{0}^{2\pi} \int_{0}^{\theta_{outer}} I d\theta d\phi = 2 \pi (1 - cos\frac{\theta_{outer}}{2})I \\ I = \frac{\Phi}{2 \pi (1 - cos\frac{\theta_{outer}}{2})}
@@ -1770,7 +1770,7 @@ $$
  C_{sRGB} = \begin{cases} 12.92 \times \hat{C}_{linear} & \hat{C}_{linear} \le 0.0031308 \\ 1.055 \times \hat{C}_{linear}^{\frac{1}{2.4}} - 0.055 & \hat{C}_{linear} \gt 0.0031308 \end{cases}
 $$
 
-For convenience, [figure 45](#figure_colortemperaturescalecct) shows the range of correlated color temperatures from 1,000K to 12,500K. All the colors used below assume CIE $ D\_{65} $ as the white point (as is the case in the sRGB color space).
+For convenience, [figure 45](#figure_colortemperaturescalecct) shows the range of correlated color temperatures from 1,000K to 12,500K. All the colors used below assume CIE $ D_{65} $ as the white point (as is the case in the sRGB color space).
 
 ![diagram_color_temperature_cct.png](/images/diagram_color_temperature_cct.png)
 
@@ -1788,7 +1788,7 @@ For reference, [figure 47](#figure_colortemperaturescalecctclamped) shows the ra
 
 > **Figure 47:** Unnormalized scale of correlated color temperatures
 
-[Table 14](#table_colortemperaturesamples) presents the correlated color temperature of various common light sources as sRGB color swatches. These colors are relative to the $ D\_{65} $ white point, so their perceived hue might vary based on your display's white point. See [What colour is the Sun?](http://jila.colorado.edu/~ajsh/colour/Tspectrum.html) for more information.
+[Table 14](#table_colortemperaturesamples) presents the correlated color temperature of various common light sources as sRGB color swatches. These colors are relative to the $ D_{65} $ white point, so their perceived hue might vary based on your display's white point. See [What colour is the Sun?](http://jila.colorado.edu/~ajsh/colour/Tspectrum.html) for more information.
 
 | Temperature (K) | Light Source                 | Color |
 | --------------- | ---------------------------- | ----- |
@@ -2036,9 +2036,9 @@ From the equation above we can see that $\tilde{I}$ is equivalent to $I$ when $L
 
 $$
 \begin{align*}
-\tilde{I}(f(\Theta)\Lt^{constant}) &= \Lt^{constant} \hat{I}(f(\Theta)) \frac{I(f(\Theta))}{\hat{I}(f(\Theta))} \\
-                                   &= \Lt^{constant} I(f(\Theta))                                               \\
-                                   &= I(f(\Theta)\Lt^{constant})
+\tilde{I}(f(\Theta)L_{\bot}^{constant}) &= L_{\bot}^{constant} \hat{I}(f(\Theta)) \frac{I(f(\Theta))}{\hat{I}(f(\Theta))} \\
+                                   &= L_{\bot}^{constant} I(f(\Theta))                                               \\
+                                   &= I(f(\Theta)L_{\bot}^{constant})
 \end{align*}
 $$
 
@@ -2046,8 +2046,8 @@ Similarly, we can also demonstrate that the result is correct when $v = n$, sinc
 
 $$
 \begin{align*}
-\tilde{I}(f(\Theta)\Lt) &= I(f(\Theta)\Lt) \frac{I(f(\Theta))}{I(f(\Theta))}    \\
-                        &= I(f(\Theta)\Lt)
+\tilde{I}(f(\Theta)L_{\bot}) &= I(f(\Theta)L_{\bot}) \frac{I(f(\Theta))}{I(f(\Theta))}    \\
+                        &= I(f(\Theta)L_{\bot})
 \end{align*}
 $$
 
@@ -2055,12 +2055,12 @@ Finally, we can show that the scale factor $K$ satisfies our average irradiance 
 
 $$
 \begin{align*}
-\tilde{I}(f(\Theta)\Lt) &= \tilde{I}\left[f\left(\Theta\right) \left(\bar{\Lt} + \Delta\Lt\right)\right] \\
-                        &= K \times \hat{I}\left[f\left(\Theta\right) \left(\bar{\Lt} + \Delta\Lt\right)\right] \\
-                        &= K \times \left[\hat{I}\left(f\left(\Theta\right)\bar{\Lt}\right) + \hat{I}\left(f\left(\Theta\right)\Delta\Lt\right)\right] \\
-                        &= K \times \hat{I}\left(f\left(\Theta\right)\bar{\Lt}\right) + K \times \hat{I}\left(f\left(\Theta\right) \Delta\Lt\right) \\
-                        &= \tilde{I}\left(f\left(\Theta\right)\bar{\Lt}\right) + \tilde{I}\left(f\left(\Theta\right) \Delta\Lt\right) \\
-                        &= I\left(f\left(\Theta\right)\bar{\Lt}\right) + \tilde{I}\left(f\left(\Theta\right) \Delta\Lt\right)
+\tilde{I}(f(\Theta)L_{\bot}) &= \tilde{I}\left[f\left(\Theta\right) \left(\bar{L_{\bot}} + \DeltaL_{\bot}\right)\right] \\
+                        &= K \times \hat{I}\left[f\left(\Theta\right) \left(\bar{L_{\bot}} + \DeltaL_{\bot}\right)\right] \\
+                        &= K \times \left[\hat{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \hat{I}\left(f\left(\Theta\right)\DeltaL_{\bot}\right)\right] \\
+                        &= K \times \hat{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + K \times \hat{I}\left(f\left(\Theta\right) \DeltaL_{\bot}\right) \\
+                        &= \tilde{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \tilde{I}\left(f\left(\Theta\right) \DeltaL_{\bot}\right) \\
+                        &= I\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \tilde{I}\left(f\left(\Theta\right) \DeltaL_{\bot}\right)
 \end{align*}
 $$
 
@@ -2180,11 +2180,21 @@ $$
 And finally, we extract the equations that can be calculated off-line (i.e.: the part that doesn't depend on the runtime parameters $f_0$ and $f_{90}$):
 
 $$
-\begin{equation}
-DFG_1(\alpha, \left<n \cdot v\right>) = \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left< v \cdot h \right>))} V(l_i, v, \alpha)\frac{\left< v \cdot h \right>}{\left< n \cdot h \right>} \left<n \cdot l\right> \\
-DFG_2(\alpha, \left<n \cdot v\right>) = \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left< v \cdot h \right>) } V(l_i, v, \alpha)\frac{\left< v \cdot h \right>}{\left< n \cdot h \right>} \left<n \cdot l\right> \\
-I(f(n, v, \alpha))  \equiv   \color{green}{f_0} \color{red}{DFG_1(\alpha, \left<n \cdot v\right>)} + \color{green}{f_{90}} \color{red}{DFG_2(\alpha, \left<n \cdot v\right>)}
-\end{equation}
+\begin{aligned}
+DFG_1(\alpha, \langle n \cdot v \rangle) &= \frac{4}{N} \sum_i^N
+\color{green}{(1 - F_c(\langle v \cdot h \rangle))}
+V(l_i, v, \alpha)
+\frac{\langle v \cdot h \rangle}{\langle n \cdot h \rangle}
+\langle n \cdot l \rangle \\
+DFG_2(\alpha, \langle n \cdot v \rangle) &= \frac{4}{N} \sum_i^N
+\color{green}{F_c(\langle v \cdot h \rangle)}
+V(l_i, v, \alpha)
+\frac{\langle v \cdot h \rangle}{\langle n \cdot h \rangle}
+\langle n \cdot l \rangle \\
+I(f(n, v, \alpha)) &\equiv
+\color{green}{f_0} \color{red}{DFG_1(\alpha, \langle n \cdot v \rangle)} +
+\color{green}{f_{90}} \color{red}{DFG_2(\alpha, \langle n \cdot v \rangle)}
+\end{aligned}
 $$
 
 Notice that $DFG_1$ and $DFG_2$ only depend on $n \cdot v$, that is the angle between the normal $n$ and the view direction $v$. This is true because the integral is symmetrical with respect to $n$. When integrating, we can choose any $v$ we please as long as it satisfies $n \cdot v$ (e.g.: when calculating $v \cdot h$).
@@ -2196,7 +2206,7 @@ $$
 L_{out}(n,v,\alpha,f_0,f_{90})     &\simeq \big[ f_0 \color{red}{DFG_1( n \cdot v , \alpha)} + f_{90} \color{red}{DFG_2( n \cdot v , \alpha)} \big] \times LD(n, \alpha) \\
 DFG_1(\alpha, \left< n \cdot v \right>) &=      \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left< v \cdot h \right>))} V(l_i, v, \alpha)\frac{\left< v \cdot h \right>}{\left< n \cdot h \right>} \left<n \cdot l\right> \\
 DFG_2(\alpha, \left< n \cdot v \right>) &=      \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left< v \cdot h \right>) } V(l_i, v, \alpha)\frac{\left< v \cdot h \right>}{\left< n \cdot h \right>} \left<n \cdot l\right> \\
-LD(n, \alpha)                    &=      \frac{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>\Lt(l_i) }{\sum_i^N \left<n \cdot l\right>}
+LD(n, \alpha)                    &=      \frac{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>L_{\bot}(l_i) }{\sum_i^N \left<n \cdot l\right>}
 \end{align*}
 $$
 
@@ -2353,7 +2363,7 @@ $$
 L_{out}(n,v,\alpha,f_0)                           &\simeq \big[ (1 - f_0) \color{red}{DFG_1^{multiscatter}(n \cdot l, \alpha)} + f_0 \color{red}{DFG_2^{multiscatter}(n \cdot l, \alpha)} \big] \times LD(n, \alpha) \\
 DFG_1^{multiscatter}(\alpha, \left<n \cdot l\right>) &=      \frac{4}{N}\sum_i^N  \color{green}{F_c(\left<v \cdot h\right>)} V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\
 DFG_2^{multiscatter}(\alpha, \left<n \cdot l\right>) &=      \frac{4}{N}\sum_i^N                                        V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\
-LD(n, \alpha)                                   &=      \frac{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>\Lt(l_i) }{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>}
+LD(n, \alpha)                                   &=      \frac{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>L_{\bot}(l_i) }{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>}
 \end{align*}
 $$
 
@@ -2521,7 +2531,7 @@ To properly light a transparent surface, we must first understand how the materi
 
 > **Figure 64:** Example of a complex object where lit surface transparency plays an important role
 
-To properly implement opacity, we will use the premultiplied alpha format. Given a desired opacity noted $ \alpha\_{opacity} $ and a diffuse color $ \sigma $ (linear, unpremultiplied), we can compute the effective opacity of a fragment.
+To properly implement opacity, we will use the premultiplied alpha format. Given a desired opacity noted $ \alpha_{opacity} $ and a diffuse color $ \sigma $ (linear, unpremultiplied), we can compute the effective opacity of a fragment.
 
 $$
 \begin{align*}
@@ -2826,7 +2836,7 @@ $$
 
 Note that this definition is only function of the aperture and shutter speed, but not the sensitivity. An exposure value is by convention defined for ISO 100, or $ EV*{100} $, and because we wish to work with this convention, we need to be able to express $ EV*{100} $ as a function of the sensitivity.
 
-Since we know that EV is a base-2 logarithmic scale in which each stop increases or decreases the brightness by a factor of 2, we can formally define $ EV\_{S} $, the exposure value at given sensitivity (equation [evS](evS)).
+Since we know that EV is a base-2 logarithmic scale in which each stop increases or decreases the brightness by a factor of 2, we can formally define $ EV_{S} $, the exposure value at given sensitivity (equation [evS](evS)).
 
 $$
 
@@ -2835,7 +2845,7 @@ $$
 
 $$
 
-Calculating the $ EV\_{100} $ as a function of the 3 camera settings is trivial, as shown in [ev100](ev100).
+Calculating the $ EV_{100} $ as a function of the 3 camera settings is trivial, as shown in [ev100](ev100).
 
 $$
 
@@ -2860,7 +2870,7 @@ $$
 
 That constant $K$ is the reflected-light meter constant, which varies between manufacturers. We could find two common values for this constant: 12.5, used by Canon, Nikon and Sekonic, and 14, used by Pentax and Minolta. Given the wide availability of Canon and Nikon cameras, as well as our own usage of Sekonic light meters, we will choose to use $ K = 12.5 $.
 
-Since we want to work with $ EV\_{100} $, we can substitute $K$ and $S$ in equation [evK](evK) to obtain equation [ev100L](ev100L).
+Since we want to work with $ EV_{100} $, we can substitute $K$ and $S$ in equation [evK](evK) to obtain equation [ev100L](ev100L).
 
 $$
 EV = log_2(L \frac{100}{12.5})
@@ -2884,7 +2894,7 @@ $$
 
 The constant $C$ is the incident-light meter constant, which varies between manufacturers and/or types of sensors. There are two common types of sensors: flat and hemispherical. For flat sensors, a common value is 250. With hemispherical sensors, we could find two common values: 320, used by Minolta, and 340, used by Sekonic.
 
-Since we want to work with $ EV\_{100} $, we can substitute $S$ [evC](evC) to obtain equation [ev100C](ev100C).
+Since we want to work with $ EV_{100} $, we can substitute $S$ [evC](evC) to obtain equation [ev100C](ev100C).
 
 $$
 EV = log_2(E \frac{100}{C})
@@ -2924,13 +2934,13 @@ $$
 
 Where $L$ is the luminance of the scene, $t$ the shutter speed, $N$ the aperture and $q$ the lens and vignetting attenuation (typically $ q = 0.65 $[11](#endnote-lensattenuation)). This definition does not take the sensor sensitivity into account. To do so, we must use one of the three ways to relate photometric exposure and sensitivity: saturation-based speed, noise-based speed and standard output sensitivity.
 
-We choose the saturation-based speed relation, which gives us $ H\_{sat} $, the maximum possible exposure that does not lead to clipped or bloomed camera output (equation [hSat](hSat)).
+We choose the saturation-based speed relation, which gives us $ H_{sat} $, the maximum possible exposure that does not lead to clipped or bloomed camera output (equation [hSat](hSat)).
 
 $$
 H_{sat} = \frac{78}{S_{sat}}
 $$
 
-We combine equations [hSat](hSat) and [photometricExposure](photometricExposure) in equation [lmax](lmax) to compute the maximum luminance $ L\_{max} $ that will saturate the sensor given exposure settings $S$, $N$ and $t$.
+We combine equations [hSat](hSat) and [photometricExposure](photometricExposure) in equation [lmax](lmax) to compute the maximum luminance $ L_{max} $ that will saturate the sensor given exposure settings $S$, $N$ and $t$.
 
 $$
 L_{max} = \frac{N^2}{q \cdot t} \frac{78}{S}
@@ -2944,7 +2954,7 @@ L' = L \frac{1}{L_{max}}
 \end{equation}
 $$
 
-$ L\_{max} $ can be simplified using equation [ev](ev), $ S = 100 $ and $ q = 0.65 $:
+$ L_{max} $ can be simplified using equation [ev](ev), $ S = 100 $ and $ q = 0.65 $:
 
 $$
 \begin{align*}
@@ -3048,7 +3058,7 @@ Because the EV scale is almost perceptually linear, the exposure value is also o
 
 > **Figure 74:** Saturated photosites on a sensor create a blooming effect in the bright parts of the scene
 
-With $c$ the bloom color and $ EV\_{100} $ the current exposure value, we can easily compute the luminance of the bloom value as show in equation [bloomEV](bloomEV).
+With $c$ the bloom color and $ EV_{100} $ the current exposure value, we can easily compute the luminance of the bloom value as show in equation [bloomEV](bloomEV).
 
 $$
 EV_{bloom} = EV_{100} + EC \\ L_{bloom} = c \times 2^{EV_{bloom} - 3}
@@ -3587,7 +3597,7 @@ $$
 
 Unfortunately, we would need too many samples to evaluate this integral. A technique commonly used is to choose samples that are more “important” more often, this is called _importance sampling_. In our case we'll use the distribution of micro-facets normals, $D_{ggx}$, as the distribution of important samples.
 
-The evaluation of $ L\_{out}(n,v,\Theta) $ with importance sampling is presented in equation [annexIblImportanceSampling](annexIblImportanceSampling).
+The evaluation of $ L_{out}(n,v,\Theta) $ with importance sampling is presented in equation [annexIblImportanceSampling](annexIblImportanceSampling).
 
 $$
 
@@ -3650,7 +3660,7 @@ K &= 4.0 \\
 \end{align*}
 $$
 
-Where $K$ is a constant determined empirically, $p$ the PDF of the BRDF, $ \Omega\_{s} $ the solid angle associated to the sample and $\Omega_p$ the solid angle associated with the texel in the cubemap.
+Where $K$ is a constant determined empirically, $p$ the PDF of the BRDF, $ \Omega_{s} $ the solid angle associated to the sample and $\Omega_p$ the solid angle associated with the texel in the cubemap.
 
 Cubemap sampling is done using seamless trilinear filtering. It is extremely important to sample the cubemap correctly across faces using OpenGL's seamless sampling feature or any other technique that avoids/reduces seams.
 
@@ -3793,7 +3803,7 @@ float2 DFG(float NoV, float a) {
 }
 ```
 
-C++ implementation of the $ L\_{\text{DFG}}$ term
+C++ implementation of the $ L_{\text{DFG}}$ term
 
 ## Spherical Harmonics
 
