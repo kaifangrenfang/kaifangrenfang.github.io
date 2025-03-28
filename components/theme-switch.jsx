@@ -12,8 +12,8 @@ export default function ThemeSwitch({ lite, className, ...props }) {
 
     const isDark = resolvedTheme === "dark"
     const toggleTheme = () => {
-        console.log("isDark", isDark)
-        console.log("result", isDark ? "light" : "dark")
+        // console.log("isDark", isDark)
+        // console.log("result", isDark ? "light" : "dark")
         setTheme(isDark ? "light" : "dark")
     }
     const text = mounted && resolvedTheme === "dark" ? "Dark" : "Light"

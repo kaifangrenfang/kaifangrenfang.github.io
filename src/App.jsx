@@ -55,7 +55,7 @@ function App() {
                     <main className="w-full min-w-0 max-w-6xl px-6 pt-4 md:px-12">
                         <MdxProviderWrapper>
                             <Routes>
-                                <Route index path="/" element={<Home />} />
+                                <Route index path="/" element={<BRDF />} />
                                 <Route path="/about" element={<About />} />
                                 <Route path="/brdf" element={<BRDF />} />
                                 <Route path="/contact" element={<Contact />} />

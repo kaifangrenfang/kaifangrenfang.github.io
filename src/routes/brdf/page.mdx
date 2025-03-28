@@ -16,33 +16,33 @@ Real-time rendering is an active area of research and there is a large number of
 
 **Real-time mobile performance**
 
-    Our primary goal is to design and implement a rendering system able to perform efficiently on mobile platforms. The primary target will be OpenGL ES 3.x class GPUs.
+    - Our primary goal is to design and implement a rendering system able to perform efficiently on mobile platforms. The primary target will be OpenGL ES 3.x class GPUs.
 
 **Quality**
 
-    Our rendering system will emphasize overall picture quality. We will however accept quality compromises to support low and medium performance GPUs.
+    - Our rendering system will emphasize overall picture quality. We will however accept quality compromises to support low and medium performance GPUs.
 
 **Ease of use**
 
-    Artists need to be able to iterate often and quickly on their assets and our rendering system must allow them to do so intuitively. We must therefore provide parameters that are easy to understand (for instance, no specular power).
+    - Artists need to be able to iterate often and quickly on their assets and our rendering system must allow them to do so intuitively. We must therefore provide parameters that are easy to understand (for instance, no specular power).
 
-    We also understand that not all developers have the luxury to work with artists. The physically based approach of our system will allow developers to craft visually plausible materials without the need to understand the theory behind our implementation.
+    - We also understand that not all developers have the luxury to work with artists. The physically based approach of our system will allow developers to craft visually plausible materials without the need to understand the theory behind our implementation.
 
-    For both artists and developers, our system will rely on as few parameters as possible to reduce trial and error and allow users to quickly master the material model.
+    - For both artists and developers, our system will rely on as few parameters as possible to reduce trial and error and allow users to quickly master the material model.
 
-    In addition, any combination of parameter values should lead to physically plausible results. Physically implausible materials must be hard to create.
+    - In addition, any combination of parameter values should lead to physically plausible results. Physically implausible materials must be hard to create.
 
 **Familiarity**
 
-    Our system should use physical units everywhere possible: distances in meters or centimeters, color temperatures in Kelvin, light units in lumens or candelas, etc.
+    - Our system should use physical units everywhere possible: distances in meters or centimeters, color temperatures in Kelvin, light units in lumens or candelas, etc.
 
 **Flexibility**
 
-    A physically based approach must not preclude non-realistic rendering. User interfaces for instance will need unlit materials.
+    - A physically based approach must not preclude non-realistic rendering. User interfaces for instance will need unlit materials.
 
 **Deployment size**
 
-    While not directly related to the content of this document, it bears emphasizing our desire to keep the rendering library as small as possible so any application can bundle it without increasing the binary to undesirable sizes.
+    - While not directly related to the content of this document, it bears emphasizing our desire to keep the rendering library as small as possible so any application can bundle it without increasing the binary to undesirable sizes.
 
 ## Physically based rendering
 
@@ -92,7 +92,7 @@ The BRDF describes the surface response of a standard material as a function mad
 
 The relationship between a surface, the surface normal, incident light and these terms is shown in [figure 1](#figure_frfd) (we ignore subsurface scattering for now):
 
-[![](/images/diagram_fr_fd.png)](/images/diagram_fr_fd.png)
+![diagram_fr_fd.png](/images/diagram_fr_fd.png)
 
 **Figure 1:** Interaction of the light with a surface using BRDF model with a diffuse term $ f_d $ and a specular term $ f_r $
 
@@ -108,19 +108,19 @@ Commonly encountered surfaces are usually not made of a flat interface so we nee
 
 A microfacet BRDF is a good physically plausible BRDF for that purpose. Such BRDF states that surfaces are not smooth at a micro level, but made of a large number of randomly aligned planar surface fragments, called microfacets. [Figure 2](#figure_microfacetvsflat) shows the difference between a flat interface and an irregular interface at a micro level:
 
-[![](/images/diagram_microfacet.png)](/images/diagram_microfacet.png)
+![diagram_microfacet.png](/images/diagram_microfacet.png)
 
 **Figure 2:** Irregular interface as modeled by a microfacet model (left) and flat interface (right)
 
 Only the microfacets whose normal is oriented halfway between the light direction and the view direction will reflect visible light, as shown in [figure 3](#figure_microfacets).
 
-[![](/images/diagram_macrosurface.png)](/images/diagram_macrosurface.png)
+![diagram_macrosurface.png](/images/diagram_macrosurface.png)
 
 **Figure 3:** Microfacets
 
 However, not all microfacets with a properly oriented normal will contribute reflected light as the BRDF takes into account masking and shadowing. This is illustrated in [figure 4](#figure_microfacetshadowing).
 
-[![](/images/diagram_shadowing_masking.png)](/images/diagram_shadowing_masking.png)
+![diagram_shadowing_masking.png](/images/diagram_shadowing_masking.png)
 
 **Figure 4:** Masking and shadowing of microfacets
 
@@ -128,7 +128,7 @@ A microfacet BRDF is heavily influenced by a _roughness_ parameter which describ
 
 [Figure 5](#figure_roughness) shows surfaces of different roughness and how light interacts with them.
 
-[![](/images/diagram_roughness.png)](/images/diagram_roughness.png)
+![diagram_roughness.png](/images/diagram_roughness.png)
 
 **Figure 5:** Varying roughness (from left to right, rough to smooth) and the resulting BRDF specular component lobe
 
@@ -150,7 +150,7 @@ Since this equation is valid for both the specular and diffuse components, the d
 
 It is important to note that this equation is used to integrate over the hemisphere at a _micro level_:
 
-[![](/images/diagram_micro_vs_macro.png)](/images/diagram_micro_vs_macro.png)
+![diagram_micro_vs_macro.png](/images/diagram_micro_vs_macro.png)
 
 **Figure 6:** Modeling the surface response at a single point requires an integration at the micro level
 
@@ -166,13 +166,13 @@ To better understand some of the equations and behaviors shown below, we must fi
 
 We saw earlier that when incident light hits a surface governed by a BRDF, the light is reflected as two separate components: the diffuse reflectance and the specular reflectance. The modelization of this behavior is straightforward as shown in [figure 7](#figure_bsdfbrdf).
 
-[![](/images/diagram_fr_fd.png)](/images/diagram_fr_fd.png)
+![diagram_fr_fd.png](/images/diagram_fr_fd.png)
 
 **Figure 7:** Modelization of the BRDF part of a BSDF
 
 This modelization is a simplification of how the light actually interacts with the surface. In reality, part of the incident light will penetrate the surface, scatter inside, and exit the surface again as diffuse reflectance. This phenomenon is illustrated in [figure 8](#figure_diffusescattering).
 
-[![](/images/diagram_scattering.png)](/images/diagram_scattering.png)
+![diagram_scattering.png](/images/diagram_scattering.png)
 
 **Figure 8:** Scattering of diffuse light
 
@@ -180,7 +180,7 @@ Here lies the difference between conductors and dielectrics. There is no subsurf
 
 To properly modelize the BRDF we must therefore distinguish between dielectrics and conductors (scattering not shown for clarity), as shown in [figure 9](#figure_dielectricconductor).
 
-[![](/images/diagram_brdf_dielectric_conductor.png)](/images/diagram_brdf_dielectric_conductor.png)
+![diagram_brdf_dielectric_conductor.png](/images/diagram_brdf_dielectric_conductor.png)
 
 **Figure 9:** BRDF modelization for dielectric and conductor surfaces
 
@@ -347,7 +347,7 @@ The Fresnel effect plays an important role in the appearance of physically based
 
 The amount of light reflected depends not only on the viewing angle, but also on the index of refraction (IOR) of the material. At normal incidence (perpendicular to the surface, or 0° angle), the amount of light reflected back is noted $f_{0}$ and can be derived from the IOR as we will see in section [4.8.3.2](#toc4.8.3.2). The amount of light reflected back at grazing angle is noted $f_{90}$ and approaches 100% for smooth materials.
 
-[![](/images/photo_fresnel_lake.jpg)](/images/photo_fresnel_lake.jpg)
+![photo_fresnel_lake.jpg](/images/photo_fresnel_lake.jpg)
 
 **Figure 10:** The Fresnel effect is particularly evident on large bodies of water
 
@@ -439,7 +439,7 @@ float Fd_Burley(float NoV, float NoL, float LoH, float roughness) {
 
 [Figure 11](#figure_lambert_vs_disney) shows a comparison between a simple Lambertian diffuse BRDF and the higher quality Disney diffuse BRDF, using a fully rough dielectric material. For comparison purposes, the right sphere was mirrored. The surface response is very similar with both BRDFs but the Disney one exhibits some nice retro-reflections at grazing angles (look closely at the left edge of the spheres).
 
-[![](/images/diagram_lambert_vs_disney.png)](/images/diagram_lambert_vs_disney.png)
+![diagram_lambert_vs_disney.png](/images/diagram_lambert_vs_disney.png)
 
 **Figure 11:** Comparison between the Lambertian diffuse BRDF (left) and the Disney diffuse BRDF (right)
 
@@ -516,27 +516,27 @@ TODO: talk about the issue with fr+fd
 
 The Cook-Torrance BRDF we presented earlier attempts to model several events at the microfacet level but does so by accounting for a single bounce of light. This approximation can cause a loss of energy at high roughness, the surface is not energy preserving. [Figure 12](#figure_singlevsmultibounce) shows why this loss of energy occurs. In the single bounce (or single scattering) model, a ray of light hitting the surface can be reflected back onto another microfacet and thus be discarded because of the masking and shadowing term. If we however account for multiple bounces (multiscattering), the same ray of light might escape the microfacet field and be reflected back towards the viewer.
 
-[![](/images/diagram_single_vs_multi_scatter.png)](/images/diagram_single_vs_multi_scatter.png)
+![diagram_single_vs_multi_scatter.png](/images/diagram_single_vs_multi_scatter.png)
 
 **Figure 12:** Single scattering (left) vs multiscattering
 
 Based on this simple explanation, we can intuitively deduce that the rougher a surface is, the higher the chances are that energy gets lost because of the failure to account for multiple scattering events. This loss of energy appears to darken rough materials. Metallic surfaces are particularly affected because all of their reflectance is specular. This darkening effect is illustrated in [figure 13](#figure_metallicroughenergyloss). With multiscattering, energy preservation can be achieved, as shown in [figure 14](#figure_metallicroughenergypreservation).
 
-[![](/images/material_metallic_energy_loss.png)](/images/material_metallic_energy_loss.png)
+![material_metallic_energy_loss.png](/images/material_metallic_energy_loss.png)
 
 **Figure 13:** Darkening increases with roughness due to single scattering
 
-[![](/images/material_metallic_energy_preservation.png)](/images/material_metallic_energy_preservation.png)
+![material_metallic_energy_preservation.png](/images/material_metallic_energy_preservation.png)
 
 **Figure 14:** Energy preservation with multiscattering
 
 We can use a white furnace, a uniform lighting environment set to pure white, to validate the energy preservation property of a BRDF. When energy preservation is achieved, a purely reflective metallic surface ($f_{0} = 1$) should be indistinguishable from the background, no matter the roughness of said surface. [Figure 15](#figure_whitefurnaceloss) shows what such a surface looks like with the specular BRDF presented in the previous sections. The loss of energy as the roughness increases is obvious. In contrast, [figure 16](#figure_whitefurnacepreservation) shows that accounting for multiscattering events addresses the energy loss.
 
-[![](/images/material_furnace_energy_loss.png)](/images/material_furnace_energy_loss.png)
+![material_furnace_energy_loss.png](/images/material_furnace_energy_loss.png)
 
 **Figure 15:** Darkening increases with roughness due to single scattering
 
-[![](/images/material_furnace_energy_preservation.png)](/images/material_furnace_energy_preservation.png)
+![material_furnace_energy_preservation.png](/images/material_furnace_energy_preservation.png)
 
 **Figure 16:** Energy preservation with multiscattering
 
@@ -627,7 +627,7 @@ Disney's material model described in [Burley12](#citation-burley12) is a good st
 
 [Figure 17](#figure_material_parameters) shows how the metallic, roughness and reflectance parameters affect the appearance of a surface.
 
-[![](/images/material_parameters.png)](/images/material_parameters.png)
+![material_parameters.png](/images/material_parameters.png)
 
 **Figure 17:** From top to bottom: varying metallic, varying dielectric roughness, varying metallic roughness, varying reflectance
 
@@ -635,33 +635,14 @@ Disney's material model described in [Burley12](#citation-burley12) is a good st
 
 It is important to understand the type and range of the different parameters of our material model, described in [table 3](#table_standardparameterstypes).
 
-Parameter
-
-Type and range
-
-**BaseColor**
-
-Linear RGB 0..1
-
-**Metallic**
-
-Scalar 0..1
-
-**Roughness**
-
-Scalar 0..1
-
-**Reflectance**
-
-Scalar 0..1
-
-**Emissive**
-
-Linear RGB 0..1 + exposure compensation
-
-**Ambient occlusion**
-
-Scalar 0..1
+| Parameter             | Type and Range                          |
+| --------------------- | --------------------------------------- |
+| **BaseColor**         | Linear RGB $[0..1]$                         |
+| **Metallic**          | Scalar $[0..1]$                             |
+| **Roughness**         | Scalar $[0..1]$                             |
+| **Reflectance**       | Scalar $[0..1]$                             |
+| **Emissive**          | Linear RGB $[0..1]$ + exposure compensation |
+| **Ambient occlusion** | Scalar $[0..1]$                             |
 
 **Table 3:** Range and type of the standard model's parameters
 
@@ -699,7 +680,7 @@ $$
 
 The goal is to map $f_{0}$ onto a range that can represent the Fresnel values of both common dielectric surfaces (4% reflectance) and gemstones (8% to 16%). The mapping function is chosen to yield a 4% Fresnel reflectance value for an input reflectance of 0.5 (or 128 on a linear RGB gray scale). [Figure 18](#figure_reflectance) show those common values and how they relate to the mapping function.
 
-[![](/images/diagram_reflectance.png)](/images/diagram_reflectance.png)
+![diagram_reflectance.png](/images/diagram_reflectance.png)
 
 **Figure 18:** Common reflectance values
 
@@ -883,7 +864,7 @@ $$
 
 [Figure 19](#figure_grazing_reflectance) shows a red plastic ball. If you look closely at the edges of the sphere, you will be able to notice the achromatic specular reflectance at grazing angles.
 
-[![](/images/material_grazing_reflectance.png)](/images/material_grazing_reflectance.png)
+![material_grazing_reflectance.png](/images/material_grazing_reflectance.png)
 
 **Figure 19:** The specular reflectance becomes achromatic at grazing angles
 
@@ -913,7 +894,7 @@ $$
 
 [Figure 20](#figure_roughness_remap) shows a silver metallic surface with increasing roughness (from 0.0 to 1.0), using the unmodified roughness value (bottom) and the remapped value (top).
 
-[![](/images/material_roughness_remap.png)](/images/material_roughness_remap.png)
+![material_roughness_remap.png](/images/material_roughness_remap.png)
 
 **Figure 20:** Roughness remapping comparison: perceptually linear roughness (top) and roughness (bottom)
 
@@ -937,13 +918,13 @@ As noted in [Burley12](#citation-burley12) and [Neubelt13](#citation-neubelt13),
 
 For instance, [figure 21](#figure_materialblending) shows how the studio Ready at Dawn used material blending and layering in _The Order: 1886_ to create complex appearances from a library of simple materials (gold, copper, wood, rust, etc.).
 
-[![](/images/material_blending.png)](/images/material_blending.png)
+![material_blending.png](/images/material_blending.png)
 
 **Figure 21:** Material blending and layering. Source: Ready at Dawn Studios
 
 The blending and layering of materials is effectively an interpolation of the various parameters of the material model. [Figure 22](#figure_material_interpolation) show an interpolation between shiny metallic chrome and rough red plastic. While the intermediate blended materials make little physical sense, they look plausible.
 
-[![](/images/material_interpolation.png)](/images/material_interpolation.png)
+![material_interpolation.png](/images/material_interpolation.png)
 
 **Figure 22:** Interpolation from shiny chrome (left) to rough red plastic (right)
 
@@ -953,7 +934,7 @@ Designing physically based materials is fairly easy once you understand the natu
 
 We provide a [useful chart/reference guide](./Material%20Properties.pdf) to help artists and developers craft their own physically based materials.
 
-[![](/images/material_chart.jpg)](/images/material_chart.jpg)
+![material_chart.jpg](/images/material_chart.jpg)
 
 Crafting physically based materials
 
@@ -985,7 +966,7 @@ Metallic materials
 
 The standard material model described previously is a good fit for isotropic surfaces made of a single layer. Multi-layer materials are unfortunately fairly common, particularly materials with a thin translucent layer over a standard layer. Real world examples of such materials include car paints, soda cans, lacquered wood, acrylic, etc.
 
-[![](/images/material_clear_coat.png)](/images/material_clear_coat.png)
+![material_clear_coat.png](/images/material_clear_coat.png)
 
 **Figure 23:** Comparison of a blue metallic surface under the standard material model (left) and the clear coat model (right)
 
@@ -993,7 +974,7 @@ A clear coat layer can be simulated as an extension of the standard material mod
 
 Since incoming light will traverse the clear coat layer, we must also take the loss of energy into account as shown in [figure 24](#figure_clearcoatmodel). Our model will however not simulate inter reflection and refraction behaviors.
 
-[![](/images/diagram_clear_coat.png)](/images/diagram_clear_coat.png)
+![diagram_clear_coat.png](/images/diagram_clear_coat.png)
 
 **Figure 24:** Clear coat surface model
 
@@ -1061,11 +1042,11 @@ The clear coat roughness parameter is remapped and clamped in a similar way to t
 
 [Figure 25](#figure_clearcoat) and [figure 26](#figure_clearcoatroughness) show how the clear coat parameters affect the appearance of a surface.
 
-[![](/images/material_clear_coat1.png)](/images/material_clear_coat1.png)
+![material_clear_coat1.png](/images/material_clear_coat1.png)
 
 **Figure 25:** Clear coat varying from 0.0 (left) to 1.0 (right) with metallic set to 1.0 and roughness to 0.8
 
-[![](/images/material_clear_coat2.png)](/images/material_clear_coat2.png)
+![material_clear_coat2.png](/images/material_clear_coat2.png)
 
 **Figure 26:** Clear coat roughness varying from 0.0 (left) to 1.0 (right) with metallic set to 1.0, roughness to 0.8 and clear coat to 1.0
 
@@ -1122,7 +1103,7 @@ We should also modify the base layer's apparent roughness based on the IOR of th
 
 The standard material model described previously can only describe isotropic surfaces, that is, surfaces whose properties are identical in all directions. Many real-world materials, such as brushed metal, can, however, only be replicated using an anisotropic model.
 
-[![](/images/material_anisotropic.png)](/images/material_anisotropic.png)
+![material_anisotropic.png](/images/material_anisotropic.png)
 
 **Figure 27:** Comparison of isotropic material (left) and anisotropic material (right)
 
@@ -1229,7 +1210,7 @@ Amount of anisotropy. Scalar between −1 and 1
 
 No further remapping is required. Note that negative values will align the anisotropy with the bitangent direction instead of the tangent direction. [Figure 28](#figure_anisotropyparameter) shows how the anisotropy parameter affect the appearance of a rough metallic surface.
 
-[![](/images/materials/anisotropy.png)](/images/materials/anisotropy.png)
+![materials/anisotropy.png](/images/materials/anisotropy.png)
 
 **Figure 28:** Anisotropy varying from 0.0 (left) to 1.0 (right)
 
@@ -1251,13 +1232,13 @@ All the material models described previously are designed to simulate dense surf
 
 [Figure 29](#figure_materialcloth) shows how a traditional microfacet BRDF fails to capture the appearance of a sample of denim fabric. The surface appears rigid (almost plastic-like), more similar to a tarp than a piece of clothing. This figure also shows how important the softer specular lobe caused by absorption and scattering is to the faithful recreation of the fabric.
 
-[![](/images/screenshot_cloth.png)](/images/screenshot_cloth.png)
+![screenshot_cloth.png](/images/screenshot_cloth.png)
 
 **Figure 29:** Comparison of denim fabric rendered using a traditional microfacet BRDF (left) and our cloth BRDF (right)
 
 Velvet is an interesting use case for a cloth material model. As shown in [figure 30](#figure_materialvelvet) this type of fabric exhibits strong rim lighting due to forward and backward scattering. These scattering events are caused by fibers standing straight at the surface of the fabric. When the incident light comes from the direction opposite to the view direction, the fibers will forward-scatter the light. Similarly, when the incident light from the same direction as the view direction, the fibers will scatter the light backward.
 
-[![](/images/screenshot_cloth_velvet.png)](/images/screenshot_cloth_velvet.png)
+![screenshot_cloth_velvet.png](/images/screenshot_cloth_velvet.png)
 
 **Figure 30:** Velvet fabric showcasing forward and backward scattering
 
@@ -1325,7 +1306,7 @@ $$
 
 To offer better control over the appearance of cloth and to give users the ability to recreate two-tone specular materials, we introduce the ability to directly modify the specular reflectance. [Figure 31](#figure_materialclothsheen) shows an example of using the parameter we call “sheen color”.
 
-[![](/images/screenshot_cloth_sheen.png)](/images/screenshot_cloth_sheen.png)
+![screenshot_cloth_sheen.png](/images/screenshot_cloth_sheen.png)
 
 **Figure 31:** Blue fabric without (left) and with (right) sheen
 
@@ -1349,7 +1330,7 @@ $$
 
 Where $w$ is a value between 0 and 1 defining by how much the diffuse light should wrap around the terminator. To avoid introducing another parameter, we fix $w = 0.5$. Note that with wrap diffuse lighting, the diffuse term must not be multiplied by $n \cdot l$. The effect of this cheap subsurface scattering approximation can be seen in [figure 32](#figure_materialclothsubsurface).
 
-[![](/images/screenshot_cloth_subsurface.png)](/images/screenshot_cloth_subsurface.png)
+![screenshot_cloth_subsurface.png](/images/screenshot_cloth_subsurface.png)
 
 **Figure 32:** White cloth (left column) vs white cloth with brown subsurface scattering (right)
 
@@ -1565,7 +1546,7 @@ The illuminance reaching a surface can be measured using an incident light meter
 
 The incident light meter uses a white diffuse dome to capture the illuminance reaching a surface. It is important to orient the dome properly depending on the desired measurement. For instance, orienting the dome perpendicular to the sun on a bright clear day will give very different results than orienting the dome horizontally.
 
-[![](/images/photo_light_meter.jpg)](/images/photo_light_meter.jpg)
+![photo_light_meter.jpg](/images/photo_light_meter.jpg)
 
 **Figure 33:** Sekonic L-478D incident light meter
 
@@ -1573,7 +1554,7 @@ The incident light meter uses a white diffuse dome to capture the illuminance re
 
 The luminance at a surface, or the product of the incident light and the surface, can be measured using a luminance meter, also often called a spot meter. While incident light meters use a diffuse hemisphere to capture light from all directions, a spot meter uses a shield to measure incident light from a single direction. For our tests, we use a [Sekonic 5° Viewfinder](http://www.sekonic.com/products/l-478dr/accessories/np-finder-5-degree-for-l-478.aspx) that can replace the diffuser on the L-478D to measure luminance in a 5° cone.
 
-[![](/images/photo_incident_light_meter.jpg)](/images/photo_incident_light_meter.jpg)
+![photo_incident_light_meter.jpg](/images/photo_incident_light_meter.jpg)
 
 Sekonic L-478D working as a luminance meter using a special viewfinder
 
@@ -1599,7 +1580,7 @@ $$
 
 The main purpose of directional lights is to recreate important light sources for outdoor environment, i.e. the sun and/or the moon. While directional lights do not truly exist in the physical world, any light source sufficiently far from the light receptor can be assumed to be directional (i.e. all the incident light rays are parallel, as shown in [figure 34](#figure_directionallight)).
 
-[![](/images/diagram_directional_light.png)](/images/diagram_directional_light.png)
+![diagram_directional_light.png](/images/diagram_directional_light.png)
 
 **Figure 34:** Interaction between a directional light and a surface. The light source is a virtual construct that can only be represented by a direction
 
@@ -1667,7 +1648,7 @@ Dynamic directional lights are particularly cheap to evaluate at runtime, as sho
 
 [Figure 35](#figure_directionallighttest) shows the effect of lighting a simple scene with a directional light setup to approximate a midday Sun (illuminance set to 110,000 $lx$). For illustration purposes, only direct lighting is shown.
 
-[![](/images/screenshot_directional_light.png)](/images/screenshot_directional_light.png)
+![screenshot_directional_light.png](/images/screenshot_directional_light.png)
 
 **Figure 35:** Series of dielectric materials of varying roughness under a directional light
 
@@ -1696,7 +1677,7 @@ The difference between point and spot lights lies in how $E$ is computed, and in
 
 A point light is defined only by a position in space, as shown in [figure 36](#figure_pointlight).
 
-[![](/images/diagram_point_light.png)](/images/diagram_point_light.png)
+![diagram_point_light.png](/images/diagram_point_light.png)
 
 **Figure 36:** Interaction between a point light and a surface. The attenuation only depends on the distance to the light
 
@@ -1714,7 +1695,7 @@ $$
 
 [Figure 37](#figure_pointlighttest) shows the effect of lighting a simple scene with a point light subject to distance attenuation. Light falloff is exaggerated for illustration purposes.
 
-[![](/images/screenshot_point_light.png)](/images/screenshot_point_light.png)
+![screenshot_point_light.png](/images/screenshot_point_light.png)
 
 **Figure 37:** Inverse square law applied to point lights evaluation
 
@@ -1722,7 +1703,7 @@ $$
 
 A spot light is defined by a position in space, a direction vector and two cone angles, $ \theta*{inner} $ and $ \theta*{outer} $ (see [figure 38](#figure_spotlight)). These two angles are used to define the angular falloff attenuation of the spot light. The light evaluation function of a spot light must therefore take into account both the inverse square law and these two angles to properly evaluate the luminance attenuation.
 
-[![](/images/diagram_spot_light.png)](/images/diagram_spot_light.png)
+![diagram_spot_light.png](/images/diagram_spot_light.png)
 
 **Figure 38:** Interaction between a spot light and a surface. The attenuation depends on the distance to the light and the angle between the surface the spot light's direction vector
 
@@ -1734,7 +1715,7 @@ $$
 
 While this formulation is physically correct, it makes spot lights a little difficult to use: changing the outer angle of the cone changes the illumination levels. [Figure 39](#figure_spotlighttestfocused) shows the same scene lit by a spot light, with an outer angle of 55° and an outer angle of 15°. Observes how the illumination level increases as the cone aperture decreases.
 
-[![](/images/screenshot_spot_light_focused.png)](/images/screenshot_spot_light_focused.png)
+![screenshot_spot_light_focused.png](/images/screenshot_spot_light_focused.png)
 
 **Figure 39:** Comparison of spot light outer angles, 55° (left) and 15° (right)
 
@@ -1746,7 +1727,7 @@ $$
 
 With this new formulation to compute the luminous intensity, the test scene in [figure 40](#figure_spotlighttest) exhibits similar illumination levels with both cone apertures.
 
-[![](/images/screenshot_spot_light.png)](/images/screenshot_spot_light.png)
+![screenshot_spot_light.png](/images/screenshot_spot_light.png)
 
 **Figure 40:** Comparison of spot light outer angles, 55° (left) and 15° (right)
 
@@ -1840,19 +1821,19 @@ Punctual lights are an extremely practical and efficient way to light a scene bu
 
 The lighting system we have described so far can easily address the first two points but we need a way to define the distribution of light within the space. Light distribution is especially important for indoor scenes or for some types of outdoor scenes or even road lighting. [Figure 41](#figure_lightdistributiontest) shows scenes where the light distribution is controlled by the artist. This type of distribution control is widely used when putting objects on display (museums, stores or galleries for instance).
 
-[![](/images/screenshot_photometric_lights.png)](/images/screenshot_photometric_lights.png)
+![screenshot_photometric_lights.png](/images/screenshot_photometric_lights.png)
 
 **Figure 41:** Controlling the distribution of a point light
 
 Photometric lights use a photometric profile to describe their intensity distribution. There are two commonly used formats, IES (Illuminating Engineering Society) and EULUMDAT (European Lumen Data format) but we will focus on the former. IES profiles are supported by many tools and engines, such as Unreal Engine 4, Frostbite, Renderman, Maya and Killzone. In addition, IES light profiles are commonly made available by bulbs and luminaires manufacturers (Philips offers [an extensive array of IES files](http://www.usa.lighting.philips.com/connect/tools_literature/photometric_data_1.wpd) for download for instance). Photometric profiles are particularly useful when they measure a luminaire or light fixture, in which the light source is partially covered. The luminaire will block the light emitted in certain directions, thus shaping the light distribution.
 
-[![](/images/photo_photometric_lights.jpg)](/images/photo_photometric_lights.jpg)
+![photo_photometric_lights.jpg](/images/photo_photometric_lights.jpg)
 
 Example of a real world luminaires that can be described by photometric profiles
 
 An IES profile stores luminous intensity for various angles on a sphere around the measured light source. This spherical coordinate system is usually referred to as the photometric web, which can be visualized using specialized tools such as [IESviewer](http://www.photometricviewer.com/). [Figure 42](#figure_xarrow) below shows the photometric web of the XArrow IES profile [provided by Pixar](http://renderman.pixar.com/view/DP25764) for use with Renderman. This picture also shows a rendering in 3D space of the XArrow IES profile by our tool `lightgen`.
 
-[![](/images/screenshot_xarrow.png)](/images/screenshot_xarrow.png)
+![screenshot_xarrow.png](/images/screenshot_xarrow.png)
 
 **Figure 42:** The XArrow IES profile rendered as a photometric web and as a point light in 3D space
 
@@ -1860,7 +1841,7 @@ The IES format is poorly documented and it is not uncommon to find syntax variat
 
 [Figure 43](#figure_lightensamples) shows the series of IES profiles provided by Pixar for Renderman, rendered using our `lightgen` tool.
 
-[![](/images/screenshot_lightgen_samples.png)](/images/screenshot_lightgen_samples.png)
+![screenshot_lightgen_samples.png](/images/screenshot_lightgen_samples.png)
 
 **Figure 43:** Series of IES light profiles rendered with lightgen
 
@@ -2006,7 +1987,7 @@ However, real-world artificial lights are often defined by their color temperatu
 
 To compute RGB values from a temperature, we can use the Planckian locus, shown in [figure 44](#figure_planckianlocus). This locus is the path that the color of an incandescent black body takes in a chromaticity space as the body's temperature changes.
 
-[![](/images/diagram_planckian_locus.png)](/images/diagram_planckian_locus.png)
+![diagram_planckian_locus.png](/images/diagram_planckian_locus.png)
 
 **Figure 44:** The Planckian locus visualized on a CIE 1931 chromaticity diagram (source: Wikipedia)
 
@@ -2060,19 +2041,19 @@ $$
 
 For convenience, [figure 45](#figure_colortemperaturescalecct) shows the range of correlated color temperatures from 1,000K to 12,500K. All the colors used below assume CIE $ D\_{65} $ as the white point (as is the case in the sRGB color space).
 
-[![](/images/diagram_color_temperature_cct.png)](/images/diagram_color_temperature_cct.png)
+![diagram_color_temperature_cct.png](/images/diagram_color_temperature_cct.png)
 
 **Figure 45:** Scale of correlated color temperatures
 
 Similarly, [figure 46](#figure_colortemperaturescalecie) shows the range of CIE standard illuminants series D from 1,000K to 12,500K.
 
-[![](/images/diagram_color_temperature_cie.png)](/images/diagram_color_temperature_cie.png)
+![diagram_color_temperature_cie.png](/images/diagram_color_temperature_cie.png)
 
 **Figure 46:** Scale of CIE standard illuminants series D
 
 For reference, [figure 47](#figure_colortemperaturescalecctclamped) shows the range of correlated color temperatures without the normalization step presented in equation [normalizedRGB](normalizedRGB).
 
-[![](/images/diagram_color_temperature_cct_clamped.png)](/images/diagram_color_temperature_cct_clamped.png)
+![diagram_color_temperature_cct_clamped.png](/images/diagram_color_temperature_cct_clamped.png)
 
 **Figure 47:** Unnormalized scale of correlated color temperatures
 
@@ -2196,7 +2177,7 @@ In practice we pre-expose the following lights:
 
 In real life, light comes from every direction either directly from light sources or indirectly after bouncing off objects in the environment, being partially absorbed in the process. In a way the whole environment around an object can be seen as a light source. Images, in particular cubemaps, are a great way to encode such an “environment light”. This is called Image Based Lighting (IBL) or sometimes Indirect Lighting.
 
-[![](/images/screenshot_ball_ibl.png)](/images/screenshot_ball_ibl.png)
+![screenshot_ball_ibl.png](/images/screenshot_ball_ibl.png)
 
 **Figure 48:** The object shown here is lit only by image-encoded environment lights. Notice the subtle lighting effects that can be applied using this technique.
 
@@ -2268,11 +2249,11 @@ $\Omega_s$ is the solid-angle[8](#endnote-ibldiffuse2) associated to sample $i$.
 
 The irradiance integral $E_d$ can be trivially, albeit slowly[9](#endnote-ibldiffuse3), precomputed and stored into a cubemap for efficient access at runtime. Typically, _image_ is a cubemap or an equirectangular image. The term $ \frac{\sigma}{\pi} $ is independent of the IBL and is added at runtime to obtain the _radiance_.
 
-[![](/images/ibl/ibl_river_roughness_m0.png)](/images/ibl/ibl_river_roughness_m0.png)
+![ibl/ibl_river_roughness_m0.png](/images/ibl/ibl_river_roughness_m0.png)
 
 **Figure 49:** Image-based environment
 
-[![](/images/ibl/ibl_irradiance.png)](/images/ibl/ibl_irradiance.png)
+![ibl/ibl_irradiance.png](/images/ibl/ibl_irradiance.png)
 
 **Figure 50:** Image-based irradiance map using the Lambertian BRDF
 
@@ -2295,11 +2276,11 @@ SH decomposition is similar in concept to a Fourier transform, it expresses the 
 
 In practice only 4 or 9 coefficients (i.e.: 2 or 3 bands) are enough for $\left< \cos \theta \right> $ meaning we don't need more either for $L_{\bot}$.
 
-[![](/images/ibl/ibl_irradiance_sh3.png)](/images/ibl/ibl_irradiance_sh3.png)
+![ibl/ibl_irradiance_sh3.png](/images/ibl/ibl_irradiance_sh3.png)
 
 **Figure 51:** 3 bands (9 coefficients)
 
-[![](/images/ibl/ibl_irradiance_sh2.png)](/images/ibl/ibl_irradiance_sh2.png)
+![ibl/ibl_irradiance_sh2.png](/images/ibl/ibl_irradiance_sh2.png)
 
 **Figure 52:** 2 bands (4 coefficients)
 
@@ -2527,11 +2508,11 @@ $DFG_2$
 
 ${ DFG_1, DFG_2, 0 }$
 
-[![](/images/ibl/dfg1.png)](/images/ibl/dfg1.png)
+![ibl/dfg1.png](/images/ibl/dfg1.png)
 
-[![](/images/ibl/dfg2.png)](/images/ibl/dfg2.png)
+![ibl/dfg2.png](/images/ibl/dfg2.png)
 
-[![](/images/ibl/dfg.png)](/images/ibl/dfg.png)
+![ibl/dfg.png](/images/ibl/dfg.png)
 
 **Table 15:** Y axis: $\alpha$. X axis: $cos \theta$
 
@@ -2545,11 +2526,11 @@ $DFG_2$
 
 ${ DFG_1, DFG_2, 0 }$
 
-[![](/images/ibl/dfg1_approx.png)](/images/ibl/dfg1_approx.png)
+![ibl/dfg1_approx.png](/images/ibl/dfg1_approx.png)
 
-[![](/images/ibl/dfg2_approx.png)](/images/ibl/dfg2_approx.png)
+![ibl/dfg2_approx.png](/images/ibl/dfg2_approx.png)
 
-[![](/images/ibl/dfg_approx.png)](/images/ibl/dfg_approx.png)
+![ibl/dfg_approx.png](/images/ibl/dfg_approx.png)
 
 **Table 16:** Y axis: $\alpha$. X axis: $cos \theta$
 
@@ -2566,23 +2547,23 @@ $$
 
 See an example below:
 
-[![](/images/ibl/ibl_river_roughness_m0.png)](/images/ibl/ibl_river_roughness_m0.png)
+![ibl/ibl_river_roughness_m0.png](/images/ibl/ibl_river_roughness_m0.png)
 
 $\alpha=0.0$
 
-[![](/images/ibl/ibl_river_roughness_m1.png)](/images/ibl/ibl_river_roughness_m1.png)
+![ibl/ibl_river_roughness_m1.png](/images/ibl/ibl_river_roughness_m1.png)
 
 $\alpha=0.2$
 
-[![](/images/ibl/ibl_river_roughness_m2.png)](/images/ibl/ibl_river_roughness_m2.png)
+![ibl/ibl_river_roughness_m2.png](/images/ibl/ibl_river_roughness_m2.png)
 
 $\alpha=0.4$
 
-[![](/images/ibl/ibl_river_roughness_m3.png)](/images/ibl/ibl_river_roughness_m3.png)
+![ibl/ibl_river_roughness_m3.png](/images/ibl/ibl_river_roughness_m3.png)
 
 $0.6$
 
-[![](/images/ibl/ibl_river_roughness_m4.png)](/images/ibl/ibl_river_roughness_m4.png)
+![ibl/ibl_river_roughness_m4.png](/images/ibl/ibl_river_roughness_m4.png)
 
 $0.8$
 
@@ -2590,7 +2571,7 @@ $0.8$
 
 [Figure 53](#figure_iblvisualized) shows how indirect lighting interacts with dielectrics and conductors. Direct lighting was removed for illustration purposes.
 
-[![](/images/ibl/ibl_visualization.jpg)](/images/ibl/ibl_visualization.jpg)
+![ibl/ibl_visualization.jpg](/images/ibl/ibl_visualization.jpg)
 
 **Figure 53:** Indirect diffuse and specular decomposition
 
@@ -2732,23 +2713,23 @@ In order to calculate the specular contribution of distant image-based lights, w
 - Schlick's Fresnel
 - $f_{90} = 1$ in the multiscattering case.
 
-[![](/images/ibl/ibl_prefilter_vs_reference.png)](/images/ibl/ibl_prefilter_vs_reference.png)
+![ibl/ibl_prefilter_vs_reference.png](/images/ibl/ibl_prefilter_vs_reference.png)
 
 **Figure 54:**
 
-[![](/images/ibl/ibl_stretchy_reflections_error.png)](/images/ibl/ibl_stretchy_reflections_error.png)
+![ibl/ibl_stretchy_reflections_error.png](/images/ibl/ibl_stretchy_reflections_error.png)
 
 **Figure 55:**
 
-[![](/images/ibl/ibl_trilinear_0.png)](/images/ibl/ibl_trilinear_0.png)
+![ibl/ibl_trilinear_0.png](/images/ibl/ibl_trilinear_0.png)
 
 **Figure 56:**
 
-[![](/images/ibl/ibl_trilinear_1.png)](/images/ibl/ibl_trilinear_1.png)
+![ibl/ibl_trilinear_1.png](/images/ibl/ibl_trilinear_1.png)
 
 **Figure 57:**
 
-[![](/images/ibl/ibl_no_mipmaping.png)](/images/ibl/ibl_no_mipmaping.png)
+![ibl/ibl_no_mipmaping.png](/images/ibl/ibl_no_mipmaping.png)
 
 **Figure 58:**
 
@@ -2771,11 +2752,11 @@ When sampling the IBL, the clear coat layer is calculated as a second specular l
 
 [McAuley15](#citation-mcauley15) describes a technique called “bent reflection vector”, based [Revie12](#citation-revie12). The bent reflection vector is a rough approximation of anisotropic lighting but the alternative is to use importance sampling. This approximation is sufficiently cheap to compute and provides good results, as shown in [figure 59](#figure_anisotropicibl1) and [figure 60](#figure_anisotropicibl2).
 
-[![](/images/screenshot_anisotropic_ibl1.jpg)](/images/screenshot_anisotropic_ibl1.jpg)
+![screenshot_anisotropic_ibl1.jpg](/images/screenshot_anisotropic_ibl1.jpg)
 
 **Figure 59:** Anisotropic indirect specular reflections using bent normals (left: roughness 0.3, right: roughness: 0.0; both: anisotropy 1.0)
 
-[![](/images/screenshot_anisotropic_ibl2.jpg)](/images/screenshot_anisotropic_ibl2.jpg)
+![screenshot_anisotropic_ibl2.jpg](/images/screenshot_anisotropic_ibl2.jpg)
 
 **Figure 60:** Anisotropic reflections with varying roughness, metallicness, etc.
 
@@ -2804,7 +2785,7 @@ This technique can be made more useful by accepting negative `anisotropy` values
 
 [Figure 61](#figure_anisotropicdirection) demonstrates this modified implementation in practice.
 
-[![](/images/screenshot_anisotropy_direction.png)](/images/screenshot_anisotropy_direction.png)
+![screenshot_anisotropy_direction.png](/images/screenshot_anisotropy_direction.png)
 
 **Figure 61:** Control of the anisotropy direction using positive (left) and negative (right) values
 
@@ -2818,7 +2799,7 @@ The IBL implementation for the cloth material model is more complicated than for
 
 The DG term is generated using uniform sampling as recommended in [Estevez17](#citation-estevez17). With uniform sampling the $pdf$ is simply $\frac{1}{2\pi}$ and we must still use the Jacobian $\frac{1}{4\left< v \cdot h \right>}$.
 
-[![](/images/ibl/dfg_cloth.png)](/images/ibl/dfg_cloth.png)
+![ibl/dfg_cloth.png](/images/ibl/dfg_cloth.png)
 
 **Figure 62:** DFG LUT with a 3rd channel encoding the DG term of the cloth BRDF
 
@@ -2856,11 +2837,11 @@ Transparent and translucent materials are important to add realism and correctne
 
 To properly light a transparent surface, we must first understand how the material's opacity is applied. Observe a window and you will see that the diffuse reflectance is transparent. On the other hand, the brighter the specular reflectance, the less opaque the window appears. This effect can be seen in [figure 63](#figure_cameratransparency): the scene is properly reflected onto the glass surfaces but the specular highlight of the sun is bright enough to appear opaque.
 
-[![](/images/screenshot_camera_transparency.jpg)](/images/screenshot_camera_transparency.jpg)
+![screenshot_camera_transparency.jpg](/images/screenshot_camera_transparency.jpg)
 
 **Figure 63:** Example of a complex object where lit surface transparency plays an important role
 
-[![](/images/screenshot_car.jpg)](/images/screenshot_car.jpg)
+![screenshot_car.jpg](/images/screenshot_car.jpg)
 
 **Figure 64:** Example of a complex object where lit surface transparency plays an important role
 
@@ -2909,7 +2890,7 @@ Volume translucency is useful to light particle systems, for instance clouds or 
 
 TODO Surface translucency (BRDF+BTDF, BSSRDF)
 
-[![](/images/screenshot_translucency.png)](/images/screenshot_translucency.png)
+![screenshot_translucency.png](/images/screenshot_translucency.png)
 
 **Figure 65:** Front-lit translucent object (left) and back-lit translucent object (right), using approximated BTDF and BSSRDF. Model: Lucy from the Stanford University Computer Graphics Laboratory
 
@@ -2976,7 +2957,7 @@ In practice, baked ambient occlusion is stored as a grayscale texture which can 
 
 [Figure 66](#figure_aocomparison) shows two different materials without and with diffuse ambient occlusion. Notice how the material ambient occlusion is used to recreate the natural shadowing that occurs between the different tiles. Without ambient occlusion, both materials appear too flat.
 
-[![](/images/screenshot_ao.jpg)](/images/screenshot_ao.jpg)
+![screenshot_ao.jpg](/images/screenshot_ao.jpg)
 
 **Figure 66:** Comparison of materials without diffuse ambient occlusion (left) and with (right)
 
@@ -3050,17 +3031,17 @@ There are two common use cases of normal maps: replacing high-poly meshes with l
 
 Let's imagine that we want to render a piece of furniture covered in tufted leather. Modeling the geometry to accurately represent the tufted pattern would require too many triangles so we instead bake a high-poly mesh into a normal map. Once the base map is applied to a simplified mesh (in this case, a quad), we get the result in [figure 67](#figure_normalmapped). The base map used to create this effect is shown in [figure 68](#figure_basenormalmap).
 
-[![](/images/screenshot_normal_mapping.jpg)](/images/screenshot_normal_mapping.jpg)
+![screenshot_normal_mapping.jpg](/images/screenshot_normal_mapping.jpg)
 
 **Figure 67:** Low-poly mesh without normal mapping (left) and with (right)
 
-[![](/images/screenshot_normal_map.jpg)](/images/screenshot_normal_map.jpg)
+![screenshot_normal_map.jpg](/images/screenshot_normal_map.jpg)
 
 **Figure 68:** Normal map used as a base map
 
 A simple problem arises if we now want to combine this base map with a second normal map. For instance, let's use the detail map shown in [figure 69](#figure_detailnormalmap) to add cracks in the leather.
 
-[![](/images/screenshot_normal_map_detail.jpg)](/images/screenshot_normal_map_detail.jpg)
+![screenshot_normal_map_detail.jpg](/images/screenshot_normal_map_detail.jpg)
 
 **Figure 69:** Normal map used as a detail map
 
@@ -3087,7 +3068,7 @@ The normalization step is not strictly necessary and can be skipped if the techn
 
 Since this technique is slightly more expensive than the one described below, we will mostly use it offline. We therefore provide a simple offline tool to combine two normal maps. [Figure 70](#figure_blendednormalmaps) presents the output of the tool with the base map and the detail map shown previously.
 
-[![](/images/screenshot_normal_map_blended.jpg)](/images/screenshot_normal_map_blended.jpg)
+![screenshot_normal_map_blended.jpg](/images/screenshot_normal_map_blended.jpg)
 
 **Figure 70:** Blended normal and detail map (left) and resulting render when combined with a diffuse map (right)
 
@@ -3106,7 +3087,7 @@ The technique called UDN blending, described in [Hill12](#citation-hill12), is a
 
 The results are visually close to Reoriented Normal Mapping but a careful comparison of the data shows that UDN is indeed less correct. [Figure 71](#figure_blendednormalmapsudn) presents the result of the UDN blending approach using the same source data as in the previous examples.
 
-[![](/images/screenshot_normal_map_blended_udn.jpg)](/images/screenshot_normal_map_blended_udn.jpg)
+![screenshot_normal_map_blended_udn.jpg](/images/screenshot_normal_map_blended_udn.jpg)
 
 **Figure 71:** Blended normal and detail map using the UDN blending technique
 
@@ -3114,11 +3095,11 @@ The results are visually close to Reoriented Normal Mapping but a careful compar
 
 ## Exponential height fog
 
-[![](/images/screenshot_fog1.jpg)](/images/screenshot_fog1.jpg)
+![screenshot_fog1.jpg](/images/screenshot_fog1.jpg)
 
 **Figure 72:** Example of directional in-scattering with exponential height fog
 
-[![](/images/screenshot_fog2.jpg)](/images/screenshot_fog2.jpg)
+![screenshot_fog2.jpg](/images/screenshot_fog2.jpg)
 
 **Figure 73:** Example of directional in-scattering with exponential height fog
 
@@ -3438,7 +3419,7 @@ Where $ \Delta t $ is the delta time from the previous frame and $\tau$ a consta
 
 Because the EV scale is almost perceptually linear, the exposure value is also often used as a light unit. This means we could let artists specify the intensity of lights or emissive surfaces using exposure compensation as a unit. The intensity of emitted light would therefore be relative to the exposure settings. Using exposure compensation as a light unit should be avoided whenever possible but can be useful to force (or cancel) a bloom effect around emissive surfaces independently of the camera settings (for instance, a lightsaber in a game should always bloom).
 
-[![](/images/screenshot_bloom.jpg)](/images/screenshot_bloom.jpg)
+![screenshot_bloom.jpg](/images/screenshot_bloom.jpg)
 
 **Figure 74:** Saturated photosites on a sensor create a blooming effect in the bright parts of the scene
 
@@ -3472,7 +3453,7 @@ Equation [bloomEV](bloomEV) can be used in a fragment shader to implement emissi
 
 TODO
 
-[![](/images/screenshot_fringing.jpg)](/images/screenshot_fringing.jpg)
+![screenshot_fringing.jpg](/images/screenshot_fringing.jpg)
 
 **Figure 75:** Example of color fringing: look at the ear on the left or the chin at the bottom.
 
@@ -3517,13 +3498,13 @@ Tiled shading can be applied to both forward and deferred rendering methods. The
 
 The scene displayed in [figure 76](#figure_sponza) was rendered using clustered forward rendering.
 
-[![](/images/screenshot_sponza.jpg)](/images/screenshot_sponza.jpg)
+![screenshot_sponza.jpg](/images/screenshot_sponza.jpg)
 
 **Figure 76:** Clustered forward rendering with dozens of dynamic lights and MSAA
 
 [Figure 77](#figure_sponzatiles) shows the same scene split in tiles (in this case, a 1280×720 render target with 80×80px tiles).
 
-[![](/images/screenshot_sponza_tiles.jpg)](/images/screenshot_sponza_tiles.jpg)
+![screenshot_sponza_tiles.jpg](/images/screenshot_sponza_tiles.jpg)
 
 **Figure 77:** Tiled shading (16×9 tiles)
 
@@ -3533,17 +3514,17 @@ We decided to explore another method called Clustered Shading, in its forward va
 
 The frustum is first sliced on the depth axis as show in [figure 78](#figure_sponzaslices).
 
-[![](/images/screenshot_sponza_slices.jpg)](/images/screenshot_sponza_slices.jpg)
+![screenshot_sponza_slices.jpg](/images/screenshot_sponza_slices.jpg)
 
 **Figure 78:** Depth slicing (16 slices)
 
 And the depth slices are then combined with the screen tiles to “voxelize” the frustum. We call each cluster a froxel as it makes it clear what they represent (a voxel in frustum space). The result of the “froxelization” pass is shown in [figure 79](#figure_froxel1) and [figure 80](#figure_froxel2).
 
-[![](/images/screenshot_sponza_froxels1.jpg)](/images/screenshot_sponza_froxels1.jpg)
+![screenshot_sponza_froxels1.jpg](/images/screenshot_sponza_froxels1.jpg)
 
 **Figure 79:** Frustum voxelization (5×3 tiles, 8 depth slices)
 
-[![](/images/screenshot_sponza_froxels2.jpg)](/images/screenshot_sponza_froxels2.jpg)
+![screenshot_sponza_froxels2.jpg](/images/screenshot_sponza_froxels2.jpg)
 
 **Figure 80:** Frustum voxelization (5×3 tiles, 8 depth slices)
 
@@ -3553,13 +3534,13 @@ The depth slicing is not linear, but exponential. In a typical scene, there will
 
 [Figure 81](#figure_froxeldistribution) shows how much world space unit each depth slice uses with exponential slicing.
 
-[![](/images/diagram_froxels1.png)](/images/diagram_froxels1.png)
+![diagram_froxels1.png](/images/diagram_froxels1.png)
 
 **Figure 81:** Near: 0.1m, Far: 100m, 16 slices
 
 A simple exponential voxelization is unfortunately not enough. The graphic above clearly illustrates how world space is distributed across slices but it fails to show what happens close to the near plane. If we examine the same distribution in a smaller range (0.1m to 7m) we can see an interesting problem appear as shown in [figure 82](#figure_froxeldistributionclose).
 
-[![](/images/diagram_froxels2.png)](/images/diagram_froxels2.png)
+![diagram_froxels2.png](/images/diagram_froxels2.png)
 
 **Figure 82:** Depth distribution in the 0.1-7m range
 
@@ -3567,7 +3548,7 @@ This graphic shows that a simple exponential distribution uses up half of the sl
 
 Our solution is to manually tweak the size of the first froxel depending on the scene and the near and far planes. By doing so, we can better distribute the remaining froxels across the frustum. [Figure 83](#figure_froxeldistributionexp) shows for instance what happens when we use a special froxel between 0.1m and 5m.
 
-[![](/images/diagram_froxels3.png)](/images/diagram_froxels3.png)
+![diagram_froxels3.png](/images/diagram_froxels3.png)
 
 **Figure 83:** Near: 0.1, Far: 100m, 16 slices, Special froxel: 0.1-5m
 
@@ -3714,7 +3695,7 @@ A quick and easy way to validate a scene's lighting is to modify the shader to o
 
 With emissive materials and IBLs, it is fairly easy to obtain a scene in which specular highlights are brighter than their apparent caster. This type of issue can be difficult to observe after tone-mapping and quantization but is fairly obvious in the scene-referred space. [Figure 84](#figure_luminanceviz) shows how the custom operator described in [listing 45](#listing_tonemapluminanceviz) is used to show the exposed luminance of a scene.
 
-[![](/images/screenshot_luminance_debug.png)](/images/screenshot_luminance_debug.png)
+![screenshot_luminance_debug.png](/images/screenshot_luminance_debug.png)
 
 **Figure 84:** Visualizing luminance by color coding the stops: cyan is middle gray, blue is 1 stop darker, green 1 stop brighter, etc.
 
@@ -3756,11 +3737,11 @@ To validate our implementation against reference renderings, we will use a comme
 
 [Figure 85](#figure_mitsubareference) and [figure 86](#figure_filamentreference) show a simple scene, a perfectly smooth dielectric sphere, rendered respectively with Mitsuba and Filament.
 
-[![](/images/screenshot_ref_mitsuba.jpg)](/images/screenshot_ref_mitsuba.jpg)
+![screenshot_ref_mitsuba.jpg](/images/screenshot_ref_mitsuba.jpg)
 
 **Figure 85:** Rendered in 2048×1440 in 1 minute and 42 seconds on a 12 core 2013 MacPro
 
-[![](/images/screenshot_ref_filament.jpg)](/images/screenshot_ref_filament.jpg)
+![screenshot_ref_filament.jpg](/images/screenshot_ref_filament.jpg)
 
 **Figure 86:** Rendered in 2048×1440 with MSAA 4x at 60 fps on a Nexus 9 device (Tegra K1 GPU)
 
@@ -3809,7 +3790,7 @@ The slight differences between the two renderings come from the various approxim
 
 [Figure 87](#figure_referencecomparison) shows the luminance gradient of the images produced by both engines. The comparison was performed on LDR images.
 
-[![](/images/screenshot_ref_comparison.png)](/images/screenshot_ref_comparison.png)
+![screenshot_ref_comparison.png](/images/screenshot_ref_comparison.png)
 
 **Figure 87:** Luminance gradients from Mitsuba (left) and Filament (right)
 
@@ -3821,7 +3802,7 @@ The biggest difference is visible at grazing angles, which is most likely explai
 
 Filament uses a Y-up, right-handed coordinate system.
 
-[![](/images/screenshot_coordinates.jpg)](/images/screenshot_coordinates.jpg)
+![screenshot_coordinates.jpg](/images/screenshot_coordinates.jpg)
 
 **Figure 88:** Red +X, green +Y, blue +Z (rendered in Marmoset Toolbag).
 
@@ -3833,7 +3814,7 @@ Filament's Camera looks towards its local -Z axis. That is, when placing a camer
 
 All cubemaps used in Filament follow the OpenGL convention for face alignment shown in [figure 89](#figure_cubemapcoordinates).
 
-[![](/images/screenshot_cubemap_coordinates.png)](/images/screenshot_cubemap_coordinates.png)
+![screenshot_cubemap_coordinates.png](/images/screenshot_cubemap_coordinates.png)
 
 **Figure 89:** Horizontal cross representation of a cubemap following the OpenGL faces alignment convention.
 
@@ -4069,7 +4050,7 @@ Cubemap sampling is done using seamless trilinear filtering. It is extremely imp
 
 [Table 17](#table_importancesamplingviz) shows a comparison between importance sampling and pre-filtered importance sampling when applied to [figure 90](#figure_importancesamplingref).
 
-[![](/images/image_is_original.png)](/images/image_is_original.png)
+![image_is_original.png](/images/image_is_original.png)
 
 **Figure 90:** Importance sampling image reference
 
@@ -4081,19 +4062,19 @@ Pre-filtered importance sampling
 
 4096
 
-[![](/images/image_is_4096.png)](/images/image_is_4096.png)
+![image_is_4096.png](/images/image_is_4096.png)
 
 1024
 
-[![](/images/image_is_1024.png)](/images/image_is_1024.png)
+![image_is_1024.png](/images/image_is_1024.png)
 
-[![](/images/image_fis_1024.png)](/images/image_fis_1024.png)
+![image_fis_1024.png](/images/image_fis_1024.png)
 
 32
 
-[![](/images/image_is_32.png)](/images/image_is_32.png)
+![image_is_32.png](/images/image_is_32.png)
 
-[![](/images/image_fis_32.png)](/images/image_fis_32.png)
+![image_fis_32.png](/images/image_fis_32.png)
 
 **Table 17:** Importance sampling vs pre-filtered importance sampling with $\alpha = 0.4$
 
@@ -4101,21 +4082,21 @@ The reference renderer used in the comparison below performs no approximation. I
 
 Left: reference renderer, right: pre-filtered importance sampling.
 
-[![](/images/image_is_ref_1.png)](/images/image_is_ref_1.png)
+![image_is_ref_1.png](/images/image_is_ref_1.png)
 
-[![](/images/image_filtered_1.png)](/images/image_filtered_1.png)
+![image_filtered_1.png](/images/image_filtered_1.png)
 
-[![](/images/image_is_ref_2.png)](/images/image_is_ref_2.png)
+![image_is_ref_2.png](/images/image_is_ref_2.png)
 
-[![](/images/image_filtered_2.png)](/images/image_filtered_2.png)
+![image_filtered_2.png](/images/image_filtered_2.png)
 
-[![](/images/image_is_ref_3.png)](/images/image_is_ref_3.png)
+![image_is_ref_3.png](/images/image_is_ref_3.png)
 
-[![](/images/image_filtered_3.png)](/images/image_filtered_3.png)
+![image_filtered_3.png](/images/image_filtered_3.png)
 
-[![](/images/image_is_ref_4.png)](/images/image_is_ref_4.png)
+![image_is_ref_4.png](/images/image_is_ref_4.png)
 
-[![](/images/image_filtered_4.png)](/images/image_filtered_4.png)
+![image_filtered_4.png](/images/image_filtered_4.png)
 
 ## Choosing important directions for sampling the BRDF
 
@@ -4481,7 +4462,7 @@ $$
 
 Very few coefficients are needed to reasonably approximate $\left< cos \theta \right>$, as shown in [figure 91](#figure_shcosthetaapprox).
 
-[![](/images/chart_sh_cos_thera_approx.png)](/images/chart_sh_cos_thera_approx.png)
+![chart_sh_cos_thera_approx.png](/images/chart_sh_cos_thera_approx.png)
 
 **Figure 91:** Approximation of $cos \theta$ with SH coefficients
 

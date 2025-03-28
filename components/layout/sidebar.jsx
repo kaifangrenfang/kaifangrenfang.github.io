@@ -39,7 +39,7 @@ const menuItems = [
 const MenuItem = ({ item, level = 0 }) => {
     const pathname = useLocation().pathname
     const isActive = pathname === item.href
-    console.log('pathname', pathname, item.href, isActive)
+    // console.log('pathname', pathname, item.href, isActive)
 
     if (item.type === "section") {
         return (
