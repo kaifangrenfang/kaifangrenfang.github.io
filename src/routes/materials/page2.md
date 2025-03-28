@@ -1,4 +1,3 @@
-
 ### Anisotropy direction
 
 The `anisotropyDirection` property defines the direction of the surface at a given point and thus control the shape of the specular highlights. It is specified as vector of 3 values that usually come from a texture, encoding the directions local to the surface in tangent space. Because the direction is in tangent space, the Z component should be set to 0.
@@ -83,33 +82,14 @@ The index of refraction (or refractive index) of a material is a dimensionless n
 
 [Table 6](#table_commonmatior) describes acceptable refractive indices for various types of materials.
 
-Material
-
-IOR
-
-Air
-
-1.0
-
-Water
-
-1.33
-
-Common liquids
-
-1.33 to 1.5
-
-Common gemstones
-
-1.58 to 2.33
-
-Plastics, glass
-
-1.5 to 1.58
-
-Other dielectric materials
-
-1.33 to 1.58
+| Material                   | IOR          |
+| -------------------------- | ------------ |
+| Air                        | 1.0          |
+| Water                      | 1.33         |
+| Common liquids             | 1.33 to 1.5  |
+| Common gemstones           | 1.58 to 2.33 |
+| Plastics, glass            | 1.5 to 1.58  |
+| Other dielectric materials | 1.33 to 1.58 |
 
 **Table 6:** Index of refraction of common materials
 
@@ -225,45 +205,19 @@ It is important to note that there are types of fabrics that are still best mode
 
 The cloth material model encompasses all the parameters previously defined for the standard material mode except for _metallic_ and _reflectance_. Two extra parameters described in [table 7](#table_clothproperties) are also available.
 
-Parameter
-
-Definition
-
-**sheenColor**
-
-Specular tint to create two-tone specular fabrics (defaults to \\(\\sqrt{baseColor}\\))
-
-**subsurfaceColor**
-
-Tint for the diffuse color after scattering and absorption through the material
+| Parameter           | Definition                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| **sheenColor**      | Specular tint to create two-tone specular fabrics (defaults to \( \sqrt{baseColor} \)) |
+| **subsurfaceColor** | Tint for the diffuse color after scattering and absorption through the material        |
 
 **Table 7:** Cloth model parameters
 
 The type and range of each property is described in [table 8](#table_clothpropertiestypes).
 
-Property
-
-Type
-
-Range
-
-Note
-
-**sheenColor**
-
-float3
-
-\[0..1\]
-
-Linear RGB
-
-**subsurfaceColor**
-
-float3
-
-\[0..1\]
-
-Linear RGB
+| Property            | Type   | Range  | Note       |
+| ------------------- | ------ | ------ | ---------- |
+| **sheenColor**      | float3 | $0..1$ | Linear RGB |
+| **subsurfaceColor** | float3 | $0..1$ | Linear RGB |
 
 **Table 8:** Range and type of the cloth model's properties
 
@@ -299,57 +253,21 @@ The effect of `subsurfaceColor` is shown in [figure 31](#figure_materialclothsub
 
 The unlit material model can be used to turn off all lighting computations. Its primary purpose is to render pre-lit elements such as a cubemap, external content (such as a video or camera stream), user interfaces, visualization/debugging etc. The unlit model exposes only two properties described in [table 9](#table_unlitproperties).
 
-Property
-
-Definition
-
-**baseColor**
-
-Surface diffuse color
-
-**emissive**
-
-Additional diffuse color to simulate emissive surfaces. This property is mostly useful in an HDR pipeline with a bloom pass
-
-**postLightingColor**
-
-Additional color to blend with base color and emissive
+| Property              | Definition                                                                                                                  |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **baseColor**         | Surface diffuse color                                                                                                       |
+| **emissive**          | Additional diffuse color to simulate emissive surfaces. This property is mostly useful in an HDR pipeline with a bloom pass |
+| **postLightingColor** | Additional color to blend with base color and emissive                                                                      |
 
 **Table 9:** Properties of the standard model
 
 The type and range of each property is described in [table 10](#table_unlitpropertiestypes).
 
-Property
-
-Type
-
-Range
-
-Note
-
-**baseColor**
-
-float4
-
-\[0..1\]
-
-Pre-multiplied linear RGB
-
-**emissive**
-
-float4
-
-rgb=\[0..n\], a=\[0..1\]
-
-Linear RGB intensity in nits, alpha encodes the exposure weight
-
-**postLightingColor**
-
-float4
-
-\[0..1\]
-
-Pre-multiplied linear RGB
+| Property              | Type   | Range                | Note                                                            |
+| --------------------- | ------ | -------------------- | --------------------------------------------------------------- |
+| **baseColor**         | float4 | $0..1$               | Pre-multiplied linear RGB                                       |
+| **emissive**          | float4 | rgb=$0..n$, a=$0..1$ | Linear RGB intensity in nits, alpha encodes the exposure weight |
+| **postLightingColor** | float4 | $0..1$               | Pre-multiplied linear RGB                                       |
 
 **Table 10:** Range and type of the unlit model's properties
 
@@ -367,57 +285,21 @@ This alternative lighting model exists to comply with legacy standards. Since it
 
 This model encompasses the parameters previously defined for the standard lit mode except for _metallic_, _reflectance_, and _roughness_. It adds parameters for _specularColor_ and _glossiness_.
 
-Parameter
-
-Definition
-
-**baseColor**
-
-Surface diffuse color
-
-**specularColor**
-
-Specular tint (defaults to black)
-
-**glossiness**
-
-Glossiness (defaults to 0.0)
+| Parameter         | Definition                        |
+| ----------------- | --------------------------------- |
+| **baseColor**     | Surface diffuse color             |
+| **specularColor** | Specular tint (defaults to black) |
+| **glossiness**    | Glossiness (defaults to 0.0)      |
 
 **Table 11:** Properties of the specular-glossiness shading model
 
 The type and range of each property is described in [table 12](#table_glossinesspropertiestypes).
 
-Property
-
-Type
-
-Range
-
-Note
-
-**baseColor**
-
-float4
-
-\[0..1\]
-
-Pre-multiplied linear RGB
-
-**specularColor**
-
-float3
-
-\[0..1\]
-
-Linear RGB
-
-**glossiness**
-
-float
-
-\[0..1\]
-
-Inverse of roughness
+| Property          | Type   | Range  | Note                      |
+| ----------------- | ------ | ------ | ------------------------- |
+| **baseColor**     | float4 | $0..1$ | Pre-multiplied linear RGB |
+| **specularColor** | float3 | $0..1$ | Linear RGB                |
+| **glossiness**    | float  | $0..1$ | Inverse of roughness      |
 
 **Table 12:** Range and type of the specular-glossiness model's properties
 
@@ -437,6 +319,7 @@ A material definition is a text file that describes all the information required
 
 The material definition format is a format loosely based on [JSON](https://www.json.org/) that we call _JSONish_. At the top level a material definition is composed of 3 different blocks that use the JSON object notation:
 
+```cpp
     material {
         // material properties
     }
@@ -448,6 +331,7 @@ The material definition format is a format loosely based on [JSON](https://www.j
     fragment {
         // fragment shader
     }
+```
 
 A minimum viable material definition must contain a `material` preamble and a `fragment` block. The `vertex` block is optional.
 
@@ -455,11 +339,15 @@ A minimum viable material definition must contain a `material` preamble and a `f
 
 In JSON, an object is made of key/value _pairs_. A JSON pair has the following syntax:
 
+```json
     "key" : value
+```
 
 Where value can be a string, number, object, array or a literal (`true`, `false` or `null`). While this syntax is perfectly valid in a material definition, a variant without quotes around strings is also accepted in JSONish:
 
+```json
     key : value
+```
 
 Quotes remain mandatory when the string contains spaces.
 
@@ -475,6 +363,7 @@ The value of a pair is not case-sensitive.
 
 The following code listing shows an example of a valid material definition. This definition uses the _lit_ material model (see [Lit model](#litmodel) section), uses the default opaque blending mode, requires that a set of UV coordinates be presented in the rendered mesh and defines 3 user parameters. The following sections of this document describe the `material` and `fragment` blocks in detail.
 
+```cpp
     material {
         name : "Textured material",
         parameters : [
@@ -506,6 +395,7 @@ The following code listing shows an example of a valid material definition. This
             material.roughness = materialParams.roughness;
         }
     }
+```
 
 ## Material block
 
@@ -525,6 +415,7 @@ Description
 
 Sets the name of the material. The name is retained at runtime for debugging purpose.
 
+```cpp
     material {
         name : stone
     }
@@ -532,32 +423,21 @@ Sets the name of the material. The name is retained at runtime for debugging pur
     material {
         name : "Wet pavement"
     }
+```
 
 ### General: featureLevel
 
-Type
+| Type      | `number`                                            |
+| --------- | --------------------------------------------------- |
+| **Value** | An integer value, either 1, 2, or 3. Defaults to 1. |
 
-`number`
+### Feature Level and Guaranteed Features
 
-Value
-
-An integer value, either 1, 2 or 3. Defaults to 1.
-
-Feature Level
-
-Guaranteed features
-
-1
-
-9 textures per material
-
-2
-
-9 textures per material, cubemap arrays, ESSL 3.10
-
-3
-
-12 textures per material, cubemap arrays, ESSL 3.10
+| Level | Guaranteed Features                                 |
+| ----- | --------------------------------------------------- |
+| 1     | 9 textures per material                             |
+| 2     | 9 textures per material, cubemap arrays, ESSL 3.10  |
+| 3     | 12 textures per material, cubemap arrays, ESSL 3.10 |
 
 **Table 13:** Feature levels
 
@@ -565,9 +445,11 @@ Description
 
 Sets the feature level of the material. Each feature level defines a set of features the material can use. If the material uses a feature not supported by the selected level, `matc` will generate an error during compilation. A given feature level is guaranteed to support all features of lower feature levels.
 
+```cpp
     material {
         featureLevel : 2
     }
+```
 
 Bugs
 
@@ -577,16 +459,17 @@ Bugs
 
 Type
 
-`string`
+- `string`
 
 Value
 
-Any of `lit`, `subsurface`, `cloth`, `unlit`, `specularGlossiness`. Defaults to `lit`.
+- Any of `lit`, `subsurface`, `cloth`, `unlit`, `specularGlossiness`. Defaults to `lit`.
 
 Description
 
-Selects the material model as described in the [Material models](#materialmodels) section.
+- Selects the material model as described in the [Material models](#materialmodels) section.
 
+```cpp
     material {
         shadingModel : unlit
     }
@@ -594,6 +477,7 @@ Selects the material model as described in the [Material models](#materialmodels
     material {
         shadingModel : "subsurface"
     }
+```
 
 ### General: parameters
 
@@ -605,97 +489,30 @@ Value
 
 Each entry is an object with the properties `name` and `type`, both of `string` type. The name must be a valid GLSL identifier. Entries also have an optional `precision`, which can be one of `default` (best precision for the platform, typically `high` on desktop, `medium` on mobile), `low`, `medium`, `high`. The type must be one of the types described in [table 14](#table_materialparamstypes).
 
-Type
-
-Description
-
-bool
-
-Single boolean
-
-bool2
-
-Vector of 2 booleans
-
-bool3
-
-Vector of 3 booleans
-
-bool4
-
-Vector of 4 booleans
-
-float
-
-Single float
-
-float2
-
-Vector of 2 floats
-
-float3
-
-Vector of 3 floats
-
-float4
-
-Vector of 4 floats
-
-int
-
-Single integer
-
-int2
-
-Vector of 2 integers
-
-int3
-
-Vector of 3 integers
-
-int4
-
-Vector of 4 integers
-
-uint
-
-Single unsigned integer
-
-uint2
-
-Vector of 2 unsigned integers
-
-uint3
-
-Vector of 3 unsigned integers
-
-uint4
-
-Vector of 4 unsigned integers
-
-float3×3
-
-Matrix of 3×3 floats
-
-float4×4
-
-Matrix of 4×4 floats
-
-sampler2d
-
-2D texture
-
-sampler2dArray
-
-Array of 2D textures
-
-samplerExternal
-
-External texture (platform-specific)
-
-samplerCubemap
-
-Cubemap texture
+| Type            | Description                          |
+| --------------- | ------------------------------------ |
+| bool            | Single boolean                       |
+| bool2           | Vector of 2 booleans                 |
+| bool3           | Vector of 3 booleans                 |
+| bool4           | Vector of 4 booleans                 |
+| float           | Single float                         |
+| float2          | Vector of 2 floats                   |
+| float3          | Vector of 3 floats                   |
+| float4          | Vector of 4 floats                   |
+| int             | Single integer                       |
+| int2            | Vector of 2 integers                 |
+| int3            | Vector of 3 integers                 |
+| int4            | Vector of 4 integers                 |
+| uint            | Single unsigned integer              |
+| uint2           | Vector of 2 unsigned integers        |
+| uint3           | Vector of 3 unsigned integers        |
+| uint4           | Vector of 4 unsigned integers        |
+| float3×3        | Matrix of 3×3 floats                 |
+| float4×4        | Matrix of 4×4 floats                 |
+| sampler2d       | 2D texture                           |
+| sampler2dArray  | Array of 2D textures                 |
+| samplerExternal | External texture (platform-specific) |
+| samplerCubemap  | Cubemap texture                      |
 
 **Table 14:** Material parameter types
 
@@ -714,6 +531,7 @@ Lists the parameters required by your material. These parameters can be set at r
 - **Samplers types**: use the parameter name prefixed with `materialParams_`. For instance, `materialParams_myTexture`.
 - **Other types**: use the parameter name as the field of a structure called `materialParams`. For instance, `materialParams.myColor`.
 
+```cpp
     material {
     parameters : [
     {
@@ -746,3 +564,4 @@ Lists the parameters required by your material. These parameters can be set at r
     material.reflectance = materialParams.metallicReflectance.y;
     }
     }
+```

@@ -1,6 +1,6 @@
 import { Diagram } from "@/components/diagram"
 
-# Physically Based Rendering in Filament
+# Physically Based Rendering
 
 {/* ### Table of Contents
 
@@ -76,57 +76,9 @@ import { Diagram } from "@/components/diagram"
 - [10 Revisions](#revisions)  
 - [11 Bibliography](#bibliography)   */}
 
-# Overview
-
-Filament is a physically based rendering (PBR) engine for Android. The goal of Filament is to offer a set of tools and APIs for Android developers that will enable them to create high quality 2D and 3D rendering with ease.
-
-The goal of this document is to explain the equations and theory behind the material and lighting models used in Filament. This document is intended as a reference for contributors to Filament or developers interested in the inner workings of the engine. We will provide code snippets as needed to make the relationship between theory and practice as clear as possible.
-
-This document is not intended as a design document. It focuses solely on algorithms and its content could be used to implement PBR in any engine. However, this document explains why we chose specific algorithms/models over others.
-
-Unless noted otherwise, all the 3D renderings present in this document have been generated in-engine (prototype or production). Many of these 3D renderings were captured during the early stages of development of Filament and do not reflect the final quality.
-
-## Principles
-
-Real-time rendering is an active area of research and there is a large number of equations, algorithms and implementation to choose from for every single feature that needs to be implemented (the book _Rendering real-time shadows_, for instance, is a 400 pages summary of dozens of shadows rendering techniques). As such, we must first define our goals (or principles, to follow Brent Burley's seminal paper Physically-based shading at Disney [Burley12](#citation-burley12)) before we can make informed decisions.
-
-**Real-time mobile performance**
-
-    - Our primary goal is to design and implement a rendering system able to perform efficiently on mobile platforms. The primary target will be OpenGL ES 3.x class GPUs.
-
-**Quality**
-
-    - Our rendering system will emphasize overall picture quality. We will however accept quality compromises to support low and medium performance GPUs.
-
-**Ease of use**
-
-    - Artists need to be able to iterate often and quickly on their assets and our rendering system must allow them to do so intuitively. We must therefore provide parameters that are easy to understand (for instance, no specular power).
-
-    - We also understand that not all developers have the luxury to work with artists. The physically based approach of our system will allow developers to craft visually plausible materials without the need to understand the theory behind our implementation.
-
-    - For both artists and developers, our system will rely on as few parameters as possible to reduce trial and error and allow users to quickly master the material model.
-
-    - In addition, any combination of parameter values should lead to physically plausible results. Physically implausible materials must be hard to create.
-
-**Familiarity**
-
-    - Our system should use physical units everywhere possible: distances in meters or centimeters, color temperatures in Kelvin, light units in lumens or candelas, etc.
-
-**Flexibility**
-
-    - A physically based approach must not preclude non-realistic rendering. User interfaces for instance will need unlit materials.
-
-**Deployment size**
-
-    - While not directly related to the content of this document, it bears emphasizing our desire to keep the rendering library as small as possible so any application can bundle it without increasing the binary to undesirable sizes.
-
-## Physically based rendering
-
-We chose to adopt PBR for its benefits from an artistic and production efficient standpoints, and because it is compatible with our goals.
-
 Physically based rendering is a rendering method that provides a more accurate representation of materials and how they interact with light when compared to traditional real-time models. The separation of materials and lighting at the core of the PBR method makes it easier to create realistic assets that look accurate in all lighting conditions.
 
-# Notation
+## Notation
 
 The equations found throughout this document use the symbols described in [table 1](#table_symbols).
 
@@ -175,7 +127,9 @@ The relationship between a surface, the surface normal, incident light and these
 The complete surface response can be expressed as such:
 
 $$
+\begin{align}
  f(v,l)=f_d(v,l)+f_r(v,l)
+\end{align}
 $$
 
 This equation characterizes the surface response for incident light from a single direction. The full rendering equation would require to integrate $l$ over the entire hemisphere.
@@ -215,7 +169,9 @@ The roughness parameter as set by the user is called `perceptualRoughness` in th
 A microfacet model is described by the following equation (where x stands for the specular or diffuse component):
 
 $$
- f_X(v,l) = \frac{1}{| n \cdot v | | n \cdot l |} \int_\Omega D(m,\alpha) G(v,l,m) f_m(v,l,m) (v \cdot m) (l \cdot m) dm
+\begin{align}
+ f_x (v,l) = \frac{1}{ | n \cdot v | | n \cdot l | } \int_\Omega D(m,\alpha) G(v,l,m) f_m(v,l,m) (v \cdot m) (l \cdot m) dm
+\end{align}
 $$
 
 The term $D$ models the distribution of the microfacets (this term is also referred to as the NDF or Normal Distribution Function). This term plays a primordial role in the appearance of surfaces as shown in [figure 5](#figure_roughness).
@@ -269,7 +225,9 @@ Energy conservation is one of the key components of a good BRDF for physically b
 For the specular term, $f_r$ is a mirror BRDF that can be modeled with the Fresnel law, noted $F$ in the Cook-Torrance approximation of the microfacet model integration:
 
 $$
+\begin{align}
  f_r(v,l) = \frac{D(h, \alpha) G(v, l, \alpha) F(v, h, f0)}{4(n \cdot v)(n \cdot l)}
+\end{align}
 $$
 
 Given our real-time constraints, we must use an approximation for the three terms $D$, $G$ and $F$. [Karis13a](#citation-karis13a) has compiled a great list of formulations for these three terms that can be used with the Cook-Torrance specular BRDF. The sections that follow describe the equations we picked for these terms.
@@ -279,7 +237,9 @@ Given our real-time constraints, we must use an approximation for the three term
 [Burley12](#citation-burley12) observed that long-tailed normal distribution functions (NDF) are a good fit for real-world surfaces. The GGX distribution described in [Walter07](#citation-walter07) is a distribution with long-tailed falloff and short peak in the highlights, with a simple formulation suitable for real-time implementations. It is also a popular model, equivalent to the Trowbridge-Reitz distribution, in modern physically based renderers.
 
 $$
+\begin{align}
  D_{GGX}(h,\alpha) = \frac{\alpha^2}{\pi ( (n \cdot h)^2 (\alpha^2 - 1) + 1)^2}
+\end{align}
 $$
 
 The GLSL implementation of the NDF, shown in [listing 1](#listing_speculard), is simple and efficient.
@@ -299,7 +259,9 @@ We can improve this implementation by using half precision floats. This optimiza
 The solution involves Lagrange's identity:
 
 $$
+\begin{align}
  | a \times b |^2 = |a|^2 |b|^2 - (a \cdot b)^2
+\end{align}
 $$
 
 Since both $n$ and $h$ are unit vectors, $|n \times h|^2 = 1 - (n \cdot h)^2$. This allows us to compute $1 - (n \cdot h)^2$ directly with half precision floats by using a simple cross product. [Listing 2](#listing_speculardfp16) shows the final optimized implementation.
@@ -323,60 +285,90 @@ float D_GGX(float roughness, float NoH, const vec3 n, const vec3 h) {
 
 Eric Heitz showed in [Heitz14](#citation-heitz14) that the Smith geometric shadowing function is the correct and exact $G$ term to use. The Smith formulation is the following:
 
+
 $$
+\begin{align}
  G(v,l,\alpha) = G_1(l,\alpha) G_1(v,\alpha)
+\end{align}
 $$
 
 $G_1$ can in turn follow several models, and is commonly set to the GGX formulation:
 
+
 $$
+\begin{align}
  G_1(v,\alpha) = G_{GGX}(v,\alpha) = \frac{2 (n \cdot v)}{n \cdot v + \sqrt{\alpha^2 + (1 - \alpha^2) (n \cdot v)^2}}
+\end{align}
 $$
 
 The full Smith-GGX formulation thus becomes:
 
+
 $$
+\begin{align}
  G(v,l,\alpha) = \frac{2 (n \cdot l)}{n \cdot l + \sqrt{\alpha^2 + (1 - \alpha^2) (n \cdot l)^2}} \frac{2 (n \cdot v)}{n \cdot v + \sqrt{\alpha^2 + (1 - \alpha^2) (n \cdot v)^2}}
+\end{align}
 $$
 
 We can observe that the dividends $2 (n \cdot l)$ and $2 (n \cdot v)$ allow us to simplify the original function $f_r$ by introducing a visibility function $V$:
 
+
 $$
+\begin{align}
  f_r(v,l) = D(h, \alpha) V(v, l, \alpha) F(v, h, f_0)
+\end{align}
 $$
 
 Where:
 
+
 $$
+\begin{align}
  V(v,l,\alpha) = \frac{G(v, l, \alpha)}{4 (n \cdot v) (n \cdot l)} = V_1(l,\alpha) V_1(v,\alpha)
+\end{align}
 $$
 
 And:
 
+
 $$
+\begin{align}
  V_1(v,\alpha) = \frac{1}{n \cdot v + \sqrt{\alpha^2 + (1 - \alpha^2) (n \cdot v)^2}}
+\end{align}
 $$
 
 Heitz notes however that taking the height of the microfacets into account to correlate masking and shadowing leads to more accurate results. He defines the height-correlated Smith function thusly:
 
-$$
- G(v,l,h,\alpha) = \frac{\chi^+(v \cdot h) \chi^+(l \cdot h)}{1 + \Lambda(v) + \Lambda(l)}
-$$
 
 $$
+\begin{align}
+ G(v,l,h,\alpha) = \frac{\chi^+(v \cdot h) \chi^+(l \cdot h)}{1 + \Lambda(v) + \Lambda(l)}
+\end{align}
+$$
+
+
+$$
+\begin{align}
  \Lambda(m) = \frac{-1 + \sqrt{1 + \alpha^2 tan^2(\theta_m)}}{2} = \frac{-1 + \sqrt{1 + \alpha^2 \frac{(1 - cos^2(\theta_m))}{cos^2(\theta_m)}}}{2}
+\end{align}
 $$
 
 Replacing $cos(\theta_m)$ by $n \cdot v$, we obtain:
 
+
 $$
+\begin{align}
  \Lambda(v) = \frac{1}{2} \left( \frac{\sqrt{\alpha^2 + (1 - \alpha^2)(n \cdot v)^2}}{n \cdot v} - 1 \right)
+\end{align}
 $$
 
 From which we can derive the visibility function:
 
+
 $$
+\begin{align}
  V(v,l,\alpha) = \frac{0.5}{n \cdot l \sqrt{(n \cdot v)^2 (1 - \alpha^2) + \alpha^2} + n \cdot v \sqrt{(n \cdot l)^2 (1 - \alpha^2) + \alpha^2}}
+\end{align}
 $$
 
 The GLSL implementation of the visibility term, shown in [listing 3](#listing_specularv), is a bit more expensive than we would like since it requires two `sqrt` operations.
@@ -414,7 +406,9 @@ float V_SmithGGXCorrelatedFast(float NoV, float NoL, float roughness) {
 [Hammon17](#citation-hammon17) proposes the same approximation based on the same observation that the square root can be removed. It does so by rewriting the expressions as _lerps_:
 
 $$
+\begin{align}
  V(v,l,\alpha) = \frac{0.5}{lerp(2 (n \cdot l) (n \cdot v), n \cdot l + n \cdot v, \alpha)}
+ \end{align}
 $$
 
 ### Fresnel (specular F)
@@ -1127,7 +1121,9 @@ $$
 After derivation we obtain:
 
 $$
+\begin{align}
  V_{aniso}(n \cdot l,n \cdot v,\alpha) = \frac{1}{2((n \cdot l)\hat{\Lambda}_v+(n \cdot v)\hat{\Lambda}_l)} \\ \hat{\Lambda}_v = \sqrt{\alpha^2_t(t \cdot v)^2+\alpha^2_b(b \cdot v)^2+(n \cdot v)^2} \\ \hat{\Lambda}_l = \sqrt{\alpha^2_t(t \cdot l)^2+\alpha^2_b(b \cdot l)^2+(n \cdot l)^2}
+\end{align}
 $$
 
 The term $ \hat{\Lambda}_v $ is the same for every light and can be computed only once if needed. The resulting implementation is described in [listing 16](#listing_anisotropicv).
@@ -1522,7 +1518,10 @@ A point light is defined only by a position in space, as shown in [figure 36](#f
 The luminous power of a point light is calculated by integrating the luminous intensity over the light's solid angle, as show in equation [pointLightLuminousPower](pointLightLuminousPower). The luminous intensity can then be easily derived from the luminous power.
 
 $$
- \Phi = \int_{\Omega} I dl = \int_{0}^{2\pi} \int_{0}^{\pi} I d\theta d\phi = 4 \pi I \\ I = \frac{\Phi}{4 \pi}
+\begin{align}
+\Phi = \int_{\Omega} I dl = \int_{0}^{2\pi} \int_{0}^{\pi} I d\theta d\phi = 4 \pi I \\ 
+I = \frac{\Phi}{4 \pi}
+\end{align}
 $$
 
 By simple substitution of $I$ in [punctualLightEquation](punctualLightEquation) and $E$ in [luminanceEquation](luminanceEquation) we can formulate the luminance equation of a point light as a function of the luminous power (see [pointLightLuminanceEquation](pointLightLuminanceEquation)).
@@ -1548,7 +1547,10 @@ A spot light is defined by a position in space, a direction vector and two cone 
 Equation [spotLightLuminousPower](spotLightLuminousPower) describes how the luminous power of a spot light can be calculated in a similar fashion to point lights, using $ \theta_{outer} $ the outer angle of the spot light's cone in the range 0..$\pi$.
 
 $$
- \Phi = \int_{\Omega} I dl = \int_{0}^{2\pi} \int_{0}^{\theta_{outer}} I d\theta d\phi = 2 \pi (1 - cos\frac{\theta_{outer}}{2})I \\ I = \frac{\Phi}{2 \pi (1 - cos\frac{\theta_{outer}}{2})}
+\begin{align}
+ \Phi = \int_{\Omega} I dl = \int_{0}^{2\pi} \int_{0}^{\theta_{outer}} I d\theta d\phi = 2 \pi (1 - cos\frac{\theta_{outer}}{2})I \\
+I = \frac{\Phi}{2 \pi (1 - cos\frac{\theta_{outer}}{2})}
+\end{align}
 $$
 
 While this formulation is physically correct, it makes spot lights a little difficult to use: changing the outer angle of the cone changes the illumination levels. [Figure 39](#figure_spotlighttestfocused) shows the same scene lit by a spot light, with an outer angle of 55° and an outer angle of 15°. Observes how the illumination level increases as the cone aperture decreases.
@@ -1560,7 +1562,9 @@ While this formulation is physically correct, it makes spot lights a little diff
 The coupling of illumination and the outer cone means that an artist cannot tweak the influence cone of a spot light without also changing the perceived illumination. It therefore makes sense to provide artists with a parameter to disable this coupling. Equations [spotLightLuminousPowerB](spotLightLuminousPowerB) shows how to formulate the luminous power for that purpose.
 
 $$
+\begin{align}
  \Phi = \pi I \\ I = \frac{\Phi}{\pi} \\
+\end{align}
 $$
 
 With this new formulation to compute the luminous intensity, the test scene in [figure 40](#figure_spotlighttest) exhibits similar illumination levels with both cone apertures.
@@ -1795,13 +1799,17 @@ To compute RGB values from a temperature, we can use the Planckian locus, shown 
 The easiest way to compute RGB values from this locus is to use the formula described in [Krystek85](#citation-krystek85). Krystek's algorithm (equation [krystek](krystek)) works in the CIE 1960 (UCS) space, using the following formula where $T$ is the desired temperature, and $u$ and $v$ the coordinates in UCS.
 
 $$
- u(T) = \frac{0.860117757 + 1.54118254 \times 10^{-4}T + 1.28641212 \times 10^{-7}T^2}{1 + 8.42420235 \times 10^{-4}T + 7.08145163 \times 10^{-7}T^2} \\ v(T) = \frac{0.317398726 + 4.22806245 \times 10^{-5}T + 4.20481691 \times 10^{-8}T^2}{1 - 2.89741816 \times 10^{-5}T + 1.61456053 \times 10^{-7}T^2}
+\begin{align}
+u(T) = \frac{0.860117757 + 1.54118254 \times 10^{-4}T + 1.28641212 \times 10^{-7}T^2}{1 + 8.42420235 \times 10^{-4}T + 7.08145163 \times 10^{-7}T^2} \\ v(T) = \frac{0.317398726 + 4.22806245 \times 10^{-5}T + 4.20481691 \times 10^{-8}T^2}{1 - 2.89741816 \times 10^{-5}T + 1.61456053 \times 10^{-7}T^2}
+\end{align}
 $$
 
 This approximation is accurate to roughly $ 9 \times 10^{-5} $ in the range 1,000K to 15,000K. From the CIE 1960 space we can compute the coordinates in xyY space (CIES 1931), using the formula from equation [cieToxyY](cieToxyY).
 
 $$
+\begin{align}
 x = \frac{3u}{2u - 8v + 4} \\ y = \frac{2v}{2u - 8v + 4}
+\end{align}
 $$
 
 The formulas above are valid for black body color temperatures, and therefore correlated color temperatures of standard illuminants. If we wish to compute the precise chromaticity coordinates of standard CIE illuminants in the D series we can use equation [seriesDtoxyY](seriesDtoxyY).
@@ -1813,7 +1821,9 @@ $$
 From the xyY space, we can then convert to the CIE XYZ space (equation [xyYtoXYZ](xyYtoXYZ)).
 
 $$
+\begin{*align}
  X = \frac{xY}{y} \\ Z = \frac{(1 - x - y)Y}{y}
+\end{*align}
 $$
 
 For our needs, we will fix $Y = 1$. This allows us to convert from the XYZ space to linear RGB with a simple 3×3 matrix, as shown in equation [XYZtoRGB](XYZtoRGB).
@@ -2106,7 +2116,9 @@ Because $I$ is an integral multiplications can be distributed over it. i.e.: $I(
 Armed with that,
 
 $$
+\begin{*align}
  I( f(\Theta) L_{\bot} ) \approx \tilde{I}( f(\Theta) L_{\bot} ) \\ \tilde{I}( f(\Theta) L_{\bot} ) = K \times \hat{I}( f(\Theta) L_{\bot} ) \\ K = \frac{I(f(\Theta))}{\hat{I}(f(\Theta))}
+\end{*align}
 $$
 
 From the equation above we can see that $\tilde{I}$ is equivalent to $I$ when $L_{\bot}$ is a constant, and yields the correct result:

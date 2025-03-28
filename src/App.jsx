@@ -14,6 +14,7 @@ import { Navbar } from "@/components/layout/navbar"
 import { TOC } from "@/components/layout/toc"
 const About = lazy(() => import("./routes/about/page.mdx"))
 const BRDF = lazy(() => import("./routes/brdf/page.mdx"))
+const Materials = lazy(() => import("./routes/materials/page.mdx"))
 const Contact = lazy(() => import("./routes/contact/page.mdx"))
 const Markdown = lazy(() => import("./routes/markdown/page.mdx"))
 const Sample = lazy(() => import("./routes/sample/page.mdx"))
@@ -60,6 +61,7 @@ function App() {
                                 <Route index path="/" element={<BRDF />} />
                                 <Route path="/about" element={<About />} />
                                 <Route path="/brdf" element={<BRDF />} />
+                                <Route path="/materials" element={<Materials />} />
                                 <Route path="/contact" element={<Contact />} />
                                 <Route path="/markdown" element={<Markdown />} />
                                 <Route path="/sample" element={<Sample />} />
