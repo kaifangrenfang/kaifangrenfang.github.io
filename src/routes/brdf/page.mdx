@@ -1,3 +1,5 @@
+import { Diagram } from "@/components/diagram"
+
 # Physically Based Rendering in Filament
 
 # Overview
@@ -94,7 +96,7 @@ The relationship between a surface, the surface normal, incident light and these
 
 ![diagram_fr_fd.png](/images/diagram_fr_fd.png)
 
-**Figure 1:** Interaction of the light with a surface using BRDF model with a diffuse term $ f_d $ and a specular term $ f_r $
+> **Figure 1:** Interaction of the light with a surface using BRDF model with a diffuse term $ f_d $ and a specular term $ f_r $
 
 The complete surface response can be expressed as such:
 
@@ -110,19 +112,19 @@ A microfacet BRDF is a good physically plausible BRDF for that purpose. Such BRD
 
 ![diagram_microfacet.png](/images/diagram_microfacet.png)
 
-**Figure 2:** Irregular interface as modeled by a microfacet model (left) and flat interface (right)
+> **Figure 2:** Irregular interface as modeled by a microfacet model (left) and flat interface (right)
 
 Only the microfacets whose normal is oriented halfway between the light direction and the view direction will reflect visible light, as shown in [figure 3](#figure_microfacets).
 
 ![diagram_macrosurface.png](/images/diagram_macrosurface.png)
 
-**Figure 3:** Microfacets
+> **Figure 3:** Microfacets
 
 However, not all microfacets with a properly oriented normal will contribute reflected light as the BRDF takes into account masking and shadowing. This is illustrated in [figure 4](#figure_microfacetshadowing).
 
 ![diagram_shadowing_masking.png](/images/diagram_shadowing_masking.png)
 
-**Figure 4:** Masking and shadowing of microfacets
+> **Figure 4:** Masking and shadowing of microfacets
 
 A microfacet BRDF is heavily influenced by a _roughness_ parameter which describes how smooth (low roughness) or how rough (high roughness) a surface is at a micro level. The smoother the surface, the more facets are aligned and the more pronounced the reflected light is. The rougher the surface, the fewer facets are oriented towards the camera and incoming light is scattered away from the camera after reflection, giving a blurry aspect to the specular highlights.
 
@@ -130,7 +132,7 @@ A microfacet BRDF is heavily influenced by a _roughness_ parameter which describ
 
 ![diagram_roughness.png](/images/diagram_roughness.png)
 
-**Figure 5:** Varying roughness (from left to right, rough to smooth) and the resulting BRDF specular component lobe
+> **Figure 5:** Varying roughness (from left to right, rough to smooth) and the resulting BRDF specular component lobe
 
 About roughness
 
@@ -152,7 +154,7 @@ It is important to note that this equation is used to integrate over the hemisph
 
 ![diagram_micro_vs_macro.png](/images/diagram_micro_vs_macro.png)
 
-**Figure 6:** Modeling the surface response at a single point requires an integration at the micro level
+> **Figure 6:** Modeling the surface response at a single point requires an integration at the micro level
 
 The diagram above shows that at a macro level, the surfaces is considered flat. This helps simplify our equations by assuming that a shaded fragment lit from a single direction corresponds to a single point at the surface.
 
@@ -168,13 +170,13 @@ We saw earlier that when incident light hits a surface governed by a BRDF, the l
 
 ![diagram_fr_fd.png](/images/diagram_fr_fd.png)
 
-**Figure 7:** Modelization of the BRDF part of a BSDF
+> **Figure 7:** Modelization of the BRDF part of a BSDF
 
 This modelization is a simplification of how the light actually interacts with the surface. In reality, part of the incident light will penetrate the surface, scatter inside, and exit the surface again as diffuse reflectance. This phenomenon is illustrated in [figure 8](#figure_diffusescattering).
 
 ![diagram_scattering.png](/images/diagram_scattering.png)
 
-**Figure 8:** Scattering of diffuse light
+> **Figure 8:** Scattering of diffuse light
 
 Here lies the difference between conductors and dielectrics. There is no subsurface scattering occurring with purely metallic materials, which means there is no diffuse component (and we will see later that this has an influence on the perceived color of the specular component). Scattering happens in dielectrics, which means they have both specular and diffuse components.
 
@@ -182,7 +184,7 @@ To properly modelize the BRDF we must therefore distinguish between dielectrics 
 
 ![diagram_brdf_dielectric_conductor.png](/images/diagram_brdf_dielectric_conductor.png)
 
-**Figure 9:** BRDF modelization for dielectric and conductor surfaces
+> **Figure 9:** BRDF modelization for dielectric and conductor surfaces
 
 ## Energy conservation
 
@@ -349,7 +351,7 @@ The amount of light reflected depends not only on the viewing angle, but also on
 
 ![photo_fresnel_lake.jpg](/images/photo_fresnel_lake.jpg)
 
-**Figure 10:** The Fresnel effect is particularly evident on large bodies of water
+> **Figure 10:** The Fresnel effect is particularly evident on large bodies of water
 
 More formally, the Fresnel term defines how light reflects and refracts at the interface between two different media, or the ratio of reflected and transmitted energy. [Schlick94](#citation-schlick94) describes an inexpensive approximation of the Fresnel term for the Cook-Torrance specular BRDF:
 
@@ -441,7 +443,7 @@ float Fd_Burley(float NoV, float NoL, float LoH, float roughness) {
 
 ![diagram_lambert_vs_disney.png](/images/diagram_lambert_vs_disney.png)
 
-**Figure 11:** Comparison between the Lambertian diffuse BRDF (left) and the Disney diffuse BRDF (right)
+> **Figure 11:** Comparison between the Lambertian diffuse BRDF (left) and the Disney diffuse BRDF (right)
 
 We could allow artists/developers to choose the Disney diffuse BRDF depending on the quality they desire and the performance of the target device. It is important to note however that the Disney diffuse BRDF is not energy conserving as expressed here.
 
@@ -518,27 +520,27 @@ The Cook-Torrance BRDF we presented earlier attempts to model several events at 
 
 ![diagram_single_vs_multi_scatter.png](/images/diagram_single_vs_multi_scatter.png)
 
-**Figure 12:** Single scattering (left) vs multiscattering
+> **Figure 12:** Single scattering (left) vs multiscattering
 
 Based on this simple explanation, we can intuitively deduce that the rougher a surface is, the higher the chances are that energy gets lost because of the failure to account for multiple scattering events. This loss of energy appears to darken rough materials. Metallic surfaces are particularly affected because all of their reflectance is specular. This darkening effect is illustrated in [figure 13](#figure_metallicroughenergyloss). With multiscattering, energy preservation can be achieved, as shown in [figure 14](#figure_metallicroughenergypreservation).
 
 ![material_metallic_energy_loss.png](/images/material_metallic_energy_loss.png)
 
-**Figure 13:** Darkening increases with roughness due to single scattering
+> **Figure 13:** Darkening increases with roughness due to single scattering
 
 ![material_metallic_energy_preservation.png](/images/material_metallic_energy_preservation.png)
 
-**Figure 14:** Energy preservation with multiscattering
+> **Figure 14:** Energy preservation with multiscattering
 
 We can use a white furnace, a uniform lighting environment set to pure white, to validate the energy preservation property of a BRDF. When energy preservation is achieved, a purely reflective metallic surface ($f_{0} = 1$) should be indistinguishable from the background, no matter the roughness of said surface. [Figure 15](#figure_whitefurnaceloss) shows what such a surface looks like with the specular BRDF presented in the previous sections. The loss of energy as the roughness increases is obvious. In contrast, [figure 16](#figure_whitefurnacepreservation) shows that accounting for multiscattering events addresses the energy loss.
 
 ![material_furnace_energy_loss.png](/images/material_furnace_energy_loss.png)
 
-**Figure 15:** Darkening increases with roughness due to single scattering
+> **Figure 15:** Darkening increases with roughness due to single scattering
 
 ![material_furnace_energy_preservation.png](/images/material_furnace_energy_preservation.png)
 
-**Figure 16:** Energy preservation with multiscattering
+> **Figure 16:** Energy preservation with multiscattering
 
 Multiple-scattering microfacet BRDFs are discussed in depth in [Heitz16](#citation-heitz16). Unfortunately this paper only presents a stochastic evaluation of the multiscattering BRDF. This solution is therefore not suitable for real-time rendering. Kulla and Conty present a different approach in [Kulla17](#citation-kulla17). Their idea is to add an energy compensation term as an additional BRDF lobe shown in equation [energyCompensationLobe](energyCompensationLobe):
 
@@ -629,7 +631,7 @@ Disney's material model described in [Burley12](#citation-burley12) is a good st
 
 ![material_parameters.png](/images/material_parameters.png)
 
-**Figure 17:** From top to bottom: varying metallic, varying dielectric roughness, varying metallic roughness, varying reflectance
+> **Figure 17:** From top to bottom: varying metallic, varying dielectric roughness, varying metallic roughness, varying reflectance
 
 ### Types and ranges
 
@@ -682,7 +684,7 @@ The goal is to map $f_{0}$ onto a range that can represent the Fresnel values of
 
 ![diagram_reflectance.png](/images/diagram_reflectance.png)
 
-**Figure 18:** Common reflectance values
+> **Figure 18:** Common reflectance values
 
 If the index of refraction is known (for instance, an air-water interface has an IOR of 1.33), the Fresnel reflectance can be calculated as follows:
 
@@ -739,7 +741,7 @@ $$
 
 ![material_grazing_reflectance.png](/images/material_grazing_reflectance.png)
 
-**Figure 19:** The specular reflectance becomes achromatic at grazing angles
+> **Figure 19:** The specular reflectance becomes achromatic at grazing angles
 
 **Conductors**
 
@@ -769,7 +771,7 @@ $$
 
 ![material_roughness_remap.png](/images/material_roughness_remap.png)
 
-**Figure 20:** Roughness remapping comparison: perceptually linear roughness (top) and roughness (bottom)
+> **Figure 20:** Roughness remapping comparison: perceptually linear roughness (top) and roughness (bottom)
 
 Using this visual comparison, it is obvious that the remapped roughness is easier to understand by artists and developers. Without this remapping, shiny metallic surfaces would have to be confined to a very small range between 0.0 and 0.05.
 
@@ -793,13 +795,13 @@ For instance, [figure 21](#figure_materialblending) shows how the studio Ready a
 
 ![material_blending.png](/images/material_blending.png)
 
-**Figure 21:** Material blending and layering. Source: Ready at Dawn Studios
+> **Figure 21:** Material blending and layering. Source: Ready at Dawn Studios
 
 The blending and layering of materials is effectively an interpolation of the various parameters of the material model. [Figure 22](#figure_material_interpolation) show an interpolation between shiny metallic chrome and rough red plastic. While the intermediate blended materials make little physical sense, they look plausible.
 
 ![material_interpolation.png](/images/material_interpolation.png)
 
-**Figure 22:** Interpolation from shiny chrome (left) to rough red plastic (right)
+> **Figure 22:** Interpolation from shiny chrome (left) to rough red plastic (right)
 
 ### Crafting physically based materials
 
@@ -841,7 +843,7 @@ The standard material model described previously is a good fit for isotropic sur
 
 ![material_clear_coat.png](/images/material_clear_coat.png)
 
-**Figure 23:** Comparison of a blue metallic surface under the standard material model (left) and the clear coat model (right)
+> **Figure 23:** Comparison of a blue metallic surface under the standard material model (left) and the clear coat model (right)
 
 A clear coat layer can be simulated as an extension of the standard material model by adding a second specular lobe, which implies evaluating a second specular BRDF. To simplify the implementation and parameterization, the clear coat layer will always be isotropic and dielectric. The base layer can be anything allowed by the standard model (dielectric or conductor).
 
@@ -849,7 +851,7 @@ Since incoming light will traverse the clear coat layer, we must also take the l
 
 ![diagram_clear_coat.png](/images/diagram_clear_coat.png)
 
-**Figure 24:** Clear coat surface model
+> **Figure 24:** Clear coat surface model
 
 ### Clear coat specular BRDF
 
@@ -910,11 +912,11 @@ The clear coat roughness parameter is remapped and clamped in a similar way to t
 
 ![material_clear_coat1.png](/images/material_clear_coat1.png)
 
-**Figure 25:** Clear coat varying from 0.0 (left) to 1.0 (right) with metallic set to 1.0 and roughness to 0.8
+> **Figure 25:** Clear coat varying from 0.0 (left) to 1.0 (right) with metallic set to 1.0 and roughness to 0.8
 
 ![material_clear_coat2.png](/images/material_clear_coat2.png)
 
-**Figure 26:** Clear coat roughness varying from 0.0 (left) to 1.0 (right) with metallic set to 1.0, roughness to 0.8 and clear coat to 1.0
+> **Figure 26:** Clear coat roughness varying from 0.0 (left) to 1.0 (right) with metallic set to 1.0, roughness to 0.8 and clear coat to 1.0
 
 [Listing 14](#listing_clearcoatbrdf) shows the GLSL implementation of the clear coat material model after remapping, parameterization and integration in the standard surface response.
 
@@ -971,7 +973,7 @@ The standard material model described previously can only describe isotropic sur
 
 ![material_anisotropic.png](/images/material_anisotropic.png)
 
-**Figure 27:** Comparison of isotropic material (left) and anisotropic material (right)
+> **Figure 27:** Comparison of isotropic material (left) and anisotropic material (right)
 
 ### Anisotropic specular BRDF
 
@@ -1074,7 +1076,7 @@ No further remapping is required. Note that negative values will align the aniso
 
 ![materials/anisotropy.png](/images/materials/anisotropy.png)
 
-**Figure 28:** Anisotropy varying from 0.0 (left) to 1.0 (right)
+> **Figure 28:** Anisotropy varying from 0.0 (left) to 1.0 (right)
 
 ## Subsurface model
 
@@ -1096,13 +1098,13 @@ All the material models described previously are designed to simulate dense surf
 
 ![screenshot_cloth.png](/images/screenshot_cloth.png)
 
-**Figure 29:** Comparison of denim fabric rendered using a traditional microfacet BRDF (left) and our cloth BRDF (right)
+> **Figure 29:** Comparison of denim fabric rendered using a traditional microfacet BRDF (left) and our cloth BRDF (right)
 
 Velvet is an interesting use case for a cloth material model. As shown in [figure 30](#figure_materialvelvet) this type of fabric exhibits strong rim lighting due to forward and backward scattering. These scattering events are caused by fibers standing straight at the surface of the fabric. When the incident light comes from the direction opposite to the view direction, the fibers will forward-scatter the light. Similarly, when the incident light from the same direction as the view direction, the fibers will scatter the light backward.
 
 ![screenshot_cloth_velvet.png](/images/screenshot_cloth_velvet.png)
 
-**Figure 30:** Velvet fabric showcasing forward and backward scattering
+> **Figure 30:** Velvet fabric showcasing forward and backward scattering
 
 Since fibers are flexible, we should in theory model the ability to groom the surface. While our model does not replicate this characteristic, it does model a visible front facing specular contribution that can be attributed to the random variance in the direction of the fibers.
 
@@ -1170,7 +1172,7 @@ To offer better control over the appearance of cloth and to give users the abili
 
 ![screenshot_cloth_sheen.png](/images/screenshot_cloth_sheen.png)
 
-**Figure 31:** Blue fabric without (left) and with (right) sheen
+> **Figure 31:** Blue fabric without (left) and with (right) sheen
 
 ### Cloth diffuse BRDF
 
@@ -1194,7 +1196,7 @@ Where $w$ is a value between 0 and 1 defining by how much the diffuse light shou
 
 ![screenshot_cloth_subsurface.png](/images/screenshot_cloth_subsurface.png)
 
-**Figure 32:** White cloth (left column) vs white cloth with brown subsurface scattering (right)
+> **Figure 32:** White cloth (left column) vs white cloth with brown subsurface scattering (right)
 
 The complete implementation of our cloth BRDF, including sheen color and optional subsurface scattering, can be found in [listing 19](#listing_clothfullbrdf).
 
@@ -1325,7 +1327,7 @@ The incident light meter uses a white diffuse dome to capture the illuminance re
 
 ![photo_light_meter.jpg](/images/photo_light_meter.jpg)
 
-**Figure 33:** Sekonic L-478D incident light meter
+> **Figure 33:** Sekonic L-478D incident light meter
 
 #### Luminance
 
@@ -1359,7 +1361,7 @@ The main purpose of directional lights is to recreate important light sources fo
 
 ![diagram_directional_light.png](/images/diagram_directional_light.png)
 
-**Figure 34:** Interaction between a directional light and a surface. The light source is a virtual construct that can only be represented by a direction
+> **Figure 34:** Interaction between a directional light and a surface. The light source is a virtual construct that can only be represented by a direction
 
 This approximation proves to work incredibly well for the diffuse response of a surface but the specular response is incorrect. The Frostbite engine solves this problem by treating the “sun” directional light as a disc area light. However, our tests have shown that the quality increase does not justify the added computational costs.
 
@@ -1401,7 +1403,7 @@ vec3 luminance = BSDF(v, l) * illuminance;
 
 ![screenshot_directional_light.png](/images/screenshot_directional_light.png)
 
-**Figure 35:** Series of dielectric materials of varying roughness under a directional light
+> **Figure 35:** Series of dielectric materials of varying roughness under a directional light
 
 3 Measurements taken with an incident light meter (Sekonic L-478D)
 
@@ -1430,7 +1432,7 @@ A point light is defined only by a position in space, as shown in [figure 36](#f
 
 ![diagram_point_light.png](/images/diagram_point_light.png)
 
-**Figure 36:** Interaction between a point light and a surface. The attenuation only depends on the distance to the light
+> **Figure 36:** Interaction between a point light and a surface. The attenuation only depends on the distance to the light
 
 The luminous power of a point light is calculated by integrating the luminous intensity over the light's solid angle, as show in equation [pointLightLuminousPower](pointLightLuminousPower). The luminous intensity can then be easily derived from the luminous power.
 
@@ -1448,7 +1450,7 @@ $$
 
 ![screenshot_point_light.png](/images/screenshot_point_light.png)
 
-**Figure 37:** Inverse square law applied to point lights evaluation
+> **Figure 37:** Inverse square law applied to point lights evaluation
 
 #### Spot lights
 
@@ -1456,7 +1458,7 @@ A spot light is defined by a position in space, a direction vector and two cone 
 
 ![diagram_spot_light.png](/images/diagram_spot_light.png)
 
-**Figure 38:** Interaction between a spot light and a surface. The attenuation depends on the distance to the light and the angle between the surface the spot light's direction vector
+> **Figure 38:** Interaction between a spot light and a surface. The attenuation depends on the distance to the light and the angle between the surface the spot light's direction vector
 
 Equation [spotLightLuminousPower](spotLightLuminousPower) describes how the luminous power of a spot light can be calculated in a similar fashion to point lights, using $ \theta\_{outer} $ the outer angle of the spot light's cone in the range 0..$\pi$.
 
@@ -1468,7 +1470,7 @@ While this formulation is physically correct, it makes spot lights a little diff
 
 ![screenshot_spot_light_focused.png](/images/screenshot_spot_light_focused.png)
 
-**Figure 39:** Comparison of spot light outer angles, 55° (left) and 15° (right)
+> **Figure 39:** Comparison of spot light outer angles, 55° (left) and 15° (right)
 
 The coupling of illumination and the outer cone means that an artist cannot tweak the influence cone of a spot light without also changing the perceived illumination. It therefore makes sense to provide artists with a parameter to disable this coupling. Equations [spotLightLuminousPowerB](spotLightLuminousPowerB) shows how to formulate the luminous power for that purpose.
 
@@ -1480,7 +1482,7 @@ With this new formulation to compute the luminous intensity, the test scene in [
 
 ![screenshot_spot_light.png](/images/screenshot_spot_light.png)
 
-**Figure 40:** Comparison of spot light outer angles, 55° (left) and 15° (right)
+> **Figure 40:** Comparison of spot light outer angles, 55° (left) and 15° (right)
 
 This new formulation can also be considered physically based if the spot's reflector is replaced with a matte, diffuse mask that absorbs light perfectly.
 
@@ -1574,7 +1576,7 @@ The lighting system we have described so far can easily address the first two po
 
 ![screenshot_photometric_lights.png](/images/screenshot_photometric_lights.png)
 
-**Figure 41:** Controlling the distribution of a point light
+> **Figure 41:** Controlling the distribution of a point light
 
 Photometric lights use a photometric profile to describe their intensity distribution. There are two commonly used formats, IES (Illuminating Engineering Society) and EULUMDAT (European Lumen Data format) but we will focus on the former. IES profiles are supported by many tools and engines, such as Unreal Engine 4, Frostbite, Renderman, Maya and Killzone. In addition, IES light profiles are commonly made available by bulbs and luminaires manufacturers (Philips offers [an extensive array of IES files](http://www.usa.lighting.philips.com/connect/tools_literature/photometric_data_1.wpd) for download for instance). Photometric profiles are particularly useful when they measure a luminaire or light fixture, in which the light source is partially covered. The luminaire will block the light emitted in certain directions, thus shaping the light distribution.
 
@@ -1586,7 +1588,7 @@ An IES profile stores luminous intensity for various angles on a sphere around t
 
 ![screenshot_xarrow.png](/images/screenshot_xarrow.png)
 
-**Figure 42:** The XArrow IES profile rendered as a photometric web and as a point light in 3D space
+> **Figure 42:** The XArrow IES profile rendered as a photometric web and as a point light in 3D space
 
 The IES format is poorly documented and it is not uncommon to find syntax variations between files found on the Internet. The best resource to understand IES profile is Ian Ashdown's “Parsing the IESNA LM-63 photometric data file” document [Ashdown98](#citation-ashdown98). Succinctly, an IES profiles stores luminous intensities in candela at various angles around the light source. For each measured horizontal angle, a series of luminous intensities at different vertical angles is provided. It is however fairly common for measured light sources to be horizontally symmetrical. The XArrow profile shown above is a good example: intensities vary with vertical angles (vertical axis) but are symmetrical on the horizontal axis. The range of vertical angles in an IES profile is 0 to 180° and the range of horizontal angles is 0 to 360°.
 
@@ -1594,7 +1596,7 @@ The IES format is poorly documented and it is not uncommon to find syntax variat
 
 ![screenshot_lightgen_samples.png](/images/screenshot_lightgen_samples.png)
 
-**Figure 43:** Series of IES light profiles rendered with lightgen
+> **Figure 43:** Series of IES light profiles rendered with lightgen
 
 IES profiles can be applied directly to any punctual light, point or spot. To do so, we must first process the IES profile and generate a photometric profile as a texture. For performance considerations, the photometric profile we generate is a 1D texture that represents the average luminous intensity for all horizontal angles at a specific vertical angle (i.e., each pixel represents a vertical angle). To truly represent a photometric light, we should use a 2D texture but since most lights are fully, or mostly, symmetrical on the horizontal plane, we can accept this approximation. The values stored in the texture are normalized by the inverse maximum intensity defined in the IES profile. This allows us to easily store the texture in any float format or, at the cost of a bit of precision, in a luminance 8-bit texture (grayscale PNG for instance). Storing normalized values also allows us to treat photometric profiles as a mask:
 
@@ -1703,7 +1705,7 @@ To compute RGB values from a temperature, we can use the Planckian locus, shown 
 
 ![diagram_planckian_locus.png](/images/diagram_planckian_locus.png)
 
-**Figure 44:** The Planckian locus visualized on a CIE 1931 chromaticity diagram (source: Wikipedia)
+> **Figure 44:** The Planckian locus visualized on a CIE 1931 chromaticity diagram (source: Wikipedia)
 
 The easiest way to compute RGB values from this locus is to use the formula described in [Krystek85](#citation-krystek85). Krystek's algorithm (equation [krystek](krystek)) works in the CIE 1960 (UCS) space, using the following formula where $T$ is the desired temperature, and $u$ and $v$ the coordinates in UCS.
 
@@ -1757,19 +1759,19 @@ For convenience, [figure 45](#figure_colortemperaturescalecct) shows the range o
 
 ![diagram_color_temperature_cct.png](/images/diagram_color_temperature_cct.png)
 
-**Figure 45:** Scale of correlated color temperatures
+> **Figure 45:** Scale of correlated color temperatures
 
 Similarly, [figure 46](#figure_colortemperaturescalecie) shows the range of CIE standard illuminants series D from 1,000K to 12,500K.
 
 ![diagram_color_temperature_cie.png](/images/diagram_color_temperature_cie.png)
 
-**Figure 46:** Scale of CIE standard illuminants series D
+> **Figure 46:** Scale of CIE standard illuminants series D
 
 For reference, [figure 47](#figure_colortemperaturescalecctclamped) shows the range of correlated color temperatures without the normalization step presented in equation [normalizedRGB](normalizedRGB).
 
 ![diagram_color_temperature_cct_clamped.png](/images/diagram_color_temperature_cct_clamped.png)
 
-**Figure 47:** Unnormalized scale of correlated color temperatures
+> **Figure 47:** Unnormalized scale of correlated color temperatures
 
 [Table 14](#table_colortemperaturesamples) presents the correlated color temperature of various common light sources as sRGB color swatches. These colors are relative to the $ D\_{65} $ white point, so their perceived hue might vary based on your display's white point. See [What colour is the Sun?](http://jila.colorado.edu/~ajsh/colour/Tspectrum.html) for more information.
 
@@ -1842,7 +1844,7 @@ In real life, light comes from every direction either directly from light source
 
 ![screenshot_ball_ibl.png](/images/screenshot_ball_ibl.png)
 
-**Figure 48:** The object shown here is lit only by image-encoded environment lights. Notice the subtle lighting effects that can be applied using this technique.
+> **Figure 48:** The object shown here is lit only by image-encoded environment lights. Notice the subtle lighting effects that can be applied using this technique.
 
 There are limitations with image-based lighting. Obviously the environment image must be acquired somehow and as we'll see below it needs to be pre-processed before it can be used for lighting. Typically, the environment image is acquired offline in the real world, or generated by the engine either offline or at run time; either way, local or distant probes are used.
 
@@ -1914,11 +1916,11 @@ The irradiance integral $E_d$ can be trivially, albeit slowly[9](#endnote-ibldif
 
 ![ibl/ibl_river_roughness_m0.png](/images/ibl/ibl_river_roughness_m0.png)
 
-**Figure 49:** Image-based environment
+> **Figure 49:** Image-based environment
 
 ![ibl/ibl_irradiance.png](/images/ibl/ibl_irradiance.png)
 
-**Figure 50:** Image-based irradiance map using the Lambertian BRDF
+> **Figure 50:** Image-based irradiance map using the Lambertian BRDF
 
 5 $\Theta$ represents the parameters of the material model $f$, i.e.: _roughness_, albedo and so on...
 
@@ -1941,11 +1943,11 @@ In practice only 4 or 9 coefficients (i.e.: 2 or 3 bands) are enough for $\left<
 
 ![ibl/ibl_irradiance_sh3.png](/images/ibl/ibl_irradiance_sh3.png)
 
-**Figure 51:** 3 bands (9 coefficients)
+> **Figure 51:** 3 bands (9 coefficients)
 
 ![ibl/ibl_irradiance_sh2.png](/images/ibl/ibl_irradiance_sh2.png)
 
-**Figure 52:** 2 bands (4 coefficients)
+> **Figure 52:** 2 bands (4 coefficients)
 
 In practice we pre-convolve $L_{\bot}$ with $\left< \cos \theta \right> $ and pre-scale these coefficients by the basis scaling factors $K_l^m$ so that the reconstruction code is as simple as possible in the shader:
 
@@ -2208,7 +2210,7 @@ See an example below:
 
 ![ibl/ibl_visualization.jpg](/images/ibl/ibl_visualization.jpg)
 
-**Figure 53:** Indirect diffuse and specular decomposition
+> **Figure 53:** Indirect diffuse and specular decomposition
 
 #### IBL evaluation implementation
 
@@ -2350,23 +2352,23 @@ In order to calculate the specular contribution of distant image-based lights, w
 
 ![ibl/ibl_prefilter_vs_reference.png](/images/ibl/ibl_prefilter_vs_reference.png)
 
-**Figure 54:**
+> **Figure 54:**
 
 ![ibl/ibl_stretchy_reflections_error.png](/images/ibl/ibl_stretchy_reflections_error.png)
 
-**Figure 55:**
+> **Figure 55:**
 
 ![ibl/ibl_trilinear_0.png](/images/ibl/ibl_trilinear_0.png)
 
-**Figure 56:**
+> **Figure 56:**
 
 ![ibl/ibl_trilinear_1.png](/images/ibl/ibl_trilinear_1.png)
 
-**Figure 57:**
+> **Figure 57:**
 
 ![ibl/ibl_no_mipmaping.png](/images/ibl/ibl_no_mipmaping.png)
 
-**Figure 58:**
+> **Figure 58:**
 
 ### Clear coat
 
@@ -2389,11 +2391,11 @@ When sampling the IBL, the clear coat layer is calculated as a second specular l
 
 ![screenshot_anisotropic_ibl1.jpg](/images/screenshot_anisotropic_ibl1.jpg)
 
-**Figure 59:** Anisotropic indirect specular reflections using bent normals (left: roughness 0.3, right: roughness: 0.0; both: anisotropy 1.0)
+> **Figure 59:** Anisotropic indirect specular reflections using bent normals (left: roughness 0.3, right: roughness: 0.0; both: anisotropy 1.0)
 
 ![screenshot_anisotropic_ibl2.jpg](/images/screenshot_anisotropic_ibl2.jpg)
 
-**Figure 60:** Anisotropic reflections with varying roughness, metallicness, etc.
+> **Figure 60:** Anisotropic reflections with varying roughness, metallicness, etc.
 
 The implementation of this technique is straightforward, as demonstrated in [listing 32](#listing_bentreflectionvector).
 
@@ -2422,7 +2424,7 @@ This technique can be made more useful by accepting negative `anisotropy` values
 
 ![screenshot_anisotropy_direction.png](/images/screenshot_anisotropy_direction.png)
 
-**Figure 61:** Control of the anisotropy direction using positive (left) and negative (right) values
+> **Figure 61:** Control of the anisotropy direction using positive (left) and negative (right) values
 
 ### Subsurface
 
@@ -2436,7 +2438,7 @@ The DG term is generated using uniform sampling as recommended in [Estevez17](#c
 
 ![ibl/dfg_cloth.png](/images/ibl/dfg_cloth.png)
 
-**Figure 62:** DFG LUT with a 3rd channel encoding the DG term of the cloth BRDF
+> **Figure 62:** DFG LUT with a 3rd channel encoding the DG term of the cloth BRDF
 
 The remainder of the image-based lighting implementation follows the same steps as the implementation of regular lights, including the optional subsurface scattering term and its wrap diffuse component. Just as with the clear coat IBL implementation, we cannot integrate over the hemisphere and use the view direction as the dominant light direction to compute the wrap diffuse component.
 
@@ -2474,11 +2476,11 @@ To properly light a transparent surface, we must first understand how the materi
 
 ![screenshot_camera_transparency.jpg](/images/screenshot_camera_transparency.jpg)
 
-**Figure 63:** Example of a complex object where lit surface transparency plays an important role
+> **Figure 63:** Example of a complex object where lit surface transparency plays an important role
 
 ![screenshot_car.jpg](/images/screenshot_car.jpg)
 
-**Figure 64:** Example of a complex object where lit surface transparency plays an important role
+> **Figure 64:** Example of a complex object where lit surface transparency plays an important role
 
 To properly implement opacity, we will use the premultiplied alpha format. Given a desired opacity noted $ \alpha\_{opacity} $ and a diffuse color $ \sigma $ (linear, unpremultiplied), we can compute the effective opacity of a fragment.
 
@@ -2527,7 +2529,7 @@ TODO Surface translucency (BRDF+BTDF, BSSRDF)
 
 ![screenshot_translucency.png](/images/screenshot_translucency.png)
 
-**Figure 65:** Front-lit translucent object (left) and back-lit translucent object (right), using approximated BTDF and BSSRDF. Model: Lucy from the Stanford University Computer Graphics Laboratory
+> **Figure 65:** Front-lit translucent object (left) and back-lit translucent object (right), using approximated BTDF and BSSRDF. Model: Lucy from the Stanford University Computer Graphics Laboratory
 
 ## Occlusion
 
@@ -2594,7 +2596,7 @@ In practice, baked ambient occlusion is stored as a grayscale texture which can 
 
 ![screenshot_ao.jpg](/images/screenshot_ao.jpg)
 
-**Figure 66:** Comparison of materials without diffuse ambient occlusion (left) and with (right)
+> **Figure 66:** Comparison of materials without diffuse ambient occlusion (left) and with (right)
 
 Applying baked diffuse ambient occlusion in a GLSL shader is straightforward, as shown in [listing 36](#listing_bakeddiffuseao).
 
@@ -2668,17 +2670,17 @@ Let's imagine that we want to render a piece of furniture covered in tufted leat
 
 ![screenshot_normal_mapping.jpg](/images/screenshot_normal_mapping.jpg)
 
-**Figure 67:** Low-poly mesh without normal mapping (left) and with (right)
+> **Figure 67:** Low-poly mesh without normal mapping (left) and with (right)
 
 ![screenshot_normal_map.jpg](/images/screenshot_normal_map.jpg)
 
-**Figure 68:** Normal map used as a base map
+> **Figure 68:** Normal map used as a base map
 
 A simple problem arises if we now want to combine this base map with a second normal map. For instance, let's use the detail map shown in [figure 69](#figure_detailnormalmap) to add cracks in the leather.
 
 ![screenshot_normal_map_detail.jpg](/images/screenshot_normal_map_detail.jpg)
 
-**Figure 69:** Normal map used as a detail map
+> **Figure 69:** Normal map used as a detail map
 
 Given the nature of normal maps (XYZ components stored in tangent space), it is fairly obvious that naive approaches such as linear or overlay blending cannot work. We will use two more advanced techniques: a mathematically correct one and an approximation suitable for real-time shading.
 
@@ -2705,7 +2707,7 @@ Since this technique is slightly more expensive than the one described below, we
 
 ![screenshot_normal_map_blended.jpg](/images/screenshot_normal_map_blended.jpg)
 
-**Figure 70:** Blended normal and detail map (left) and resulting render when combined with a diffuse map (right)
+> **Figure 70:** Blended normal and detail map (left) and resulting render when combined with a diffuse map (right)
 
 ### UDN blending
 
@@ -2724,7 +2726,7 @@ The results are visually close to Reoriented Normal Mapping but a careful compar
 
 ![screenshot_normal_map_blended_udn.jpg](/images/screenshot_normal_map_blended_udn.jpg)
 
-**Figure 71:** Blended normal and detail map using the UDN blending technique
+> **Figure 71:** Blended normal and detail map using the UDN blending technique
 
 # Volumetric effects
 
@@ -2732,11 +2734,11 @@ The results are visually close to Reoriented Normal Mapping but a careful compar
 
 ![screenshot_fog1.jpg](/images/screenshot_fog1.jpg)
 
-**Figure 72:** Example of directional in-scattering with exponential height fog
+> **Figure 72:** Example of directional in-scattering with exponential height fog
 
 ![screenshot_fog2.jpg](/images/screenshot_fog2.jpg)
 
-**Figure 73:** Example of directional in-scattering with exponential height fog
+> **Figure 73:** Example of directional in-scattering with exponential height fog
 
 # Anti-aliasing
 
@@ -2748,7 +2750,9 @@ The [lighting](#lighting) section of this document describes how light interacts
 
 The series of transformations we are going to use form the following imaging pipeline:
 
-SceneNormalizedluminanceluminanceWhitebalance(HDR)ColorgradingTonemappingPixelOETFvalue(LDR)
+<Diagram />
+
+{/* SceneNormalizedluminanceluminanceWhitebalance(HDR)ColorgradingTonemappingPixelOETFvalue(LDR) */}
 
 **Note**: the _OETF_ step is the application of the opto-electronic transfer function of the target color space. For clarity this diagram does not include post-processing steps such as vignette, bloom, etc. These effects will be discussed separately.
 
@@ -2768,17 +2772,11 @@ This range remapping is done in a camera by exposing the sensor for a certain ti
 - Shutter speed
 - Sensitivity (also called gain)
 
-Aperture
-
-Noted $N$ and expressed in f-stops ƒ, this setting controls how open or closed the camera system's aperture is. Since an f-stop indicate the ratio of the lens' focal length to the diameter of the entrance pupil, high-values (ƒ/16) indicate a small aperture and small values (ƒ/1.4) indicate a wide aperture. In addition to the exposition, the aperture setting controls the depth of field.
-
-Shutter speed
-
-Noted $t$ and expressed in seconds $s$, this setting controls how long the aperture remains opened (it also controls the timing of the sensor shutter(s), whether electronic or mechanical). In addition to the exposition, the shutter speed controls motion blur.
-
-Sensitivity
-
-Noted $S$ and expressed in ISO, this setting controls how the light reaching the sensor is quantized. Because of its unit, this setting is often referred to as simply the “ISO” or “ISO setting”. In addition to the exposition, the sensitivity setting controls the amount of noise.
+| **Parameter**            | **Description**                                                                                                                                                                              |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Aperture ($ƒ/N$)**     | Controls the size of the camera's aperture. Higher values ($ƒ/16$) indicate a smaller aperture, while lower values ($ƒ/1.4$) indicate a wider aperture. Affects exposure and depth of field. |
+| **Shutter speed ($t$)**  | Expressed in seconds ($s$). Controls how long the aperture remains open, affecting exposure and motion blur.                                                                                 |
+| **Sensitivity (S, ISO)** | Expressed in ISO. Controls how light is quantized by the sensor. Higher ISO values increase brightness but also introduce noise.                                                             |
 
 ### Exposure value
 
@@ -2826,10 +2824,7 @@ A camera, similar to a spot meter, is able to measure the average luminance of a
 It is possible to define EV as a function of the scene luminance $L$, given a per-device calibration constant $K$ (equation [evK](evK)).
 
 $$
-
- EV = log_2(\frac{L \times S}{K})
-
-
+EV = log_2(\frac{L \times S}{K})
 $$
 
 That constant $K$ is the reflected-light meter constant, which varies between manufacturers. We could find two common values for this constant: 12.5, used by Canon, Nikon and Sekonic, and 14, used by Pentax and Minolta. Given the wide availability of Canon and Nikon cameras, as well as our own usage of Sekonic light meters, we will choose to use $ K = 12.5 $.
@@ -2837,10 +2832,7 @@ That constant $K$ is the reflected-light meter constant, which varies between ma
 Since we want to work with $ EV\_{100} $, we can substitute $K$ and $S$ in equation [evK](evK) to obtain equation [ev100L](ev100L).
 
 $$
-
- EV = log_2(L \frac{100}{12.5})
-
-
+EV = log_2(L \frac{100}{12.5})
 $$
 
 Given this relationship, it would be possible to implement automatic exposure in our engine by first measuring the average luminance of a frame. An easy way to achieve this is to simply downsample a luminance buffer down to 1 pixel and read the remaining value. This technique is unfortunately rarely stable and can easily be affected by extreme values. Many games use a different approach which consists in using a luminance histogram to remove extreme values.
@@ -2848,10 +2840,7 @@ Given this relationship, it would be possible to implement automatic exposure in
 For validation and testing purposes, the luminance can be computed from a given EV:
 
 $$
-
- L = 2^{EV_{100}} \times \frac{12.5}{100} = 2^{EV_{100} - 3}
-
-
+L = 2^{EV_{100}} \times \frac{12.5}{100} = 2^{EV_{100} - 3}
 $$
 
 #### Exposure value and illuminance
@@ -2859,10 +2848,7 @@ $$
 It is possible to define EV as a function of the illuminance $E$, given a per-device calibration constant $C$:
 
 $$
-
- EV = log_2(\frac{E \times S}{C})
-
-
+EV = log_2(\frac{E \times S}{C})
 $$
 
 The constant $C$ is the incident-light meter constant, which varies between manufacturers and/or types of sensors. There are two common types of sensors: flat and hemispherical. For flat sensors, a common value is 250. With hemispherical sensors, we could find two common values: 320, used by Minolta, and 340, used by Sekonic.
@@ -2870,28 +2856,19 @@ The constant $C$ is the incident-light meter constant, which varies between manu
 Since we want to work with $ EV\_{100} $, we can substitute $S$ [evC](evC) to obtain equation [ev100C](ev100C).
 
 $$
-
- EV = log_2(E \frac{100}{C})
-
-
+EV = log_2(E \frac{100}{C})
 $$
 
 The illuminance can then be computed from a given EV. For a flat sensor with $ C = 250 $ we obtain equation [eFlatSensor](eFlatSensor).
 
 $$
-
- E = 2^{EV_{100}} \times 2.5
-
-
+E = 2^{EV_{100}} \times 2.5
 $$
 
 For a hemispherical sensor with $ C = 340 $ we obtain equation [eHemisphereSensor](eHemisphereSensor)
 
 $$
-
- E = 2^{EV_{100}} \times 3.4
-
-
+E = 2^{EV_{100}} \times 3.4
 $$
 
 #### Exposure compensation
@@ -2901,10 +2878,7 @@ Even though an exposure value actually indicates combinations of camera settings
 Applying an exposure compensation $EC$ is a simple as adding an offset to the exposure value, as shown in equation [ec](ec).
 
 $$
-
- EV_{100}' = EV_{100} - EC
-
-
+EV_{100}' = EV_{100} - EC
 $$
 
 This equation uses a negative sign because we are using $EC$ in f-stops to adjust the final exposure. Increasing the EV is akin to closing down the aperture of the lens (or reducing shutter speed or reducing sensitivity). A higher EV will produce darker images.
@@ -2914,10 +2888,7 @@ This equation uses a negative sign because we are using $EC$ in f-stops to adjus
 To convert the scene luminance into normalized luminance, we must use the [photometric exposure](https://en.wikipedia.org/wiki/Exposure_value#Camera_settings_vs._photometric_exposure) (or luminous exposure), or amount of scene luminance that reaches the camera sensor. The photometric exposure, expressed in lux seconds and noted $H$, is given by equation [photometricExposure](photometricExposure).
 
 $$
-
- H = \frac{q \cdot t}{N^2} L
-
-
+H = \frac{q \cdot t}{N^2} L
 $$
 
 Where $L$ is the luminance of the scene, $t$ the shutter speed, $N$ the aperture and $q$ the lens and vignetting attenuation (typically $ q = 0.65 $[11](#endnote-lensattenuation)). This definition does not take the sensor sensitivity into account. To do so, we must use one of the three ways to relate photometric exposure and sensitivity: saturation-based speed, noise-based speed and standard output sensitivity.
@@ -2925,61 +2896,55 @@ Where $L$ is the luminance of the scene, $t$ the shutter speed, $N$ the aperture
 We choose the saturation-based speed relation, which gives us $ H\_{sat} $, the maximum possible exposure that does not lead to clipped or bloomed camera output (equation [hSat](hSat)).
 
 $$
-
- H_{sat} = \frac{78}{S_{sat}}
-
-
+H_{sat} = \frac{78}{S_{sat}}
 $$
 
 We combine equations [hSat](hSat) and [photometricExposure](photometricExposure) in equation [lmax](lmax) to compute the maximum luminance $ L\_{max} $ that will saturate the sensor given exposure settings $S$, $N$ and $t$.
 
 $$
-
- L_{max} = \frac{N^2}{q \cdot t} \frac{78}{S}
-
-
+L_{max} = \frac{N^2}{q \cdot t} \frac{78}{S}
 $$
 
 This maximum luminance can then be used to normalize incident luminance $L$ as shown in equation [normalizedLuminance](normalizedLuminance).
 
 $$
-
- L' = L \frac{1}{L_{max}}
-
-
+\begin{equation}
+L' = L \frac{1}{L_{max}}
+\end{equation}
 $$
 
 $ L\_{max} $ can be simplified using equation [ev](ev), $ S = 100 $ and $ q = 0.65 $:
 
 $$
-
-L_{max} &= \frac{N^2}{t} \frac{78}{q \cdot S} \\ L_{max} &= 2^{EV_{100}} \frac{78}{q \cdot S} \\ L_{max} &= 2^{EV_{100}} \times 1.2
-
-
+\begin{align*}
+L_{max} &= \frac{N^2}{t} \frac{78}{q \cdot S} \\
+L_{max} &= 2^{EV_{100}} \frac{78}{q \cdot S} \\
+L_{max} &= 2^{EV_{100}} \times 1.2
+\end{align*}
 $$
 
 [Listing 42](#listing_fragmentexposure) shows how the exposure term can be applied directly to the pixel color computed in a fragment shader.
 
 ```glsl
-    // Computes the camera's EV100 from exposure settings
-    // aperture in f-stops
-    // shutterSpeed in seconds
-    // sensitivity in ISO
-    float exposureSettings(float aperture, float shutterSpeed, float sensitivity) {
-        return log2((aperture * aperture) / shutterSpeed * 100.0 / sensitivity);
-    }
+// Computes the camera's EV100 from exposure settings
+// aperture in f-stops
+// shutterSpeed in seconds
+// sensitivity in ISO
+float exposureSettings(float aperture, float shutterSpeed, float sensitivity) {
+    return log2((aperture * aperture) / shutterSpeed * 100.0 / sensitivity);
+}
 
-    // Computes the exposure normalization factor from
-    // the camera's EV100
-    float exposure(float ev100) {
-        return 1.0 / (pow(2.0, ev100) * 1.2);
-    }
+// Computes the exposure normalization factor from
+// the camera's EV100
+float exposure(float ev100) {
+    return 1.0 / (pow(2.0, ev100) * 1.2);
+}
 
-    float ev100 = exposureSettings(aperture, shutterSpeed, sensitivity);
-    float exposure = exposure(ev100);
+float ev100 = exposureSettings(aperture, shutterSpeed, sensitivity);
+float exposure = exposure(ev100);
 
-    vec4 color = evaluateLighting();
-    color.rgb *= exposure;
+vec4 color = evaluateLighting();
+color.rgb *= exposure;
 ```
 
 > **Listing 42:** Implementation of exposure in GLSL
@@ -3001,17 +2966,11 @@ Note that both methods will find the average luminance after multiplication by t
 
 These two techniques also limit the metering system to average metering, where each pixel has the same influence (or weight) over the final exposure. Cameras typically offer 3 modes of metering:
 
-Spot metering
-
-In which only a small circle in the center of the image contributes to the final exposure. That circle is usually 1 to 5% of the total image size.
-
-Center-weighted metering
-
-Gives more influence to scene luminance values located in the center of the screen.
-
-Multi-zone or matrix metering
-
-A metering mode that differs for each manufacturer. The goal of this mode is to prioritize exposure for the most important parts of the scene. This is often achieved by splitting the image into a grid and by classifying each cell (using focus information, min/max luminance, etc.). Advanced implementations attempt to compare the scene to a known dataset to achieve proper exposure (backlit sunset, overcast snowy day, etc.).
+| **Metering Mode**              | **Description**                                                                                                    |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| **Spot metering**              | A small circle in the center (1-5% of the image) determines the exposure.                                          |
+| **Center-weighted metering**   | Gives more weight to luminance values in the center of the image.                                                  |
+| **Multi-zone/matrix metering** | Uses a grid to analyze the scene and prioritizes exposure for key elements, sometimes comparing to known datasets. |
 
 #### Spot metering
 
@@ -3056,28 +3015,25 @@ Because the EV scale is almost perceptually linear, the exposure value is also o
 
 ![screenshot_bloom.jpg](/images/screenshot_bloom.jpg)
 
-**Figure 74:** Saturated photosites on a sensor create a blooming effect in the bright parts of the scene
+> **Figure 74:** Saturated photosites on a sensor create a blooming effect in the bright parts of the scene
 
 With $c$ the bloom color and $ EV\_{100} $ the current exposure value, we can easily compute the luminance of the bloom value as show in equation [bloomEV](bloomEV).
 
 $$
-
- EV_{bloom} = EV_{100} + EC \\ L_{bloom} = c \times 2^{EV_{bloom} - 3}
-
-
+EV_{bloom} = EV_{100} + EC \\ L_{bloom} = c \times 2^{EV_{bloom} - 3}
 $$
 
 Equation [bloomEV](bloomEV) can be used in a fragment shader to implement emissive blooms, as shown in [listing 43](#listing_fragmentemissive).
 
 ```glsl
-    vec4 surfaceShading() {
-        vec4 color = evaluateLights();
-        // rgb = color, w = exposure compensation
-        vec4 emissive = getEmissive();
-        color.rgb += emissive.rgb * pow(2.0, ev100 + emissive.w - 3.0);
-        color.rgb *= exposure;
-        return color;
-    }
+vec4 surfaceShading() {
+    vec4 color = evaluateLights();
+    // rgb = color, w = exposure compensation
+    vec4 emissive = getEmissive();
+    color.rgb += emissive.rgb * pow(2.0, ev100 + emissive.w - 3.0);
+    color.rgb *= exposure;
+    return color;
+}
 ```
 
 > **Listing 43:** Implementation of emissive bloom in GLSL
@@ -3090,7 +3046,7 @@ TODO
 
 ![screenshot_fringing.jpg](/images/screenshot_fringing.jpg)
 
-**Figure 75:** Example of color fringing: look at the ear on the left or the chin at the bottom.
+> **Figure 75:** Example of color fringing: look at the ear on the left or the chin at the bottom.
 
 ### Lens flares
 
@@ -3135,13 +3091,13 @@ The scene displayed in [figure 76](#figure_sponza) was rendered using clustered 
 
 ![screenshot_sponza.jpg](/images/screenshot_sponza.jpg)
 
-**Figure 76:** Clustered forward rendering with dozens of dynamic lights and MSAA
+> **Figure 76:** Clustered forward rendering with dozens of dynamic lights and MSAA
 
 [Figure 77](#figure_sponzatiles) shows the same scene split in tiles (in this case, a 1280×720 render target with 80×80px tiles).
 
 ![screenshot_sponza_tiles.jpg](/images/screenshot_sponza_tiles.jpg)
 
-**Figure 77:** Tiled shading (16×9 tiles)
+> **Figure 77:** Tiled shading (16×9 tiles)
 
 ### Clustered Forward Rendering
 
@@ -3151,17 +3107,17 @@ The frustum is first sliced on the depth axis as show in [figure 78](#figure_spo
 
 ![screenshot_sponza_slices.jpg](/images/screenshot_sponza_slices.jpg)
 
-**Figure 78:** Depth slicing (16 slices)
+> **Figure 78:** Depth slicing (16 slices)
 
 And the depth slices are then combined with the screen tiles to “voxelize” the frustum. We call each cluster a froxel as it makes it clear what they represent (a voxel in frustum space). The result of the “froxelization” pass is shown in [figure 79](#figure_froxel1) and [figure 80](#figure_froxel2).
 
 ![screenshot_sponza_froxels1.jpg](/images/screenshot_sponza_froxels1.jpg)
 
-**Figure 79:** Frustum voxelization (5×3 tiles, 8 depth slices)
+> **Figure 79:** Frustum voxelization (5×3 tiles, 8 depth slices)
 
 ![screenshot_sponza_froxels2.jpg](/images/screenshot_sponza_froxels2.jpg)
 
-**Figure 80:** Frustum voxelization (5×3 tiles, 8 depth slices)
+> **Figure 80:** Frustum voxelization (5×3 tiles, 8 depth slices)
 
 Before rendering a frame, each light in the scene is assigned to any froxel it intersects with. The result of the lights assignment pass is a list of lights for each froxel. During the rendering pass, we can compute the ID of the froxel a fragment belongs to and therefore the list of lights that can affect that fragment.
 
@@ -3171,13 +3127,13 @@ The depth slicing is not linear, but exponential. In a typical scene, there will
 
 ![diagram_froxels1.png](/images/diagram_froxels1.png)
 
-**Figure 81:** Near: 0.1m, Far: 100m, 16 slices
+> **Figure 81:** Near: 0.1m, Far: 100m, 16 slices
 
 A simple exponential voxelization is unfortunately not enough. The graphic above clearly illustrates how world space is distributed across slices but it fails to show what happens close to the near plane. If we examine the same distribution in a smaller range (0.1m to 7m) we can see an interesting problem appear as shown in [figure 82](#figure_froxeldistributionclose).
 
 ![diagram_froxels2.png](/images/diagram_froxels2.png)
 
-**Figure 82:** Depth distribution in the 0.1-7m range
+> **Figure 82:** Depth distribution in the 0.1-7m range
 
 This graphic shows that a simple exponential distribution uses up half of the slices very close to the camera. In this particular case, we use 8 slices out of 16in the first 5 meters. Since dynamic world lights are either point lights (spheres) or spot lights (cones), such a fine resolution is completely unnecessary so close to the near plane.
 
@@ -3185,7 +3141,7 @@ Our solution is to manually tweak the size of the first froxel depending on the 
 
 ![diagram_froxels3.png](/images/diagram_froxels3.png)
 
-**Figure 83:** Near: 0.1, Far: 100m, 16 slices, Special froxel: 0.1-5m
+> **Figure 83:** Near: 0.1, Far: 100m, 16 slices, Special froxel: 0.1-5m
 
 This new distribution is much more efficient and allows a better assignment of the lights throughout the entire frustum.
 
@@ -3220,37 +3176,25 @@ The list of lights per froxel can be passed to the fragment shader either as an 
 Given a near plane $n$, a far plane $f$, a maximum number of depth slices $m$ and a linear depth value $z$ in the range 0..1, equation [zToCluster](zToCluster) can be used to compute the index of the cluster for a given position.
 
 $$
-
- zToCluster(z,n,f,m)=floor \left( max \left( log2(z) \frac{m}{-log2(\frac{n}{f})} + m, 0 \right) \right)
-
-
+zToCluster(z,n,f,m)=floor \left( max \left( log2(z) \frac{m}{-log2(\frac{n}{f})} + m, 0 \right) \right)
 $$
 
 This formula suffers however from the resolution issue mentioned previously. We can fix it by introducing $sn$, a special near value that defines the extent of the first froxel (the first froxel occupies the range n..sn, the remaining froxels sn..f).
 
 $$
-
- zToCluster(z,n,sn,f,m)=floor \left( max \left( log2(z) \frac{m-1}{-log2(\frac{sn}{f})} + m, 0 \right) \right)
-
-
+zToCluster(z,n,sn,f,m)=floor \left( max \left( log2(z) \frac{m-1}{-log2(\frac{sn}{f})} + m, 0 \right) \right)
 $$
 
 Equation [linearZ](linearZ) can be used to compute a linear depth value from `gl_FragCoord.z` (assuming a standard OpenGL projection matrix).
 
 $$
-
- linearZ(z)=\frac{n}{f+z(n-f)}
-
-
+linearZ(z)=\frac{n}{f+z(n-f)}
 $$
 
 This equation can be simplified by pre-computing two terms $c0$ and $c1$, as shown in equation [linearZFix](linearZFix).
 
 $$
-
- c1 = \frac{f}{n} \\ c0 = 1 - c1 \\ linearZ(z)=\frac{1}{z \cdot c0 + c1}
-
-
+c1 = \frac{f}{n} \\ c0 = 1 - c1 \\ linearZ(z)=\frac{1}{z \cdot c0 + c1}
 $$
 
 This simplification is important because we pass the linear z value to a `log2` in [zToClusterFix](zToClusterFix). Since the division becomes a negation under a logarithmic, we can avoid a division by using $-log2(z \cdot c0 + c1)$ instead.
@@ -3258,29 +3202,29 @@ This simplification is important because we pass the linear z value to a `log2` 
 All put together, computing the froxel index of a given fragment can be implemented fairly easily as shown in [listing 44](#listing_fragcoordtofroxel).
 
 ```glsl
-    #define MAX_LIGHT_COUNT 16 // max number of lights per froxel
+#define MAX_LIGHT_COUNT 16 // max number of lights per froxel
 
-    uniform uvec4 froxels; // res x, res y, count y, count y
-    uniform vec4 zParams;  // c0, c1, index scale, index bias
+uniform uvec4 froxels; // res x, res y, count y, count y
+uniform vec4 zParams;  // c0, c1, index scale, index bias
 
-    uint getDepthSlice() {
-        return uint(max(0.0, log2(zParams.x * gl_FragCoord.z + zParams.y) *
-                zParams.z + zParams.w));
-    }
+uint getDepthSlice() {
+    return uint(max(0.0, log2(zParams.x * gl_FragCoord.z + zParams.y) *
+            zParams.z + zParams.w));
+}
 
-    uint getFroxelOffset(uint depthSlice) {
-        uvec2 froxelCoord = uvec2(gl_FragCoord.xy) / froxels.xy;
-        froxelCoord.y = (froxels.w - 1u) - froxelCoord.y;
+uint getFroxelOffset(uint depthSlice) {
+    uvec2 froxelCoord = uvec2(gl_FragCoord.xy) / froxels.xy;
+    froxelCoord.y = (froxels.w - 1u) - froxelCoord.y;
 
-        uint index = froxelCoord.x + froxelCoord.y * froxels.z +
-                depthSlice * froxels.z * froxels.w;
-        return index * MAX_FROXEL_LIGHT_COUNT;
-    }
+    uint index = froxelCoord.x + froxelCoord.y * froxels.z +
+            depthSlice * froxels.z * froxels.w;
+    return index * MAX_FROXEL_LIGHT_COUNT;
+}
 
-    uint slice = getDepthSlice();
-    uint offset = getFroxelOffset(slice);
+uint slice = getDepthSlice();
+uint offset = getFroxelOffset(slice);
 
-    // Compute lighting...
+// Compute lighting...
 ```
 
 > **Listing 44:** GLSL implementation to compute a froxel index from a fragment's screen coordinates
@@ -3288,15 +3232,15 @@ All put together, computing the froxel index of a given fragment can be implemen
 Several uniforms must be pre-computed for perform the index evaluation efficiently. The code used to pre-compute these uniforms can be found in listing ?.
 
 ```glsl
-    froxels[0] = TILE_RESOLUTION_IN_PX;
-    froxels[1] = TILE_RESOLUTION_IN_PX;
-    froxels[2] = numberOfTilesInX;
-    froxels[3] = numberOfTilesInY;
+froxels[0] = TILE_RESOLUTION_IN_PX;
+froxels[1] = TILE_RESOLUTION_IN_PX;
+froxels[2] = numberOfTilesInX;
+froxels[3] = numberOfTilesInY;
 
-    zParams[0] = 1.0f - Z_FAR / Z_NEAR;
-    zParams[1] = Z_FAR / Z_NEAR;
-    zParams[2] = (MAX_DEPTH_SLICES - 1) / log2(Z_SPECIAL_NEAR / Z_FAR);
-    zParams[3] = MAX_DEPTH_SLICES;
+zParams[0] = 1.0f - Z_FAR / Z_NEAR;
+zParams[1] = Z_FAR / Z_NEAR;
+zParams[2] = (MAX_DEPTH_SLICES - 1) / log2(Z_SPECIAL_NEAR / Z_FAR);
+zParams[3] = MAX_DEPTH_SLICES;
 ```
 
 Listing ?
@@ -3332,36 +3276,36 @@ With emissive materials and IBLs, it is fairly easy to obtain a scene in which s
 
 ![screenshot_luminance_debug.png](/images/screenshot_luminance_debug.png)
 
-**Figure 84:** Visualizing luminance by color coding the stops: cyan is middle gray, blue is 1 stop darker, green 1 stop brighter, etc.
+> **Figure 84:** Visualizing luminance by color coding the stops: cyan is middle gray, blue is 1 stop darker, green 1 stop brighter, etc.
 
 ```glsl
-    vec3 Tonemap_DisplayRange(const vec3 x) {
-        // The 5th color in the array (cyan) represents middle gray (18%)
-        // Every stop above or below middle gray causes a color shift
-        float v = log2(luminance(x) / 0.18);
-        v = clamp(v + 5.0, 0.0, 15.0);
-        int index = int(floor(v));
-        return mix(debugColors[index], debugColors[min(15, index + 1)], fract(v));
-    }
+vec3 Tonemap_DisplayRange(const vec3 x) {
+    // The 5th color in the array (cyan) represents middle gray (18%)
+    // Every stop above or below middle gray causes a color shift
+    float v = log2(luminance(x) / 0.18);
+    v = clamp(v + 5.0, 0.0, 15.0);
+    int index = int(floor(v));
+    return mix(debugColors[index], debugColors[min(15, index + 1)], fract(v));
+}
 
-    const vec3 debugColors[16] = vec3[](
-         vec3(0.0, 0.0, 0.0),         // black
-         vec3(0.0, 0.0, 0.1647),      // darkest blue
-         vec3(0.0, 0.0, 0.3647),      // darker blue
-         vec3(0.0, 0.0, 0.6647),      // dark blue
-         vec3(0.0, 0.0, 0.9647),      // blue
-         vec3(0.0, 0.9255, 0.9255),   // cyan
-         vec3(0.0, 0.5647, 0.0),      // dark green
-         vec3(0.0, 0.7843, 0.0),      // green
-         vec3(1.0, 1.0, 0.0),         // yellow
-         vec3(0.90588, 0.75294, 0.0), // yellow-orange
-         vec3(1.0, 0.5647, 0.0),      // orange
-         vec3(1.0, 0.0, 0.0),         // bright red
-         vec3(0.8392, 0.0, 0.0),      // red
-         vec3(1.0, 0.0, 1.0),         // magenta
-         vec3(0.6, 0.3333, 0.7882),   // purple
-         vec3(1.0, 1.0, 1.0)          // white
-    );
+const vec3 debugColors[16] = vec3[](
+        vec3(0.0, 0.0, 0.0),         // black
+        vec3(0.0, 0.0, 0.1647),      // darkest blue
+        vec3(0.0, 0.0, 0.3647),      // darker blue
+        vec3(0.0, 0.0, 0.6647),      // dark blue
+        vec3(0.0, 0.0, 0.9647),      // blue
+        vec3(0.0, 0.9255, 0.9255),   // cyan
+        vec3(0.0, 0.5647, 0.0),      // dark green
+        vec3(0.0, 0.7843, 0.0),      // green
+        vec3(1.0, 1.0, 0.0),         // yellow
+        vec3(0.90588, 0.75294, 0.0), // yellow-orange
+        vec3(1.0, 0.5647, 0.0),      // orange
+        vec3(1.0, 0.0, 0.0),         // bright red
+        vec3(0.8392, 0.0, 0.0),      // red
+        vec3(1.0, 0.0, 1.0),         // magenta
+        vec3(0.6, 0.3333, 0.7882),   // purple
+        vec3(1.0, 1.0, 1.0)          // white
+);
 ```
 
 > **Listing 45:** GLSL implementation of a custom debug tone-mapping operator for luminance visualization
@@ -3374,11 +3318,11 @@ To validate our implementation against reference renderings, we will use a comme
 
 ![screenshot_ref_mitsuba.jpg](/images/screenshot_ref_mitsuba.jpg)
 
-**Figure 85:** Rendered in 2048×1440 in 1 minute and 42 seconds on a 12 core 2013 MacPro
+> **Figure 85:** Rendered in 2048×1440 in 1 minute and 42 seconds on a 12 core 2013 MacPro
 
 ![screenshot_ref_filament.jpg](/images/screenshot_ref_filament.jpg)
 
-**Figure 86:** Rendered in 2048×1440 with MSAA 4x at 60 fps on a Nexus 9 device (Tegra K1 GPU)
+> **Figure 86:** Rendered in 2048×1440 with MSAA 4x at 60 fps on a Nexus 9 device (Tegra K1 GPU)
 
 The parameters used to render both scenes are the following:
 
@@ -3427,7 +3371,7 @@ The slight differences between the two renderings come from the various approxim
 
 ![screenshot_ref_comparison.png](/images/screenshot_ref_comparison.png)
 
-**Figure 87:** Luminance gradients from Mitsuba (left) and Filament (right)
+> **Figure 87:** Luminance gradients from Mitsuba (left) and Filament (right)
 
 The biggest difference is visible at grazing angles, which is most likely explained by Filament's use of a Lambertian diffuse term. The Disney diffuse term and its grazing retro-reflections would move Filament closer to Mitsuba.
 
@@ -3439,7 +3383,7 @@ Filament uses a Y-up, right-handed coordinate system.
 
 ![screenshot_coordinates.jpg](/images/screenshot_coordinates.jpg)
 
-**Figure 88:** Red +X, green +Y, blue +Z (rendered in Marmoset Toolbag).
+> **Figure 88:** Red +X, green +Y, blue +Z (rendered in Marmoset Toolbag).
 
 ### Camera coordinates system
 
@@ -3451,7 +3395,7 @@ All cubemaps used in Filament follow the OpenGL convention for face alignment sh
 
 ![screenshot_cubemap_coordinates.png](/images/screenshot_cubemap_coordinates.png)
 
-**Figure 89:** Horizontal cross representation of a cubemap following the OpenGL faces alignment convention.
+> **Figure 89:** Horizontal cross representation of a cubemap following the OpenGL faces alignment convention.
 
 Note that environment background and reflection probes are mirrored (see section [8.6.3.1](#toc8.6.3.1)).
 
@@ -3476,19 +3420,13 @@ The specular color of a metallic surface, or $f_{0}$, can be computed directly f
 Earlier in this document, we presented equation [fresnelEquation](fresnelEquation) to compute the Fresnel reflectance at normal incidence for a dielectric surface given its IOR. The same equation can be rewritten for conductors by using complex numbers to represent the surface's IOR:
 
 $$
-
- c_{ior} = n_{ior} + ik
-
-
+c_{ior} = n_{ior} + ik
 $$
 
-Equation [fresnelComplexIOR](fresnelComplexIOR) presents the resulting Fresnel formula, where $c^\*$ is the conjugate of the complex number $c$:
+Equation [fresnelComplexIOR](fresnelComplexIOR) presents the resulting Fresnel formula, where $c^*$ is the conjugate of the complex number $c$:
 
 $$
-
- f_{0}(c_{ior}) = \frac{(c_{ior} - 1)(c_{ior}^\* - 1)}{(c_{ior} + 1)(c_{ior}^\* + 1)}
-
-
+ f_{0}(c_{ior}) = \frac{(c_{ior} - 1)(c_{ior}^* - 1)}{(c_{ior} + 1)(c_{ior}^* + 1)}
 $$
 
 To compute the specular color of a material we need to evaluate the complex Fresnel equation at each spectral sample of complex IOR over the visible spectrum. For each spectral sample, we obtain a spectral reflectance sample. To find the RGB color at normal incidence, we must multiply each sample by the CIE XYZ CMFs (color matching functions) and the spectral power distribution of the desired illuminant. We choose the standard illuminant D65 because we want to compute a color in the sRGB color space.
@@ -3500,105 +3438,105 @@ To achieve the desired result we used the ICE 1931 2° CMFs, from 360nm to 830nm
 Our implementation is presented in [listing 46](#listing_specularcolorimpl), with the actual data omitted for brevity.
 
 ```glsl
-    // CIE 1931 2-deg color matching functions (CMFs), from 360nm to 830nm,
-    // at 1nm intervals
-    //
-    // Data source:
-    //     http://cvrl.ioo.ucl.ac.uk/cmfs.htm
-    //     http://cvrl.ioo.ucl.ac.uk/database/text/cmfs/ciexyz31.htm
-    const size_t CIE_XYZ_START = 360;
-    const size_t CIE_XYZ_COUNT = 471;
-    const float3 CIE_XYZ[CIE_XYZ_COUNT] = { ... };
+// CIE 1931 2-deg color matching functions (CMFs), from 360nm to 830nm,
+// at 1nm intervals
+//
+// Data source:
+//     http://cvrl.ioo.ucl.ac.uk/cmfs.htm
+//     http://cvrl.ioo.ucl.ac.uk/database/text/cmfs/ciexyz31.htm
+const size_t CIE_XYZ_START = 360;
+const size_t CIE_XYZ_COUNT = 471;
+const float3 CIE_XYZ[CIE_XYZ_COUNT] = { ... };
 
-    // CIE Standard Illuminant D65 relative spectral power distribution,
-    // from 300nm to 830, at 5nm intervals
-    //
-    // Data source:
-    //     https://en.wikipedia.org/wiki/Illuminant_D65
-    //     https://cielab.xyz/pdf/CIE_sel_colorimetric_tables.xls
-    const size_t CIE_D65_INTERVAL = 5;
-    const size_t CIE_D65_START = 300;
-    const size_t CIE_D65_END = 830;
-    const size_t CIE_D65_COUNT = 107;
-    const float CIE_D65[CIE_D65_COUNT] = { ... };
+// CIE Standard Illuminant D65 relative spectral power distribution,
+// from 300nm to 830, at 5nm intervals
+//
+// Data source:
+//     https://en.wikipedia.org/wiki/Illuminant_D65
+//     https://cielab.xyz/pdf/CIE_sel_colorimetric_tables.xls
+const size_t CIE_D65_INTERVAL = 5;
+const size_t CIE_D65_START = 300;
+const size_t CIE_D65_END = 830;
+const size_t CIE_D65_COUNT = 107;
+const float CIE_D65[CIE_D65_COUNT] = { ... };
 
-    struct Sample {
-        float w = 0.0f; // wavelength
-        std::complex<float> ior; // complex IOR, n + ik
+struct Sample {
+    float w = 0.0f; // wavelength
+    std::complex<float> ior; // complex IOR, n + ik
+};
+
+static float illuminantD65(float w) {
+    auto i0 = size_t((w - CIE_D65_START) / CIE_D65_INTERVAL);
+    uint2 indexBounds{i0, std::min(i0 + 1, CIE_D65_END)};
+
+    float2 wavelengthBounds = CIE_D65_START + float2{indexBounds} * CIE_D65_INTERVAL;
+    float t = (w - wavelengthBounds.x) / (wavelengthBounds.y - wavelengthBounds.x);
+    return lerp(CIE_D65[indexBounds.x], CIE_D65[indexBounds.y], t);
+}
+
+// For std::lower_bound
+bool operator<(const Sample& lhs, const Sample& rhs) {
+    return lhs.w < rhs.w;
+}
+
+// The wavelength w must be between 360nm and 830nm
+static std::complex<float> findSample(const std::vector<sample>& samples, float w) {
+    auto i1 = std::lower_bound(
+            samples.begin(), samples.end(), Sample{w, 0.0f + 0.0if});
+    auto i0 = i1 - 1;
+
+    // Interpolate the complex IORs
+    float t = (w - i0->w) / (i1->w - i0->w);
+    float n = lerp(i0->ior.real(), i1->ior.real(), t);
+    float k = lerp(i0->ior.imag(), i1->ior.imag(), t);
+    return { n, k };
+}
+
+static float fresnel(const std::complex<float>& sample) {
+    return (((sample - (1.0f + 0if)) * (std::conj(sample) - (1.0f + 0if))) /
+            ((sample + (1.0f + 0if)) * (std::conj(sample) + (1.0f + 0if)))).real();
+}
+
+static float3 XYZ_to_sRGB(const float3& v) {
+    const mat3f XYZ_sRGB{
+                3.2404542f, -0.9692660f,  0.0556434f,
+            -1.5371385f,  1.8760108f, -0.2040259f,
+            -0.4985314f,  0.0415560f,  1.0572252f
     };
+    return XYZ_sRGB * v;
+}
 
-    static float illuminantD65(float w) {
-        auto i0 = size_t((w - CIE_D65_START) / CIE_D65_INTERVAL);
-        uint2 indexBounds{i0, std::min(i0 + 1, CIE_D65_END)};
+// Outputs a linear sRGB color
+static float3 computeColor(const std::vector<sample>& samples) {
+    float3 xyz{0.0f};
+    float y = 0.0f;
 
-        float2 wavelengthBounds = CIE_D65_START + float2{indexBounds} * CIE_D65_INTERVAL;
-        float t = (w - wavelengthBounds.x) / (wavelengthBounds.y - wavelengthBounds.x);
-        return lerp(CIE_D65[indexBounds.x], CIE_D65[indexBounds.y], t);
+    for (size_t i = 0; i < CIE_XYZ_COUNT; i++) {
+        // Current wavelength
+        float w = CIE_XYZ_START + i;
+
+        // Find most appropriate CIE XYZ sample for the wavelength
+        auto sample = findSample(samples, w);
+        // Compute Fresnel reflectance at normal incidence
+        float f0 = fresnel(sample);
+
+        // We need to multiply by the spectral power distribution of the illuminant
+        float d65 = illuminantD65(w);
+
+        xyz += f0 * CIE_XYZ[i] * d65;
+        y += CIE_XYZ[i].y * d65;
     }
 
-    // For std::lower_bound
-    bool operator<(const Sample& lhs, const Sample& rhs) {
-        return lhs.w < rhs.w;
-    }
+    // Normalize so that 100% reflectance at every wavelength yields Y=1
+    xyz /= y;
 
-    // The wavelength w must be between 360nm and 830nm
-    static std::complex<float> findSample(const std::vector<sample>& samples, float w) {
-        auto i1 = std::lower_bound(
-             samples.begin(), samples.end(), Sample{w, 0.0f + 0.0if});
-        auto i0 = i1 - 1;
+    float3 linear = XYZ_to_sRGB(xyz);
 
-        // Interpolate the complex IORs
-        float t = (w - i0->w) / (i1->w - i0->w);
-        float n = lerp(i0->ior.real(), i1->ior.real(), t);
-        float k = lerp(i0->ior.imag(), i1->ior.imag(), t);
-        return { n, k };
-    }
+    // Normalize out-of-gamut values
+    if (any(greaterThan(linear, float3{1.0f}))) linear *= 1.0f / max(linear);
 
-    static float fresnel(const std::complex<float>& sample) {
-        return (((sample - (1.0f + 0if)) * (std::conj(sample) - (1.0f + 0if))) /
-                ((sample + (1.0f + 0if)) * (std::conj(sample) + (1.0f + 0if)))).real();
-    }
-
-    static float3 XYZ_to_sRGB(const float3& v) {
-        const mat3f XYZ_sRGB{
-                 3.2404542f, -0.9692660f,  0.0556434f,
-                -1.5371385f,  1.8760108f, -0.2040259f,
-                -0.4985314f,  0.0415560f,  1.0572252f
-        };
-        return XYZ_sRGB * v;
-    }
-
-    // Outputs a linear sRGB color
-    static float3 computeColor(const std::vector<sample>& samples) {
-        float3 xyz{0.0f};
-        float y = 0.0f;
-
-        for (size_t i = 0; i < CIE_XYZ_COUNT; i++) {
-            // Current wavelength
-            float w = CIE_XYZ_START + i;
-
-            // Find most appropriate CIE XYZ sample for the wavelength
-            auto sample = findSample(samples, w);
-            // Compute Fresnel reflectance at normal incidence
-            float f0 = fresnel(sample);
-
-            // We need to multiply by the spectral power distribution of the illuminant
-            float d65 = illuminantD65(w);
-
-            xyz += f0 * CIE_XYZ[i] * d65;
-            y += CIE_XYZ[i].y * d65;
-        }
-
-        // Normalize so that 100% reflectance at every wavelength yields Y=1
-        xyz /= y;
-
-        float3 linear = XYZ_to_sRGB(xyz);
-
-        // Normalize out-of-gamut values
-        if (any(greaterThan(linear, float3{1.0f}))) linear *= 1.0f / max(linear);
-
-        return linear;
-    }
+    return linear;
+}
 ```
 
 > **Listing 46:** C++ implementation to compute the base color of a metallic surface from spectral data
@@ -3673,10 +3611,12 @@ This technique is described in details in [Krivanek08](#citation-krivanek08).
 The cubemap LOD is determined in the following way:
 
 $$
-
-lod &= log_4 \left( K\frac{\Omega_s}{\Omega_p} \right) \\ K &= 4.0 \\ \Omega_s &= \frac{1}{N \cdot p(l_i)} \\ \Omega_p &\approx \frac{4\pi}{6 \cdot width \cdot height}
-
-
+\begin{align*}
+lod &= log_4 \left( K\frac{\Omega_s}{\Omega_p} \right) \\
+K &= 4.0 \\
+\Omega_s &= \frac{1}{N \cdot p(l_i)} \\
+\Omega_p &\approx \frac{4\pi}{6 \cdot width \cdot height}
+\end{align*}
 $$
 
 Where $K$ is a constant determined empirically, $p$ the PDF of the BRDF, $ \Omega\_{s} $ the solid angle associated to the sample and $\Omega_p$ the solid angle associated with the texel in the cubemap.
@@ -3687,7 +3627,7 @@ Cubemap sampling is done using seamless trilinear filtering. It is extremely imp
 
 ![image_is_original.png](/images/image_is_original.png)
 
-**Figure 90:** Importance sampling image reference
+> **Figure 90:** Importance sampling image reference
 
 | Samples | Importance Sampling                             | Pre-filtered Importance Sampling                  |
 | ------- | ----------------------------------------------- | ------------------------------------------------- |
@@ -3701,49 +3641,39 @@ The reference renderer used in the comparison below performs no approximation. I
 
 Left: reference renderer, right: pre-filtered importance sampling.
 
-![image_is_ref_1.png](/images/image_is_ref_1.png)
-
-![image_filtered_1.png](/images/image_filtered_1.png)
-
-![image_is_ref_2.png](/images/image_is_ref_2.png)
-
-![image_filtered_2.png](/images/image_filtered_2.png)
-
-![image_is_ref_3.png](/images/image_is_ref_3.png)
-
-![image_filtered_3.png](/images/image_filtered_3.png)
-
-![image_is_ref_4.png](/images/image_is_ref_4.png)
-
-![image_filtered_4.png](/images/image_filtered_4.png)
+| ![image_is_ref_1.png](/images/image_is_ref_1.png) | ![image_filtered_1.png](/images/image_filtered_1.png) |
+| ------------------------------------------------- | ----------------------------------------------------- |
+| ![image_is_ref_2.png](/images/image_is_ref_2.png) | ![image_filtered_2.png](/images/image_filtered_2.png) |
+| ![image_is_ref_3.png](/images/image_is_ref_3.png) | ![image_filtered_3.png](/images/image_filtered_3.png) |
+| ![image_is_ref_4.png](/images/image_is_ref_4.png) | ![image_filtered_4.png](/images/image_filtered_4.png) |
 
 ## Choosing important directions for sampling the BRDF
 
 For simplicity we use the $ D $ term of the BRDF as the PDF, however the PDF must be normalized such that the integral over the hemisphere is 1:
 
 $$
-
- \int_{\Omega}p(m)dm = 1 \\ \int_{\Omega}D(m)(n \cdot m)dm = 1 \\ \int_{\phi=0}^{2\pi}\int_{\theta=0}^{\frac{\pi}{2}}D(\theta,\phi) cos \theta sin \theta d\theta d\phi = 1 \\
-
-
+\begin{equation}
+\int_{\Omega}p(m)dm = 1 \\
+\int_{\Omega}D(m)(n \cdot m)dm = 1 \\
+\int_{\phi=0}^{2\pi}\int_{\theta=0}^{\frac{\pi}{2}}D(\theta,\phi) cos \theta sin \theta d\theta d\phi = 1 \\
+\end{equation}
 $$
 
 The PDF of the BRDF can therefore be expressed as in equation [importantPDF](importantPDF):
 
 $$
-
- p(\theta,\phi) = \frac{\alpha^2}{\pi(cos^2\theta (\alpha^2-1) + 1)^2} cos\theta sin\theta
-
-
+\begin{equation}
+p(\theta,\phi) = \frac{\alpha^2}{\pi(cos^2\theta (\alpha^2-1) + 1)^2} cos\theta sin\theta
+\end{equation}
 $$
 
 The term $sin\theta$ comes from the differential solid angle $sin\theta d\phi d\theta$ since we integrate over a sphere. We sample $\theta$ and $\phi$ independently:
 
 $$
-
-p(\theta) &= \int_0^{2\pi} p(\theta,\phi) d\phi = \frac{2\alpha^2}{(cos^2\theta (\alpha^2-1) + 1)^2} cos\theta sin\theta \\ p(\phi) &= \frac{p(\theta,\phi)}{p(\phi)} = \frac{1}{2\pi}
-
-
+\begin{align*}
+p(\theta) &= \int_0^{2\pi} p(\theta,\phi) d\phi = \frac{2\alpha^2}{(cos^2\theta (\alpha^2-1) + 1)^2} cos\theta sin\theta \\
+p(\phi) &= \frac{p(\theta,\phi)}{p(\phi)} = \frac{1}{2\pi}
+\end{align*}
 $$
 
 The expression of $ p(\phi) $ is true for an isotropic distribution of normals.
@@ -3751,28 +3681,29 @@ The expression of $ p(\phi) $ is true for an isotropic distribution of normals.
 We then calculate the cumulative distribution function (CDF) for each variable:
 
 $$
-
-P(s_{\phi}) &= \int_{0}^{s_{\phi}} p(\phi) d\phi = \frac{s_{\phi}}{2\pi} \\ P(s_{\theta}) &= \int_{0}^{s_{\theta}} p(\theta) d\theta = 2 \alpha^2 \left( \frac{1}{(2\alpha^4-4\alpha^2+2) cos(s_{\theta})^2 + 2\alpha^2 - 2} - \frac{1}{2\alpha^4-2\alpha^2} \right)
-
-
+\begin{align*}
+P(s_{\phi}) &= \int_{0}^{s_{\phi}} p(\phi) d\phi = \frac{s_{\phi}}{2\pi} \\
+P(s_{\theta}) &= \int_{0}^{s_{\theta}} p(\theta) d\theta = 2 \alpha^2 \left( \frac{1}{(2\alpha^4-4\alpha^2+2) cos(s_{\theta})^2 + 2\alpha^2 - 2} - \frac{1}{2\alpha^4-2\alpha^2} \right)
+\end{align*}
 $$
 
 We set $ P(s*{\phi}) $ and $ P(s*{\theta}) $ to random variables $ \zeta*{\phi} $ and $ \zeta*{\theta} $ and solve for $ s*{\phi} $ and $ s*{\theta} $ respectively:
 
 $$
-
-P(s_{\phi}) &= \zeta_{\phi} \rightarrow s_{\phi} = 2\pi\zeta_{\phi} \\ P(s_{\theta}) &= \zeta_{\theta} \rightarrow s_{\theta} = cos^{-1} \sqrt{\frac{1-\zeta_{\theta}}{(\alpha^2-1)\zeta_{\theta}+1}}
-
-
+\begin{align*}
+P(s_{\phi}) &= \zeta_{\phi} \rightarrow s_{\phi} = 2\pi\zeta_{\phi} \\
+P(s_{\theta}) &= \zeta_{\theta} \rightarrow s_{\theta} = cos^{-1} \sqrt{\frac{1-\zeta_{\theta}}{(\alpha^2-1)\zeta_{\theta}+1}}
+\end{align*}
 $$
 
 So given a uniform distribution $ (\zeta*{\phi},\zeta*{\theta}) $, our important direction $l$ is defined as:
 
 $$
-
-\phi &= 2\pi\zeta_{\phi} \\ \theta &= cos^{-1} \sqrt{\frac{1-\zeta_{\theta}}{(\alpha^2-1)\zeta_{\theta}+1}} \\ l &= \{ cos\phi sin\theta,sin\phi sin\theta,cos\theta \}
-
-
+\begin{align*}
+\phi &= 2\pi\zeta_{\phi} \\
+\theta &= cos^{-1} \sqrt{\frac{1-\zeta_{\theta}}{(\alpha^2-1)\zeta_{\theta}+1}} \\
+l &= \{ cos\phi sin\theta,sin\phi sin\theta,cos\theta \}
+\end{align*}
 $$
 
 ## Hammersley sequence
@@ -3789,11 +3720,11 @@ vec2f hammersley(uint i, float numSamples) {
 }
 ```
 
-C++ implementation of a Hammersley sequence generator
+> C++ implementation of a Hammersley sequence generator
 
 ## Precomputing L for image-based lighting
 
-The term $ L*{DFG} $ is only dependent on $ n \cdot v $. Below, the normal is arbitrarily set to $ n=\left0, 0, 1\right $ and $v$ is chosen to satisfy $ n \cdot v $. The vector $ h_i $ is the $ D*{GGX}(\alpha) $ important direction sample $i$.
+The term $ L*{DFG} $ is only dependent on $ n \cdot v $. Below, the normal is arbitrarily set to $ n = [left0, 0, 1 ] $ and $v$ is chosen to satisfy $ n \cdot v $. The vector $ h_i $ is the $ D*{GGX}(\alpha) $ important direction sample $i$.
 
 ```glsl
 float GDFG(float NoV, float NoL, float a) {
@@ -3831,7 +3762,7 @@ float2 DFG(float NoV, float a) {
 }
 ```
 
-C++ implementation of the $ L_{\text{DFG}}$ term
+C++ implementation of the $ L\_{\text{DFG}}$ term
 
 ## Spherical Harmonics
 
@@ -3849,7 +3780,7 @@ C++ implementation of the $ L_{\text{DFG}}$ term
 Spherical parameterization of points on the surface of the unit sphere:
 
 $$
-\begin{equation} 
+\begin{equation}
 \{ x, y, z \} = \{ cos \phi sin \theta, sin \phi sin \theta, cos \theta \}
 \end{equation}
 $$
@@ -4037,7 +3968,7 @@ Very few coefficients are needed to reasonably approximate $\left< cos \theta \r
 
 ![chart_sh_cos_thera_approx.png](/images/chart_sh_cos_thera_approx.png)
 
-**Figure 91:** Approximation of $cos \theta$ with SH coefficients
+> **Figure 91:** Approximation of $cos \theta$ with SH coefficients
 
 ### Convolution
 
