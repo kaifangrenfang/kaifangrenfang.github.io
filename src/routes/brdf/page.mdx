@@ -456,50 +456,50 @@ We could allow artists/developers to choose the Disney diffuse BRDF depending on
 The full GLSL implementation of the standard model is shown in [listing 9](#listing_glslbrdf).
 
 ```glsl
-    float D_GGX(float NoH, float a) {
-        float a2 = a * a;
-        float f = (NoH * a2 - NoH) * NoH + 1.0;
-        return a2 / (PI * f * f);
-    }
+float D_GGX(float NoH, float a) {
+    float a2 = a * a;
+    float f = (NoH * a2 - NoH) * NoH + 1.0;
+    return a2 / (PI * f * f);
+}
 
-    vec3 F_Schlick(float u, vec3 f0) {
-        return f0 + (vec3(1.0) - f0) * pow(1.0 - u, 5.0);
-    }
+vec3 F_Schlick(float u, vec3 f0) {
+    return f0 + (vec3(1.0) - f0) * pow(1.0 - u, 5.0);
+}
 
-    float V_SmithGGXCorrelated(float NoV, float NoL, float a) {
-        float a2 = a * a;
-        float GGXL = NoV * sqrt((-NoL * a2 + NoL) * NoL + a2);
-        float GGXV = NoL * sqrt((-NoV * a2 + NoV) * NoV + a2);
-        return 0.5 / (GGXV + GGXL);
-    }
+float V_SmithGGXCorrelated(float NoV, float NoL, float a) {
+    float a2 = a * a;
+    float GGXL = NoV * sqrt((-NoL * a2 + NoL) * NoL + a2);
+    float GGXV = NoL * sqrt((-NoV * a2 + NoV) * NoV + a2);
+    return 0.5 / (GGXV + GGXL);
+}
 
-    float Fd_Lambert() {
-        return 1.0 / PI;
-    }
+float Fd_Lambert() {
+    return 1.0 / PI;
+}
 
-    void BRDF(...) {
-        vec3 h = normalize(v + l);
+void BRDF(...) {
+    vec3 h = normalize(v + l);
 
-        float NoV = abs(dot(n, v)) + 1e-5;
-        float NoL = clamp(dot(n, l), 0.0, 1.0);
-        float NoH = clamp(dot(n, h), 0.0, 1.0);
-        float LoH = clamp(dot(l, h), 0.0, 1.0);
+    float NoV = abs(dot(n, v)) + 1e-5;
+    float NoL = clamp(dot(n, l), 0.0, 1.0);
+    float NoH = clamp(dot(n, h), 0.0, 1.0);
+    float LoH = clamp(dot(l, h), 0.0, 1.0);
 
-        // perceptually linear roughness to roughness (see parameterization)
-        float roughness = perceptualRoughness * perceptualRoughness;
+    // perceptually linear roughness to roughness (see parameterization)
+    float roughness = perceptualRoughness * perceptualRoughness;
 
-        float D = D_GGX(NoH, roughness);
-        vec3  F = F_Schlick(LoH, f0);
-        float V = V_SmithGGXCorrelated(NoV, NoL, roughness);
+    float D = D_GGX(NoH, roughness);
+    vec3  F = F_Schlick(LoH, f0);
+    float V = V_SmithGGXCorrelated(NoV, NoL, roughness);
 
-        // specular BRDF
-        vec3 Fr = (D * V) * F;
+    // specular BRDF
+    vec3 Fr = (D * V) * F;
 
-        // diffuse BRDF
-        vec3 Fd = diffuseColor * Fd_Lambert();
+    // diffuse BRDF
+    vec3 Fd = diffuseColor * Fd_Lambert();
 
-        // apply lighting...
-    }
+    // apply lighting...
+}
 ```
 
 > **Listing 9:** Evaluation of the BRDF in GLSL
@@ -921,22 +921,22 @@ The clear coat roughness parameter is remapped and clamped in a similar way to t
 [Listing 14](#listing_clearcoatbrdf) shows the GLSL implementation of the clear coat material model after remapping, parameterization and integration in the standard surface response.
 
 ```glsl
-    void BRDF(...) {
-        // compute Fd and Fr from standard model
+void BRDF(...) {
+    // compute Fd and Fr from standard model
 
-        // remapping and linearization of clear coat roughness
-        clearCoatPerceptualRoughness = clamp(clearCoatPerceptualRoughness, 0.089, 1.0);
-        clearCoatRoughness = clearCoatPerceptualRoughness * clearCoatPerceptualRoughness;
+    // remapping and linearization of clear coat roughness
+    clearCoatPerceptualRoughness = clamp(clearCoatPerceptualRoughness, 0.089, 1.0);
+    clearCoatRoughness = clearCoatPerceptualRoughness * clearCoatPerceptualRoughness;
 
-        // clear coat BRDF
-        float  Dc = D_GGX(clearCoatRoughness, NoH);
-        float  Vc = V_Kelemen(clearCoatRoughness, LoH);
-        float  Fc = F_Schlick(0.04, LoH) * clearCoat; // clear coat strength
-        float Frc = (Dc * Vc) * Fc;
+    // clear coat BRDF
+    float  Dc = D_GGX(clearCoatRoughness, NoH);
+    float  Vc = V_Kelemen(clearCoatRoughness, LoH);
+    float  Fc = F_Schlick(0.04, LoH) * clearCoat; // clear coat strength
+    float Frc = (Dc * Vc) * Fc;
 
-        // account for energy loss in the base layer
-        return color * ((Fd + Fr * (1.0 - Fc)) * (1.0 - Fc) + Frc);
-    }
+    // account for energy loss in the base layer
+    return color * ((Fd + Fr * (1.0 - Fc)) * (1.0 - Fc) + Frc);
+}
 ```
 
 > **Listing 14:** Implementation of the clear coat BRDF in GLSL
@@ -980,25 +980,36 @@ The standard material model described previously can only describe isotropic sur
 The isotropic specular BRDF described previously can be modified to handle anisotropic materials. Burley achieves this by using an anisotropic GGX NDF:
 
 $$
- D_{aniso}(h,\alpha) = \frac{1}{\pi \alpha_t \alpha_b} \frac{1}{((\frac{t \cdot h}{\alpha_t})^2 + (\frac{b \cdot h}{\alpha_b})^2 + (n \cdot h)^2)^2}
+\begin{equation}
+D_{aniso}(h,\alpha) = \frac{1}{\pi \alpha_t \alpha_b} \frac{1}{((\frac{t \cdot h}{\alpha_t})^2 + (\frac{b \cdot h}{\alpha_b})^2 + (\NoH)^2)^2}
+\end{equation}
 $$
 
 This NDF unfortunately relies on two supplemental roughness terms noted $\alpha*b$, the roughness along the bitangent direction, and $\alpha_t$, the roughness along the tangent direction. Neubelt and Pettineo [Neubelt13](#citation-neubelt13) propose a way to derive $\alpha_b$ from $\alpha_t$ by using an \_anisotropy\* parameter that describes the relationship between the two roughness values for a material:
 
 $$
-\alpha_t &= \alpha \\ \alpha_b &= lerp(0, \alpha, 1 - anisotropy)
+\begin{align*}
+  \alpha_t &= \alpha \\
+  \alpha_b &= lerp(0, \alpha, 1 - anisotropy)
+\end{align*}
 $$
 
 The relationship defined in [Burley12](#citation-burley12) is different, offers more pleasant and intuitive results, but is slightly more expensive:
 
 $$
-\alpha_t &= \frac{\alpha}{\sqrt{1 - 0.9 \times anisotropy}} \\ \alpha_b &= \alpha \sqrt{1 - 0.9 \times anisotropy}
+\begin{align*}
+  \alpha_t &= \frac{\alpha}{\sqrt{1 - 0.9 \times anisotropy}} \\
+  \alpha_b &= \alpha \sqrt{1 - 0.9 \times anisotropy}
+\end{align*}
 $$
 
 We instead opted to follow the relationship described in [Kulla17](#citation-kulla17) as it allows creation of sharp highlights:
 
 $$
-\alpha_t &= \alpha \times (1 + anisotropy) \\ \alpha_b &= \alpha \times (1 - anisotropy)
+\begin{align*}
+  \alpha_t &= \alpha \times (1 + anisotropy) \\
+  \alpha_b &= \alpha \times (1 - anisotropy)
+\end{align*}
 $$
 
 Note that this NDF requires the tangent and bitangent directions in addition to the normal direction. Since these directions are already needed for normal mapping, providing them may not be an issue.
@@ -1006,19 +1017,19 @@ Note that this NDF requires the tangent and bitangent directions in addition to 
 The resulting implementation is described in [listing 15](#listing_anisotropicbrdf).
 
 ```glsl
-    float at = max(roughness * (1.0 + anisotropy), 0.001);
-    float ab = max(roughness * (1.0 - anisotropy), 0.001);
+float at = max(roughness * (1.0 + anisotropy), 0.001);
+float ab = max(roughness * (1.0 - anisotropy), 0.001);
 
-    float D_GGX_Anisotropic(float NoH, const vec3 h,
-            const vec3 t, const vec3 b, float at, float ab) {
-        float ToH = dot(t, h);
-        float BoH = dot(b, h);
-        float a2 = at * ab;
-        highp vec3 v = vec3(ab * ToH, at * BoH, a2 * NoH);
-        highp float v2 = dot(v, v);
-        float w2 = a2 / v2;
-        return a2 * w2 * w2 * (1.0 / PI);
-    }
+float D_GGX_Anisotropic(float NoH, const vec3 h,
+        const vec3 t, const vec3 b, float at, float ab) {
+    float ToH = dot(t, h);
+    float BoH = dot(b, h);
+    float a2 = at * ab;
+    highp vec3 v = vec3(ab * ToH, at * BoH, a2 * NoH);
+    highp float v2 = dot(v, v);
+    float w2 = a2 / v2;
+    return a2 * w2 * w2 * (1.0 / PI);
+}
 ```
 
 > **Listing 15:** Implementation of Burley's anisotropic NDF in GLSL
@@ -1133,15 +1144,15 @@ $$
 The implementation of the velvet NDF is presented in [listing 17](#listing_clothbrdf), optimized to properly fit in half float formats and to avoid computing a costly cotangent, relying instead on trigonometric identities. Note that we removed the Fresnel component from this BRDF.
 
 ```glsl
-    float D_Ashikhmin(float roughness, float NoH) {
-        // Ashikhmin 2007, "Distribution-based BRDFs"
-     float a2 = roughness * roughness;
-     float cos2h = NoH * NoH;
-     float sin2h = max(1.0 - cos2h, 0.0078125); // 2^(-14/2), so sin2h^2 > 0 in fp16
-     float sin4h = sin2h * sin2h;
-     float cot2 = -cos2h / (a2 * sin2h);
-     return 1.0 / (PI * (4.0 * a2 + 1.0) * sin4h) * (4.0 * exp(cot2) + sin4h);
-    }
+float D_Ashikhmin(float roughness, float NoH) {
+    // Ashikhmin 2007, "Distribution-based BRDFs"
+    float a2 = roughness * roughness;
+    float cos2h = NoH * NoH;
+    float sin2h = max(1.0 - cos2h, 0.0078125); // 2^(-14/2), so sin2h^2 > 0 in fp16
+    float sin4h = sin2h * sin2h;
+    float cot2 = -cos2h / (a2 * sin2h);
+    return 1.0 / (PI * (4.0 * a2 + 1.0) * sin4h) * (4.0 * exp(cot2) + sin4h);
+}
 ```
 
 > **Listing 17:** Implementation of Ashikhmin's velvet NDF in GLSL
@@ -1155,13 +1166,13 @@ $$
 [Estevez17](#citation-estevez17) also presents a new shadowing term that we omit here because of its cost. We instead rely on the visibility term from [Neubelt13](#citation-neubelt13) (shown in equation [clothSpecularBRDF](clothSpecularBRDF) above). The implementation of this NDF is presented in [listing 18](#listing_clothcharliebrdf), optimized to properly fit in half float formats.
 
 ```glsl
-    float D_Charlie(float roughness, float NoH) {
-        // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
-        float invAlpha  = 1.0 / roughness;
-        float cos2h = NoH * NoH;
-        float sin2h = max(1.0 - cos2h, 0.0078125); // 2^(-14/2), so sin2h^2 > 0 in fp16
-        return (2.0 + invAlpha) * pow(sin2h, invAlpha * 0.5) / (2.0 * PI);
-    }
+float D_Charlie(float roughness, float NoH) {
+    // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
+    float invAlpha  = 1.0 / roughness;
+    float cos2h = NoH * NoH;
+    float sin2h = max(1.0 - cos2h, 0.0078125); // 2^(-14/2), so sin2h^2 > 0 in fp16
+    return (2.0 + invAlpha) * pow(sin2h, invAlpha * 0.5) / (2.0 * PI);
+}
 ```
 
 > **Listing 18:** Implementation of the “Charlie” NDF in GLSL
@@ -1201,29 +1212,29 @@ Where $w$ is a value between 0 and 1 defining by how much the diffuse light shou
 The complete implementation of our cloth BRDF, including sheen color and optional subsurface scattering, can be found in [listing 19](#listing_clothfullbrdf).
 
 ```glsl
-    // specular BRDF
-    float D = distributionCloth(roughness, NoH);
-    float V = visibilityCloth(NoV, NoL);
-    vec3  F = sheenColor;
-    vec3 Fr = (D * V) * F;
+// specular BRDF
+float D = distributionCloth(roughness, NoH);
+float V = visibilityCloth(NoV, NoL);
+vec3  F = sheenColor;
+vec3 Fr = (D * V) * F;
 
-    // diffuse BRDF
-    float diffuse = diffuse(roughness, NoV, NoL, LoH);
-    #if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
-    // energy conservative wrap diffuse
-    diffuse *= saturate((dot(n, light.l) + 0.5) / 2.25);
-    #endif
-    vec3 Fd = diffuse * pixel.diffuseColor;
+// diffuse BRDF
+float diffuse = diffuse(roughness, NoV, NoL, LoH);
+#if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
+// energy conservative wrap diffuse
+diffuse *= saturate((dot(n, light.l) + 0.5) / 2.25);
+#endif
+vec3 Fd = diffuse * pixel.diffuseColor;
 
-    #if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
-    // cheap subsurface scatter
-    Fd *= saturate(subsurfaceColor + NoL);
-    vec3 color = Fd + Fr * NoL;
-    color *= (lightIntensity * lightAttenuation) * lightColor;
-    #else
-    vec3 color = Fd + Fr;
-    color *= (lightIntensity * lightAttenuation * NoL) * lightColor;
-    #endif
+#if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
+// cheap subsurface scatter
+Fd *= saturate(subsurfaceColor + NoL);
+vec3 color = Fd + Fr * NoL;
+color *= (lightIntensity * lightAttenuation) * lightColor;
+#else
+vec3 color = Fd + Fr;
+color *= (lightIntensity * lightAttenuation * NoL) * lightColor;
+#endif
 ```
 
 > **Listing 19:** Implementation of our cloth BRDF in GLSL
@@ -1529,37 +1540,37 @@ $$
 [Listing 21](#listing_glslpunctuallight) demonstrates how to implement physically based punctual lights in GLSL. Note that the light intensity used in this piece of code is the luminous intensity $I$ in $cd$, converted from the luminous power CPU-side. This snippet is not optimized and some of the computations can be offloaded to the CPU (for instance the square of the light's inverse falloff radius, or the spot scale and angle).
 
 ```glsl
-    float getSquareFalloffAttenuation(vec3 posToLight, float lightInvRadius) {
-        float distanceSquare = dot(posToLight, posToLight);
-        float factor = distanceSquare * lightInvRadius * lightInvRadius;
-        float smoothFactor = max(1.0 - factor * factor, 0.0);
-        return (smoothFactor * smoothFactor) / max(distanceSquare, 1e-4);
-    }
+float getSquareFalloffAttenuation(vec3 posToLight, float lightInvRadius) {
+    float distanceSquare = dot(posToLight, posToLight);
+    float factor = distanceSquare * lightInvRadius * lightInvRadius;
+    float smoothFactor = max(1.0 - factor * factor, 0.0);
+    return (smoothFactor * smoothFactor) / max(distanceSquare, 1e-4);
+}
 
-    float getSpotAngleAttenuation(vec3 l, vec3 lightDir,
-            float innerAngle, float outerAngle) {
-        // the scale and offset computations can be done CPU-side
-        float cosOuter = cos(outerAngle);
-        float spotScale = 1.0 / max(cos(innerAngle) - cosOuter, 1e-4)
-        float spotOffset = -cosOuter * spotScale
+float getSpotAngleAttenuation(vec3 l, vec3 lightDir,
+        float innerAngle, float outerAngle) {
+    // the scale and offset computations can be done CPU-side
+    float cosOuter = cos(outerAngle);
+    float spotScale = 1.0 / max(cos(innerAngle) - cosOuter, 1e-4)
+    float spotOffset = -cosOuter * spotScale
 
-        float cd = dot(normalize(-lightDir), l);
-        float attenuation = clamp(cd * spotScale + spotOffset, 0.0, 1.0);
-        return attenuation * attenuation;
-    }
+    float cd = dot(normalize(-lightDir), l);
+    float attenuation = clamp(cd * spotScale + spotOffset, 0.0, 1.0);
+    return attenuation * attenuation;
+}
 
-    vec3 evaluatePunctualLight() {
-        vec3 l = normalize(posToLight);
-        float NoL = clamp(dot(n, l), 0.0, 1.0);
-        vec3 posToLight = lightPosition - worldPosition;
+vec3 evaluatePunctualLight() {
+    vec3 l = normalize(posToLight);
+    float NoL = clamp(dot(n, l), 0.0, 1.0);
+    vec3 posToLight = lightPosition - worldPosition;
 
-        float attenuation;
-        attenuation  = getSquareFalloffAttenuation(posToLight, lightInvRadius);
-        attenuation *= getSpotAngleAttenuation(l, lightDir, innerAngle, outerAngle);
+    float attenuation;
+    attenuation  = getSquareFalloffAttenuation(posToLight, lightInvRadius);
+    attenuation *= getSpotAngleAttenuation(l, lightDir, innerAngle, outerAngle);
 
-        vec3 luminance = (BSDF(v, l) * lightIntensity * attenuation * NoL) * lightColor;
-        return luminance;
-    }
+    vec3 luminance = (BSDF(v, l) * lightIntensity * attenuation * NoL) * lightColor;
+    return luminance;
+}
 ```
 
 > **Listing 21:** Implementation of punctual lights in GLSL
@@ -1619,25 +1630,25 @@ The term $ \Psi(l) $ is the photometric attenuation function. It depends on the 
 The photometric attenuation function can be easily implemented in GLSL by adding a new attenuation factor to the implementation of punctual lights ([listing 21](#listing_glslpunctuallight)). The modified implementation is show in [listing 22](#listing_glslphotometricpunctuallight).
 
 ```glsl
-    float getPhotometricAttenuation(vec3 posToLight, vec3 lightDir) {
-        float cosTheta = dot(-posToLight, lightDir);
-        float angle = acos(cosTheta) * (1.0 / PI);
-        return texture2DLodEXT(lightProfileMap, vec2(angle, 0.0), 0.0).r;
-    }
+float getPhotometricAttenuation(vec3 posToLight, vec3 lightDir) {
+    float cosTheta = dot(-posToLight, lightDir);
+    float angle = acos(cosTheta) * (1.0 / PI);
+    return texture2DLodEXT(lightProfileMap, vec2(angle, 0.0), 0.0).r;
+}
 
-    vec3 evaluatePunctualLight() {
-        vec3 l = normalize(posToLight);
-        float NoL = clamp(dot(n, l), 0.0, 1.0);
-        vec3 posToLight = lightPosition - worldPosition;
+vec3 evaluatePunctualLight() {
+    vec3 l = normalize(posToLight);
+    float NoL = clamp(dot(n, l), 0.0, 1.0);
+    vec3 posToLight = lightPosition - worldPosition;
 
-        float attenuation;
-        attenuation  = getSquareFalloffAttenuation(posToLight, lightInvRadius);
-        attenuation *= getSpotAngleAttenuation(l, lightDirection, innerAngle, outerAngle);
-        attenuation *= getPhotometricAttenuation(l, lightDirection);
+    float attenuation;
+    attenuation  = getSquareFalloffAttenuation(posToLight, lightInvRadius);
+    attenuation *= getSpotAngleAttenuation(l, lightDirection, innerAngle, outerAngle);
+    attenuation *= getPhotometricAttenuation(l, lightDirection);
 
-        float luminance = (BSDF(v, l) * lightIntensity * attenuation * NoL) * lightColor;
-        return luminance;
-    }
+    float luminance = (BSDF(v, l) * lightIntensity * attenuation * NoL) * lightColor;
+    return luminance;
+}
 ```
 
 > **Listing 22:** Implementation of attenuation from photometric profiles in GLSL
@@ -1645,21 +1656,21 @@ The photometric attenuation function can be easily implemented in GLSL by adding
 The light intensity is computed CPU-side ([listing 23](#listing_photometriclightintensity)) and depends on whether the photometric profile is used as a mask.
 
 ```glsl
-    float multiplier;
-    // Photometric profile used as a mask
-    if (photometricLight.isMasked()) {
-        // The desired intensity is set by the artist
-        // The integrated intensity comes from a Monte-Carlo
-        // integration over the unit sphere around the luminaire
-        multiplier = photometricLight.getDesiredIntensity() /
-                photometricLight.getIntegratedIntensity();
-    } else {
-        // Multiplier provided for convenience, set to 1.0 by default
-        multiplier = photometricLight.getMultiplier();
-    }
+float multiplier;
+// Photometric profile used as a mask
+if (photometricLight.isMasked()) {
+    // The desired intensity is set by the artist
+    // The integrated intensity comes from a Monte-Carlo
+    // integration over the unit sphere around the luminaire
+    multiplier = photometricLight.getDesiredIntensity() /
+            photometricLight.getIntegratedIntensity();
+} else {
+    // Multiplier provided for convenience, set to 1.0 by default
+    multiplier = photometricLight.getMultiplier();
+}
 
-    // The max intensity in cd comes from the IES profile
-    float lightIntensity = photometricLight.getMaxIntensity() * multiplier;
+// The max intensity in cd comes from the IES profile
+float lightIntensity = photometricLight.getMaxIntensity() * multiplier;
 ```
 
 > **Listing 23:** Computing the intensity of a photometric light on the CPU
@@ -1716,7 +1727,7 @@ $$
 This approximation is accurate to roughly $ 9 \times 10^{-5} $ in the range 1,000K to 15,000K. From the CIE 1960 space we can compute the coordinates in xyY space (CIES 1931), using the formula from equation [cieToxyY](cieToxyY).
 
 $$
- x = \frac{3u}{2u - 8v + 4} \\ y = \frac{2v}{2u - 8v + 4}
+x = \frac{3u}{2u - 8v + 4} \\ y = \frac{2v}{2u - 8v + 4}
 $$
 
 The formulas above are valid for black body color temperatures, and therefore correlated color temperatures of standard illuminants. If we wish to compute the precise chromaticity coordinates of standard CIE illuminants in the D series we can use equation [seriesDtoxyY](seriesDtoxyY).
@@ -1734,13 +1745,17 @@ $$
 For our needs, we will fix $Y = 1$. This allows us to convert from the XYZ space to linear RGB with a simple 3×3 matrix, as shown in equation [XYZtoRGB](XYZtoRGB).
 
 $$
- \left \begin{matrix} R \\ G \\ B \end{matrix} \right = M^{-1} \left \begin{matrix} X \\ Y \\ Z \end{matrix} \right
+\begin{equation}
+\left[ \begin{matrix} R \\ G \\ B \end{matrix} \right] = M^{-1} \left[ \begin{matrix} X \\ Y \\ Z \end{matrix} \right]
+\end{equation}
 $$
 
 The transformation matrix M is calculated from the target RGB color space primaries. Equation [XYZtoRGBValues](XYZtoRGBValues) shows the conversion using the inverse matrix for the sRGB color space.
 
 $$
- \left \begin{matrix} R \\ G \\ B \end{matrix} \right = \left \begin{matrix} 3.2404542 & -1.5371385 & -0.4985314 \\ -0.9692660 & 1.8760108 & 0.0415560 \\ 0.0556434 & -0.2040259 & 1.0572252 \end{matrix} \right \left \begin{matrix} X \\ Y \\ Z \end{matrix} \right
+\begin{equation}
+\left[ \begin{matrix} R \\ G \\ B \end{matrix} \right] = \left[ \begin{matrix} 3.2404542 & -1.5371385 & -0.4985314 \\ -0.9692660 & 1.8760108 & 0.0415560 \\ 0.0556434 & -0.2040259 & 1.0572252 \end{matrix} \right] \left[ \begin{matrix} X \\ Y \\ Z \end{matrix} \right]
+\end{equation}
 $$
 
 The result of these operations is a linear RGB triplet in the sRGB color space. Since we care about the chromaticity of the results, we must apply a normalization step to avoid clamping values greater than 1.0 and distort resulting colors:
@@ -1901,13 +1916,19 @@ The sections below will discuss the techniques used to accelerate the evaluation
 Using the Lambertian BRDF[7](#endnote-ibldiffuse1), we get the radiance:
 
 $$
-f_d(\sigma) &= \frac{\sigma}{\pi} \\ L_d(n, \sigma) &= \int_{\Omega} f_d(\sigma) L_{\bot}(l) \left< n \cdot l \right> dl \\ &= \frac{\sigma}{\pi} \int_{\Omega} L_{\bot}(l) \left< n \cdot l \right> dl \\ &= \frac{\sigma}{\pi} E_d(n) \quad \text{with the irradiance} \; E_d(n) = \int_{\Omega} L_{\bot}(l) \left< n \cdot l \right> dl
+\begin{align*}
+   f_d(\sigma) &= \frac{\sigma}{\pi} \\
+L_d(n, \sigma) &= \int_{\Omega} f_d(\sigma) L_{\bot}(l) \left< \NoL \right> dl \\
+               &= \frac{\sigma}{\pi} \int_{\Omega} L_{\bot}(l) \left< \NoL \right> dl \\
+               &= \frac{\sigma}{\pi} E_d(n) \quad \text{with the irradiance} \; 
+        E_d(n) = \int_{\Omega} L_{\bot}(l) \left< \NoL \right> dl
+\end{align*}
 $$
 
 Or in the discrete domain:
 
 $$
- E_d(n) \equiv \sum_{\forall \, i \in image} L_{\bot}(s_i) \left< n \cdot s_i \right> \Omega_s
+E_d(n) \equiv \sum_{\forall \, i \in image} L_{\bot}(s_i) \left< n \cdot s_i \right> \Omega_s
 $$
 
 $\Omega_s$ is the solid-angle[8](#endnote-ibldiffuse2) associated to sample $i$.
@@ -1952,20 +1973,20 @@ In practice only 4 or 9 coefficients (i.e.: 2 or 3 bands) are enough for $\left<
 In practice we pre-convolve $L_{\bot}$ with $\left< \cos \theta \right> $ and pre-scale these coefficients by the basis scaling factors $K_l^m$ so that the reconstruction code is as simple as possible in the shader:
 
 ```glsl
-    vec3 irradianceSH(vec3 n) {
-        // uniform vec3 sphericalHarmonics[9]
-        // We can use only the first 2 bands for better performance
-        return
-              sphericalHarmonics[0]
-            + sphericalHarmonics[1] * (n.y)
-            + sphericalHarmonics[2] * (n.z)
-            + sphericalHarmonics[3] * (n.x)
-            + sphericalHarmonics[4] * (n.y * n.x)
-            + sphericalHarmonics[5] * (n.y * n.z)
-            + sphericalHarmonics[6] * (3.0 * n.z * n.z - 1.0)
-            + sphericalHarmonics[7] * (n.z * n.x)
-            + sphericalHarmonics[8] * (n.x * n.x - n.y * n.y);
-    }
+vec3 irradianceSH(vec3 n) {
+    // uniform vec3 sphericalHarmonics[9]
+    // We can use only the first 2 bands for better performance
+    return
+            sphericalHarmonics[0]
+        + sphericalHarmonics[1] * (n.y)
+        + sphericalHarmonics[2] * (n.z)
+        + sphericalHarmonics[3] * (n.x)
+        + sphericalHarmonics[4] * (n.y * n.x)
+        + sphericalHarmonics[5] * (n.y * n.z)
+        + sphericalHarmonics[6] * (3.0 * n.z * n.z - 1.0)
+        + sphericalHarmonics[7] * (n.z * n.x)
+        + sphericalHarmonics[8] * (n.x * n.x - n.y * n.y);
+}
 ```
 
 > **Listing 26:** GLSL code to reconstruct the irradiance from the pre-scaled SH
@@ -2014,19 +2035,33 @@ $$
 From the equation above we can see that $\tilde{I}$ is equivalent to $I$ when $L_{\bot}$ is a constant, and yields the correct result:
 
 $$
-\tilde{I}(f(\Theta)L_{\bot}^{constant}) &= L_{\bot}^{constant} \hat{I}(f(\Theta)) \frac{I(f(\Theta))}{\hat{I}(f(\Theta))} \\ &= L_{\bot}^{constant} I(f(\Theta)) \\ &= I(f(\Theta)L_{\bot}^{constant})
+\begin{align*}
+\tilde{I}(f(\Theta)\Lt^{constant}) &= \Lt^{constant} \hat{I}(f(\Theta)) \frac{I(f(\Theta))}{\hat{I}(f(\Theta))} \\
+                                   &= \Lt^{constant} I(f(\Theta))                                               \\
+                                   &= I(f(\Theta)\Lt^{constant})
+\end{align*}
 $$
 
 Similarly, we can also demonstrate that the result is correct when $v = n$, since in that case $I = \hat{I}$:
 
 $$
-\tilde{I}(f(\Theta)L_{\bot}) &= I(f(\Theta)L_{\bot}) \frac{I(f(\Theta))}{I(f(\Theta))} \\ &= I(f(\Theta)L_{\bot})
+\begin{align*}
+\tilde{I}(f(\Theta)\Lt) &= I(f(\Theta)\Lt) \frac{I(f(\Theta))}{I(f(\Theta))}    \\
+                        &= I(f(\Theta)\Lt)
+\end{align*}
 $$
 
 Finally, we can show that the scale factor $K$ satisfies our average irradiance ($\bar{L_{\bot}}$) requirement by plugging $L_{\bot} = \bar{L_{\bot}} + (L_{\bot} - \bar{L_{\bot}}) = \bar{L_{\bot}} + \DeltaL_{\bot}$ into $\tilde{I}$:
 
 $$
-\tilde{I}(f(\Theta)L_{\bot}) &= \tilde{I}\leftf\left(\Theta\right) \left(\bar{L_{\bot}} + \DeltaL_{\bot}\right)\right \\ &= K \times \hat{I}\leftf\left(\Theta\right) \left(\bar{L_{\bot}} + \DeltaL_{\bot}\right)\right \\ &= K \times \left\hat{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \hat{I}\left(f\left(\Theta\right)\DeltaL_{\bot}\right)\right \\ &= K \times \hat{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + K \times \hat{I}\left(f\left(\Theta\right) \DeltaL_{\bot}\right) \\ &= \tilde{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \tilde{I}\left(f\left(\Theta\right) \DeltaL_{\bot}\right) \\ &= I\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \tilde{I}\left(f\left(\Theta\right) \DeltaL_{\bot}\right)
+\begin{align*}
+\tilde{I}(f(\Theta)\Lt) &= \tilde{I}\left[f\left(\Theta\right) \left(\bar{\Lt} + \Delta\Lt\right)\right] \\
+                        &= K \times \hat{I}\left[f\left(\Theta\right) \left(\bar{\Lt} + \Delta\Lt\right)\right] \\
+                        &= K \times \left[\hat{I}\left(f\left(\Theta\right)\bar{\Lt}\right) + \hat{I}\left(f\left(\Theta\right)\Delta\Lt\right)\right] \\
+                        &= K \times \hat{I}\left(f\left(\Theta\right)\bar{\Lt}\right) + K \times \hat{I}\left(f\left(\Theta\right) \Delta\Lt\right) \\
+                        &= \tilde{I}\left(f\left(\Theta\right)\bar{\Lt}\right) + \tilde{I}\left(f\left(\Theta\right) \Delta\Lt\right) \\
+                        &= I\left(f\left(\Theta\right)\bar{\Lt}\right) + \tilde{I}\left(f\left(\Theta\right) \Delta\Lt\right)
+\end{align*}
 $$
 
 The above result shows that the average irradiance is computed correctly, i.e.: $I(f(\Theta)\bar{L_{\bot}})$.
@@ -2123,17 +2158,16 @@ $$
 Now, let's substitute the fresnel term into equation [iblFV](iblFV):
 
 $$
-
- F(f_0, f_{90}, \left<v \cdot h\right>) = f_0 (1 - F_c(\left<v \cdot h\right>)) + f_{90} F_c(\left<v \cdot h\right>) \\ F_c(\left<v \cdot h\right>) = (1 - \left<v \cdot h\right>)^5
-
-
+\begin{equation}
+F(f_0, f_{90}, \left<\VoH\right>) = f_0 (1 - F_c(\left<\VoH\right>)) + f_{90} F_c(\left<\VoH\right>) \\
+F_c(\left<\VoH\right>) = (1 - \left<\VoH\right>)^5
+\end{equation}
 $$
 
 $$
-
- I(f(n, v, \alpha)) \equiv \frac{4}{N}\sum_i^N \left\color{green}{f_0 (1 - F_c(\left<v \cdot h\right>)) + f_{90} F_c(\left<v \cdot h\right>)}\right V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\
-
-
+\begin{equation}
+I(f(n, v, \alpha))  \equiv \frac{4}{N}\sum_i^N \left[\color{green}{f_0 (1 - F_c(\left<\VoH\right>)) + f_{90} F_c(\left<\VoH\right>)}\right] V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
+\end{equation}
 $$
 
 $$
@@ -2157,10 +2191,12 @@ Notice that $DFG_1$ and $DFG_2$ only depend on $n \cdot v$, that is the angle be
 Putting everything back together:
 
 $$
-
-L_{out}(n,v,\alpha,f_0,f_{90}) &\simeq \big f_0 \color{red}{DFG_1(n \cdot v, \alpha)} + f_{90} \color{red}{DFG_2(n \cdot v, \alpha)} \big \times LD(n, \alpha) \\ DFG_1(\alpha, \left<n \cdot v\right>) &= \frac{4}{N}\sum_i^N \color{green}{(1 - F_c(\left<v \cdot h\right>))} V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\ DFG_2(\alpha, \left<n \cdot v\right>) &= \frac{4}{N}\sum_i^N \color{green}{ F_c(\left<v \cdot h\right>) } V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\ LD(n, \alpha) &= \frac{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>L_{\bot}(l_i) }{\sum_i^N \left<n \cdot l\right>}
-
-
+\begin{align*}
+\Lout(n,v,\alpha,f_0,f_{90})     &\simeq \big[ f_0 \color{red}{DFG_1(\NoV, \alpha)} + f_{90} \color{red}{DFG_2(\NoV, \alpha)} \big] \times LD(n, \alpha) \\
+DFG_1(\alpha, \left<\NoV\right>) &=      \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left<\VoH\right>))} V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
+DFG_2(\alpha, \left<\NoV\right>) &=      \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left<\VoH\right>) } V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
+LD(n, \alpha)                    &=      \frac{\sum_i^N V(l_i, n, \alpha)\left<\NoL\right>\Lt(l_i) }{\sum_i^N \left<\NoL\right>}
+\end{align*}
 $$
 
 #### The $DFG_1$ and $DFG_2$ term visualized
@@ -2217,16 +2253,16 @@ See an example below:
 [Listing 27](#listing_iblevaluation) presents a GLSL implementation to evaluate the IBL, using the various textures described in the previous sections.
 
 ```glsl
-    vec3 ibl(vec3 n, vec3 v, vec3 diffuseColor, vec3 f0, vec3 f90,
-            float perceptualRoughness) {
-        vec3 r = reflect(n);
-        vec3 Ld = textureCube(irradianceEnvMap, r) * diffuseColor;
-        float lod = computeLODFromRoughness(perceptualRoughness);
-        vec3 Lld = textureCube(prefilteredEnvMap, r, lod);
-        vec2 Ldfg = textureLod(dfgLut, vec2(dot(n, v), perceptualRoughness), 0.0).xy;
-        vec3 Lr =  (f0 * Ldfg.x + f90 * Ldfg.y) * Lld;
-        return Ld + Lr;
-    }
+vec3 ibl(vec3 n, vec3 v, vec3 diffuseColor, vec3 f0, vec3 f90,
+        float perceptualRoughness) {
+    vec3 r = reflect(n);
+    vec3 Ld = textureCube(irradianceEnvMap, r) * diffuseColor;
+    float lod = computeLODFromRoughness(perceptualRoughness);
+    vec3 Lld = textureCube(prefilteredEnvMap, r, lod);
+    vec2 Ldfg = textureLod(dfgLut, vec2(dot(n, v), perceptualRoughness), 0.0).xy;
+    vec3 Lr =  (f0 * Ldfg.x + f90 * Ldfg.y) * Lld;
+    return Ld + Lr;
+}
 ```
 
 > **Listing 27:** GLSL implementation of image based lighting evaluation
@@ -2234,55 +2270,55 @@ See an example below:
 We can however save a couple of texture lookups by using Spherical Harmonics instead of an irradiance cubemap and the analytical approximation of the $DFG$ LUT, as shown in [listing 28](#listing_optimizediblevaluation).
 
 ```glsl
-    vec3 irradianceSH(vec3 n) {
-        // uniform vec3 sphericalHarmonics[9]
-        // We can use only the first 2 bands for better performance
-        return
-              sphericalHarmonics[0]
-            + sphericalHarmonics[1] * (n.y)
-            + sphericalHarmonics[2] * (n.z)
-            + sphericalHarmonics[3] * (n.x)
-            + sphericalHarmonics[4] * (n.y * n.x)
-            + sphericalHarmonics[5] * (n.y * n.z)
-            + sphericalHarmonics[6] * (3.0 * n.z * n.z - 1.0)
-            + sphericalHarmonics[7] * (n.z * n.x)
-            + sphericalHarmonics[8] * (n.x * n.x - n.y * n.y);
-    }
+vec3 irradianceSH(vec3 n) {
+    // uniform vec3 sphericalHarmonics[9]
+    // We can use only the first 2 bands for better performance
+    return
+            sphericalHarmonics[0]
+        + sphericalHarmonics[1] * (n.y)
+        + sphericalHarmonics[2] * (n.z)
+        + sphericalHarmonics[3] * (n.x)
+        + sphericalHarmonics[4] * (n.y * n.x)
+        + sphericalHarmonics[5] * (n.y * n.z)
+        + sphericalHarmonics[6] * (3.0 * n.z * n.z - 1.0)
+        + sphericalHarmonics[7] * (n.z * n.x)
+        + sphericalHarmonics[8] * (n.x * n.x - n.y * n.y);
+}
 
-    // NOTE: this is the DFG LUT implementation of the function above
-    vec2 prefilteredDFG_LUT(float coord, float NoV) {
-        // coord = sqrt(roughness), which is the mapping used by the
-        // IBL prefiltering code when computing the mipmaps
-        return textureLod(dfgLut, vec2(NoV, coord), 0.0).rg;
-    }
+// NOTE: this is the DFG LUT implementation of the function above
+vec2 prefilteredDFG_LUT(float coord, float NoV) {
+    // coord = sqrt(roughness), which is the mapping used by the
+    // IBL prefiltering code when computing the mipmaps
+    return textureLod(dfgLut, vec2(NoV, coord), 0.0).rg;
+}
 
-    vec3 evaluateSpecularIBL(vec3 r, float perceptualRoughness) {
-        // This assumes a 256x256 cubemap, with 9 mip levels
-        float lod = 8.0 * perceptualRoughness;
-        // decodeEnvironmentMap() either decodes RGBM or is a no-op if the
-        // cubemap is stored in a float texture
-        return decodeEnvironmentMap(textureCubeLodEXT(environmentMap, r, lod));
-    }
+vec3 evaluateSpecularIBL(vec3 r, float perceptualRoughness) {
+    // This assumes a 256x256 cubemap, with 9 mip levels
+    float lod = 8.0 * perceptualRoughness;
+    // decodeEnvironmentMap() either decodes RGBM or is a no-op if the
+    // cubemap is stored in a float texture
+    return decodeEnvironmentMap(textureCubeLodEXT(environmentMap, r, lod));
+}
 
-    vec3 evaluateIBL(vec3 n, vec3 v, vec3 diffuseColor, vec3 f0, vec3 f90, float perceptualRoughness) {
-        float NoV = max(dot(n, v), 0.0);
-        vec3 r = reflect(-v, n);
+vec3 evaluateIBL(vec3 n, vec3 v, vec3 diffuseColor, vec3 f0, vec3 f90, float perceptualRoughness) {
+    float NoV = max(dot(n, v), 0.0);
+    vec3 r = reflect(-v, n);
 
-        // Specular indirect
-        vec3 indirectSpecular = evaluateSpecularIBL(r, perceptualRoughness);
-        vec2 env = prefilteredDFG_LUT(perceptualRoughness, NoV);
-        vec3 specularColor = f0 * env.x + f90 * env.y;
+    // Specular indirect
+    vec3 indirectSpecular = evaluateSpecularIBL(r, perceptualRoughness);
+    vec2 env = prefilteredDFG_LUT(perceptualRoughness, NoV);
+    vec3 specularColor = f0 * env.x + f90 * env.y;
 
-        // Diffuse indirect
-        // We multiply by the Lambertian BRDF to compute radiance from irradiance
-        // With the Disney BRDF we would have to remove the Fresnel term that
-        // depends on NoL (it would be rolled into the SH). The Lambertian BRDF
-        // can be baked directly in the SH to save a multiplication here
-        vec3 indirectDiffuse = max(irradianceSH(n), 0.0) * Fd_Lambert();
+    // Diffuse indirect
+    // We multiply by the Lambertian BRDF to compute radiance from irradiance
+    // With the Disney BRDF we would have to remove the Fresnel term that
+    // depends on NoL (it would be rolled into the SH). The Lambertian BRDF
+    // can be baked directly in the SH to save a multiplication here
+    vec3 indirectDiffuse = max(irradianceSH(n), 0.0) * Fd_Lambert();
 
-        // Indirect contribution
-        return diffuseColor * indirectDiffuse + indirectSpecular * specularColor;
-    }
+    // Indirect contribution
+    return diffuseColor * indirectDiffuse + indirectSpecular * specularColor;
+}
 ```
 
 > **Listing 28:** GLSL implementation of image based lighting evaluation
@@ -2312,18 +2348,20 @@ This equality is very similar to the terms $DFG_1$ and $DFG_2$ seen in equation 
 By making the further assumption that $f_{90} = 1$, we can rewrite $DFG_1$ and $DFG_2$ and the $L_{out}$ reconstruction:
 
 $$
-
-L_{out}(n,v,\alpha,f_0) &\simeq \big (1 - f_0) \color{red}{DFG_1^{multiscatter}(n \cdot v, \alpha)} + f_0 \color{red}{DFG_2^{multiscatter}(n \cdot v, \alpha)} \big \times LD(n, \alpha) \\ DFG_1^{multiscatter}(\alpha, \left<n \cdot v\right>) &= \frac{4}{N}\sum_i^N \color{green}{F_c(\left<v \cdot h\right>)} V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\ DFG_2^{multiscatter}(\alpha, \left<n \cdot v\right>) &= \frac{4}{N}\sum_i^N V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\ LD(n, \alpha) &= \frac{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>L_{\bot}(l_i) }{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>}
-
-
+\begin{align*}
+L_{out}(n,v,\alpha,f_0)                           &\simeq \big[ (1 - f_0) \color{red}{DFG_1^{multiscatter}(n \cdot l, \alpha)} + f_0 \color{red}{DFG_2^{multiscatter}(n \cdot l, \alpha)} \big] \times LD(n, \alpha) \\
+DFG_1^{multiscatter}(\alpha, \left<n \cdot l\right>) &=      \frac{4}{N}\sum_i^N  \color{green}{F_c(\left<v \cdot h\right>)} V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\
+DFG_2^{multiscatter}(\alpha, \left<n \cdot l\right>) &=      \frac{4}{N}\sum_i^N                                        V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\
+LD(n, \alpha)                                   &=      \frac{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>\Lt(l_i) }{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>}
+\end{align*}
 $$
 
 These two new $DFG$ terms simply need to replace the ones used in the implementation shown in section [9.5](#toc9.5):
 
 ```glsl
-    float Fc = pow(1 - VoH, 5.0f);
-    r.x += Gv * Fc;
-    r.y += Gv;
+float Fc = pow(1 - VoH, 5.0f);
+r.x += Gv * Fc;
+r.y += Gv;
 ```
 
 > **Listing 29:** C++ implementation of the $L_{DFG}$ term for multiscattering
@@ -2375,12 +2413,12 @@ In order to calculate the specular contribution of distant image-based lights, w
 When sampling the IBL, the clear coat layer is calculated as a second specular lobe. This specular lobe is oriented along the view direction since we cannot reasonably integrate over the hemisphere. [Listing 31](#listing_clearcoatibl) demonstrates this approximation in practice. It also shows the energy conservation step. It is important to note that this second specular lobe is computed exactly the same way as the main specular lobe, using the same DFG approximation.
 
 ```glsl
-    // clearCoat_NoV == shading_NoV if the clear coat layer doesn't have its own normal map
-    float Fc = F_Schlick(0.04, 1.0, clearCoat_NoV) * clearCoat;
-    // base layer attenuation for energy compensation
-    iblDiffuse  *= 1.0 - Fc;
-    iblSpecular *= sq(1.0 - Fc);
-    iblSpecular += specularIBL(r, clearCoatPerceptualRoughness) * Fc;
+// clearCoat_NoV == shading_NoV if the clear coat layer doesn't have its own normal map
+float Fc = F_Schlick(0.04, 1.0, clearCoat_NoV) * clearCoat;
+// base layer attenuation for energy compensation
+iblDiffuse  *= 1.0 - Fc;
+iblSpecular *= sq(1.0 - Fc);
+iblSpecular += specularIBL(r, clearCoatPerceptualRoughness) * Fc;
 ```
 
 > **Listing 31:** GLSL implementation of the clear coat specular lobe for image-based lighting
@@ -2400,10 +2438,10 @@ When sampling the IBL, the clear coat layer is calculated as a second specular l
 The implementation of this technique is straightforward, as demonstrated in [listing 32](#listing_bentreflectionvector).
 
 ```glsl
-    vec3 anisotropicTangent = cross(bitangent, v);
-    vec3 anisotropicNormal = cross(anisotropicTangent, bitangent);
-    vec3 bentNormal = normalize(mix(n, anisotropicNormal, anisotropy));
-    vec3 r = reflect(-v, bentNormal);
+vec3 anisotropicTangent = cross(bitangent, v);
+vec3 anisotropicNormal = cross(anisotropicTangent, bitangent);
+vec3 bentNormal = normalize(mix(n, anisotropicNormal, anisotropy));
+vec3 r = reflect(-v, bentNormal);
 ```
 
 > **Listing 32:** GLSL implementation of the bent reflection vector
@@ -2411,11 +2449,11 @@ The implementation of this technique is straightforward, as demonstrated in [lis
 This technique can be made more useful by accepting negative `anisotropy` values, as shown in [listing 33](#listing_bentreflectionvectordirection). When the anisotropy is negative, the highlights are not in the direction of the tangent, but in the direction of the bitangent instead.
 
 ```glsl
-    vec3 anisotropicDirection = anisotropy >= 0.0 ? bitangent : tangent;
-    vec3 anisotropicTangent = cross(anisotropicDirection, v);
-    vec3 anisotropicNormal = cross(anisotropicTangent, anisotropicDirection);
-    vec3 bentNormal = normalize(mix(n, anisotropicNormal, anisotropy));
-    vec3 r = reflect(-v, bentNormal);
+vec3 anisotropicDirection = anisotropy >= 0.0 ? bitangent : tangent;
+vec3 anisotropicTangent = cross(anisotropicDirection, v);
+vec3 anisotropicNormal = cross(anisotropicTangent, anisotropicDirection);
+vec3 bentNormal = normalize(mix(n, anisotropicNormal, anisotropy));
+vec3 r = reflect(-v, bentNormal);
 ```
 
 > **Listing 33:** GLSL implementation of the bent reflection vector
@@ -2443,19 +2481,19 @@ The DG term is generated using uniform sampling as recommended in [Estevez17](#c
 The remainder of the image-based lighting implementation follows the same steps as the implementation of regular lights, including the optional subsurface scattering term and its wrap diffuse component. Just as with the clear coat IBL implementation, we cannot integrate over the hemisphere and use the view direction as the dominant light direction to compute the wrap diffuse component.
 
 ```glsl
-    float diffuse = Fd_Lambert() * ambientOcclusion;
-    #if defined(SHADING_MODEL_CLOTH)
-    #if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
-    diffuse *= saturate((NoV + 0.5) / 2.25);
-    #endif
-    #endif
+float diffuse = Fd_Lambert() * ambientOcclusion;
+#if defined(SHADING_MODEL_CLOTH)
+#if defined(MATERIAL_HAS_SUBSURFACE_COLOR)
+diffuse *= saturate((NoV + 0.5) / 2.25);
+#endif
+#endif
 
-    vec3 indirectDiffuse = irradianceIBL(n) * diffuse;
-    #if defined(SHADING_MODEL_CLOTH) && defined(MATERIAL_HAS_SUBSURFACE_COLOR)
-    indirectDiffuse *= saturate(subsurfaceColor + NoV);
-    #endif
+vec3 indirectDiffuse = irradianceIBL(n) * diffuse;
+#if defined(SHADING_MODEL_CLOTH) && defined(MATERIAL_HAS_SUBSURFACE_COLOR)
+indirectDiffuse *= saturate(subsurfaceColor + NoV);
+#endif
 
-    vec3 ibl = diffuseColor * indirectDiffuse + indirectSpecular * specularColor;
+vec3 ibl = diffuseColor * indirectDiffuse + indirectSpecular * specularColor;
 ```
 
 > **Listing 34:** GLSL implementation of the DFG approximation for the cloth NDF
@@ -2485,33 +2523,33 @@ To properly light a transparent surface, we must first understand how the materi
 To properly implement opacity, we will use the premultiplied alpha format. Given a desired opacity noted $ \alpha\_{opacity} $ and a diffuse color $ \sigma $ (linear, unpremultiplied), we can compute the effective opacity of a fragment.
 
 $$
-
-color &= \sigma \* \alpha_{opacity} \\ opacity &= \alpha_{opacity}
-
-
+\begin{align*}
+color &= \sigma * \alpha_{opacity} \\
+opacity &= \alpha_{opacity}
+\end{align*}
 $$
 
 The physical interpretation is that the RGB components of the source color define how much light is emitted by the pixel, whereas the alpha component defines how much of the light behind the pixel is blocked by said pixel. We must therefore use the following blending functions:
 
 $$
-
-Blend_{src} &= 1 \\ Blend_{dst} &= 1 - src_{\alpha}
-
-
+\begin{align*}
+Blend_{src} &= 1 \\
+Blend_{dst} &= 1 - src_{\alpha}
+\end{align*}
 $$
 
 The GLSL implementation of these equations is presented in [listing 35](#listing_surfacetransparency).
 
 ```glsl
-    // baseColor has already been premultiplied
-    vec4 shadeSurface(vec4 baseColor) {
-        float alpha = baseColor.a;
+// baseColor has already been premultiplied
+vec4 shadeSurface(vec4 baseColor) {
+    float alpha = baseColor.a;
 
-        vec3 diffuseColor = evaluateDiffuseLighting();
-        vec3 specularColor = evaluateSpecularLighting();
+    vec3 diffuseColor = evaluateDiffuseLighting();
+    vec3 specularColor = evaluateSpecularLighting();
 
-        return vec4(diffuseColor + specularColor, alpha);
-    }
+    return vec4(diffuseColor + specularColor, alpha);
+}
 ```
 
 > **Listing 35:** Implementation of lit surface transparency in GLSL
@@ -2535,17 +2573,11 @@ TODO Surface translucency (BRDF+BTDF, BSSRDF)
 
 Occlusion is an important darkening factor used to recreate shadowing at various scales:
 
-Small scale
-
-Micro-occlusion used to handle creases, cracks and cavities.
-
-Medium scale
-
-Macro-occlusion used to handle occlusion by an object's own geometry or by geometry baked in normal maps (bricks, etc.).
-
-Large scale
-
-Occlusion coming from contact between objects, or from an object's own geometry.
+| **Scale**        | **Description**                                                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Small scale**  | Micro-occlusion used to handle creases, cracks, and cavities.                                                            |
+| **Medium scale** | Macro-occlusion used to handle occlusion by an object's own geometry or by geometry baked in normal maps (e.g., bricks). |
+| **Large scale**  | Occlusion coming from contact between objects or from an object's own geometry.                                          |
 
 We currently ignore micro-occlusion, which is often exposed in tools and engines under the form of a “cavity map”. Sébastien Lagarde offers an interesting discussion in [Lagarde14](#citation-lagarde14) on how micro-occlusion is handled in Frostbite: diffuse micro-occlusion is pre-baked in diffuse maps and specular micro-occlusion is pre-baked in reflectance textures. In our system, micro-occlusion can simply be baked in the base color map. This must be done knowing that the specular light will not be affected by micro-occlusion.
 
@@ -2584,8 +2616,6 @@ The left term of this approximation is the pre-computed diffuse component of our
 $$
 
  {AO} = 1 - \frac{1}{\pi} \int_{\Omega} V(l) \left< n \cdot l \right> dl
-
-
 $$
 
 Since we use a pre-computed diffuse term, we cannot compute the exact accessibility of shaded points at runtime. To compensate for this lack of information in our precomputed term, we partially reconstruct incident lighting by applying an ambient occlusion factor specific to the surface's material at the shaded point.
@@ -2601,10 +2631,10 @@ In practice, baked ambient occlusion is stored as a grayscale texture which can 
 Applying baked diffuse ambient occlusion in a GLSL shader is straightforward, as shown in [listing 36](#listing_bakeddiffuseao).
 
 ```glsl
-    // diffuse indirect
-    vec3 indirectDiffuse = max(irradianceSH(n), 0.0) * Fd_Lambert();
-    // ambient occlusion
-    indirectDiffuse *= texture2D(aoMap, outUV).r;
+// diffuse indirect
+vec3 indirectDiffuse = max(irradianceSH(n), 0.0) * Fd_Lambert();
+// ambient occlusion
+indirectDiffuse *= texture2D(aoMap, outUV).r;
 ```
 
 > **Listing 36:** Implementation of baked diffuse ambient occlusion in GLSL
@@ -2616,9 +2646,9 @@ Note how the ambient occlusion term is only applied to indirect lighting.
 Specular micro-occlusion can be derived from $f_{0}$, itself derived from the diffuse color. The derivation is based on the knowledge that no real-world material has a reflectance lower than 2%. Values in the 0-2% range can therefore be treated as pre-baked specular occlusion used to smoothly extinguish the Fresnel term.
 
 ```glsl
-    float f90 = clamp(dot(f0, 50.0 * 0.33), 0.0, 1.0);
-    // cheap luminance approximation
-    float f90 = clamp(50.0 * f0.g, 0.0, 1.0);
+float f90 = clamp(dot(f0, 50.0 * 0.33), 0.0, 1.0);
+// cheap luminance approximation
+float f90 = clamp(50.0 * f0.g, 0.0, 1.0);
 ```
 
 > **Listing 37:** Pre-baked specular occlusion in GLSL
@@ -2628,15 +2658,15 @@ The derivations mentioned earlier for ambient occlusion assume Lambertian surfac
 Sébastien Lagarde proposes an empirical approach to derive the specular occlusion term from the diffuse occlusion term in [Lagarde14](#citation-lagarde14). The result does not have any physical basis but produces visually pleasant results. The goal of his formulation is return the diffuse occlusion term unmodified for rough surfaces. For smooth surfaces, the formulation, implemented in [listing 38](#listing_specularocclusion), reduces the influence of occlusion at normal incidence and increases it at grazing angles.
 
 ```glsl
-    float computeSpecularAO(float NoV, float ao, float roughness) {
-        return clamp(pow(NoV + ao, exp2(-16.0 * roughness - 1.0)) - 1.0 + ao, 0.0, 1.0);
-    }
+float computeSpecularAO(float NoV, float ao, float roughness) {
+    return clamp(pow(NoV + ao, exp2(-16.0 * roughness - 1.0)) - 1.0 + ao, 0.0, 1.0);
+}
 
-    // specular indirect
-    vec3 indirectSpecular = evaluateSpecularIBL(r, perceptualRoughness);
-    // ambient occlusion
-    float ao = texture2D(aoMap, outUV).r;
-    indirectSpecular *= computeSpecularAO(NoV, ao, roughness);
+// specular indirect
+vec3 indirectSpecular = evaluateSpecularIBL(r, perceptualRoughness);
+// ambient occlusion
+float ao = texture2D(aoMap, outUV).r;
+indirectSpecular *= computeSpecularAO(NoV, ao, roughness);
 ```
 
 > **Listing 38:** Implementation of Lagarde's specular occlusion factor in GLSL

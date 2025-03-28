@@ -12,6 +12,7 @@ export const REHYPE_ICON_DEFAULT_REPLACES = {
     css: "CssIcon",
     "c++": "CPPIcon",
     cpp: "CPPIcon",
+    glsl:"GLSLIcon",
     csharp: "CsharpIcon",
     cs: "CsharpIcon",
     "c#": "CsharpIcon",
