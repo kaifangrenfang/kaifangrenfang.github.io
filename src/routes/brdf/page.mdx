@@ -3778,15 +3778,15 @@ $$
 ## Hammersley sequence
 
 ```glsl
-    vec2f hammersley(uint i, float numSamples) {
-        uint bits = i;
-        bits = (bits << 16) | (bits >> 16);
-        bits = ((bits & 0x55555555) << 1) | ((bits & 0xAAAAAAAA) >> 1);
-        bits = ((bits & 0x33333333) << 2) | ((bits & 0xCCCCCCCC) >> 2);
-        bits = ((bits & 0x0F0F0F0F) << 4) | ((bits & 0xF0F0F0F0) >> 4);
-        bits = ((bits & 0x00FF00FF) << 8) | ((bits & 0xFF00FF00) >> 8);
-        return vec2f(i / numSamples, bits / exp2(32));
-    }
+vec2f hammersley(uint i, float numSamples) {
+    uint bits = i;
+    bits = (bits << 16) | (bits >> 16);
+    bits = ((bits & 0x55555555) << 1) | ((bits & 0xAAAAAAAA) >> 1);
+    bits = ((bits & 0x33333333) << 2) | ((bits & 0xCCCCCCCC) >> 2);
+    bits = ((bits & 0x0F0F0F0F) << 4) | ((bits & 0xF0F0F0F0) >> 4);
+    bits = ((bits & 0x00FF00FF) << 8) | ((bits & 0xFF00FF00) >> 8);
+    return vec2f(i / numSamples, bits / exp2(32));
+}
 ```
 
 C++ implementation of a Hammersley sequence generator
@@ -3796,42 +3796,42 @@ C++ implementation of a Hammersley sequence generator
 The term $ L*{DFG} $ is only dependent on $ n \cdot v $. Below, the normal is arbitrarily set to $ n=\left0, 0, 1\right $ and $v$ is chosen to satisfy $ n \cdot v $. The vector $ h_i $ is the $ D*{GGX}(\alpha) $ important direction sample $i$.
 
 ```glsl
-    float GDFG(float NoV, float NoL, float a) {
-        float a2 = a * a;
-        float GGXL = NoV * sqrt((-NoL * a2 + NoL) * NoL + a2);
-        float GGXV = NoL * sqrt((-NoV * a2 + NoV) * NoV + a2);
-        return (2 * NoL) / (GGXV + GGXL);
-    }
+float GDFG(float NoV, float NoL, float a) {
+    float a2 = a * a;
+    float GGXL = NoV * sqrt((-NoL * a2 + NoL) * NoL + a2);
+    float GGXV = NoL * sqrt((-NoV * a2 + NoV) * NoV + a2);
+    return (2 * NoL) / (GGXV + GGXL);
+}
 
-    float2 DFG(float NoV, float a) {
-        float3 V;
-        V.x = sqrt(1.0f - NoV*NoV);
-        V.y = 0.0f;
-        V.z = NoV;
+float2 DFG(float NoV, float a) {
+    float3 V;
+    V.x = sqrt(1.0f - NoV*NoV);
+    V.y = 0.0f;
+    V.z = NoV;
 
-        float2 r = 0.0f;
-        for (uint i = 0; i < sampleCount; i++) {
-            float2 Xi = hammersley(i, sampleCount);
-            float3 H = importanceSampleGGX(Xi, a, N);
-            float3 L = 2.0f * dot(V, H) * H - V;
+    float2 r = 0.0f;
+    for (uint i = 0; i < sampleCount; i++) {
+        float2 Xi = hammersley(i, sampleCount);
+        float3 H = importanceSampleGGX(Xi, a, N);
+        float3 L = 2.0f * dot(V, H) * H - V;
 
-            float VoH = saturate(dot(V, H));
-            float NoL = saturate(L.z);
-            float NoH = saturate(H.z);
+        float VoH = saturate(dot(V, H));
+        float NoL = saturate(L.z);
+        float NoH = saturate(H.z);
 
-            if (NoL > 0.0f) {
-                float G = GDFG(NoV, NoL, a);
-                float Gv = G * VoH / NoH;
-                float Fc = pow(1 - VoH, 5.0f);
-                r.x += Gv * (1 - Fc);
-                r.y += Gv * Fc;
-            }
+        if (NoL > 0.0f) {
+            float G = GDFG(NoV, NoL, a);
+            float Gv = G * VoH / NoH;
+            float Fc = pow(1 - VoH, 5.0f);
+            r.x += Gv * (1 - Fc);
+            r.y += Gv * Fc;
         }
-        return r * (1.0f / sampleCount);
     }
+    return r * (1.0f / sampleCount);
+}
 ```
 
-C++ implementation of the $ L\_{DFG} $ term
+C++ implementation of the $ L_{\text{DFG}}$ term
 
 ## Spherical Harmonics
 
@@ -3849,28 +3849,22 @@ C++ implementation of the $ L\_{DFG} $ term
 Spherical parameterization of points on the surface of the unit sphere:
 
 $$
-
- \{ x, y, z \} = \{ cos \phi sin \theta, sin \phi sin \theta, cos \theta \}
-
-
+\begin{equation} 
+\{ x, y, z \} = \{ cos \phi sin \theta, sin \phi sin \theta, cos \theta \}
+\end{equation}
 $$
 
 The complex spherical harmonics bases are given by:
 
 $$
-
- Y^m_l(\theta, \phi) = K^m_l e^{im\theta} P^{|m|}_l(cos \theta), l \in N, -l <= m <= l
-
-
+\begin{equation} Y^m_l(\theta, \phi) = K^m_l e^{im\theta} P^{|m|}_l(cos \theta), l \in N, -l <= m <= l
+\end{equation}
 $$
 
 However we only need the real bases:
 
 $$
-
-y^{m > 0}_l &= \sqrt{2} K^m_l cos(m \phi) P^m_l(cos \theta) \\ y^{m < 0}_l &= \sqrt{2} K^m_l sin(|m| \phi) P^{|m|}_l(cos \theta) \\ y^0_l &= K^0_l P^0_l(cos \theta)
-
-
+\begin{align*} y^{m > 0}_l &= \sqrt{2} K^m_l cos(m \phi) P^m_l(cos \theta) \\ y^{m < 0}_l &= \sqrt{2} K^m_l sin(|m| \phi) P^{|m|}_l(cos \theta) \\ y^0_l &= K^0_l P^0_l(cos \theta) \end{align*}
 $$
 
 The normalization factors are given by:
@@ -3899,16 +3893,20 @@ Computing $y^{|m|}_l$ requires to compute $P^{|m|}_l(z)$ first. This can be acco
 It's also fairly easy to compute the trigonometric terms recursively:
 
 $$
-C_m &\equiv cos(m \phi)sin(\theta)^m \\ S_m &\equiv sin(m \phi)sin(\theta)^m \\ \{ x, y, z \} &= \{ cos \phi sin \theta, sin \phi sin \theta, cos \theta \}
+\begin{align*}
+C_m &\equiv cos(m \phi)sin(\theta)^m \\
+S_m &\equiv sin(m \phi)sin(\theta)^m \\
+\{ x, y, z \} &= \{ cos \phi sin \theta, sin \phi sin \theta, cos \theta \}
+\end{align*}
 $$
 
 Using the angle sum trigonometric identities:
 
 $$
-
-cos(m \phi + \phi) &= cos(m \phi) cos(\phi) - sin(m \phi) sin(\phi) \Leftrightarrow C_{m + 1} = x C_m - y S_m \\ sin(m \phi + \phi) &= sin(m \phi) cos(\phi) + cos(m \phi) sin(\phi) \Leftrightarrow S_{m + 1} = x S_m - y C_m
-
-
+\begin{align*}
+cos(m \phi + \phi) &= cos(m \phi) cos(\phi) - sin(m \phi) sin(\phi) \Leftrightarrow C_{m + 1} = x C_m - y S_m \\
+sin(m \phi + \phi) &= sin(m \phi) cos(\phi) + cos(m \phi) sin(\phi) \Leftrightarrow S_{m + 1} = x S_m - y C_m
+\end{align*}
 $$
 
 [Listing 47](#listing_nonnormalizedshbasis) shows the C++ code to compute the non-normalized SH basis $\frac{y^m_l(s)}{\sqrt{2} K^m_l}$:
@@ -4046,7 +4044,7 @@ Very few coefficients are needed to reasonably approximate $\left< cos \theta \r
 Convolutions by a kernel $h$ that has a circular symmetry can be applied directly and easily in SH space:
 
 $$
- (h \* f)^m_l = \sqrt{\frac{4\pi}{2l + 1}} h^0_l(s) f^m_l(s)
+ (h * f)^m_l = \sqrt{\frac{4\pi}{2l + 1}} h^0_l(s) f^m_l(s)
 $$
 
 Conveniently, $\sqrt{\frac{4\pi}{2l + 1}} = \frac{1}{K^0_l}$, so in practice we pre-multiply $C_l$ by $\frac{1}{K^0_l}$ and we get a simpler expression:
@@ -4273,21 +4271,12 @@ void main() {
 
 The second compute shader, shown in [listing 49](#listing_froxelevaluation), runs every frame (if the camera and/or lights have changed) and assigns all the lights to their respective froxels. This shader relies only on a couple of uniforms (the number of point/spot lights and the view matrix) and four SSBOs:
 
-Light index buffer
-
-For each froxel, the index of each light that affects said froxel. The indices for point lights are written first and if there is enough space left, the indices for spot lights are written as well. A sentinel of value 0×7fffffffu separates point and spot lights and/or marks the end of the froxel's list of lights. Each froxel has a maximum number of lights (point + spot).
-
-Point lights buffer
-
-Array of structures describing the scene's point lights.
-
-Spot lights buffer
-
-Array of structures describing the scene's spot lights.
-
-Froxels buffer
-
-The list of froxels represented by planes, created by the previous compute shader.
+| Parameter               | Definition                                                                                                                                                                                                                                                                                                                                                                               |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Light index buffer**  | For each froxel, the index of each light that affects said froxel. The indices for point lights are written first, and if there is enough space left, the indices for spot lights are written as well. A sentinel of value `0x7fffffffu` separates point and spot lights and/or marks the end of the froxel's list of lights. Each froxel has a maximum number of lights (point + spot). |
+| **Point lights buffer** | Array of structures describing the scene's point lights.                                                                                                                                                                                                                                                                                                                                 |
+| **Spot lights buffer**  | Array of structures describing the scene's spot lights.                                                                                                                                                                                                                                                                                                                                  |
+| **Froxels buffer**      | The list of froxels represented by planes, created by the previous compute shader.                                                                                                                                                                                                                                                                                                       |
 
 ```glsl
 #version 310 es
