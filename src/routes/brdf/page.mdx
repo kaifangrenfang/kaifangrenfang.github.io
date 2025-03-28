@@ -2,7 +2,7 @@ import { Diagram } from "@/components/diagram"
 
 # Physically Based Rendering
 
-Source: [google.github.io/Filament](https://google.github.io/filament/Filament.md.html)
+Visit Origin Posts: [google.github.io/Filament](https://google.github.io/filament/Filament.md.html)
 
 {/* ### Table of Contents
 
@@ -1823,9 +1823,9 @@ $$
 From the xyY space, we can then convert to the CIE XYZ space (equation [xyYtoXYZ](xyYtoXYZ)).
 
 $$
-\begin{*align}
+\begin{align*}
  X = \frac{xY}{y} \\ Z = \frac{(1 - x - y)Y}{y}
-\end{*align}
+\end{align*}
 $$
 
 For our needs, we will fix $Y = 1$. This allows us to convert from the XYZ space to linear RGB with a simple 3×3 matrix, as shown in equation [XYZtoRGB](XYZtoRGB).
@@ -2118,9 +2118,9 @@ Because $I$ is an integral multiplications can be distributed over it. i.e.: $I(
 Armed with that,
 
 $$
-\begin{*align}
+\begin{align*}
  I( f(\Theta) L_{\bot} ) \approx \tilde{I}( f(\Theta) L_{\bot} ) \\ \tilde{I}( f(\Theta) L_{\bot} ) = K \times \hat{I}( f(\Theta) L_{\bot} ) \\ K = \frac{I(f(\Theta))}{\hat{I}(f(\Theta))}
-\end{*align}
+\end{align*}
 $$
 
 From the equation above we can see that $\tilde{I}$ is equivalent to $I$ when $L_{\bot}$ is a constant, and yields the correct result:
@@ -2142,18 +2142,19 @@ $$
 \end{align*}
 $$
 
-Finally, we can show that the scale factor $K$ satisfies our average irradiance ($\bar{L_{\bot}}$) requirement by plugging $L_{\bot} = \bar{L_{\bot}} + (L_{\bot} - \bar{L_{\bot}}) = \bar{L_{\bot}} + \DeltaL_{\bot}$ into $\tilde{I}$:
+Finally, we can show that the scale factor $K$ satisfies our average irradiance ($\bar{L_{\bot}}$) requirement by plugging $L_{\bot} = \bar{L_{\bot}} + (L_{\bot} - \bar{L_{\bot}}) = \bar{L_{\bot}} + \Delta L_{\bot}$ into $\tilde{I}$:
 
 $$
 \begin{align*}
-\tilde{I}(f(\Theta)L_{\bot}) &= \tilde{I}\left[f\left(\Theta\right) \left(\bar{L_{\bot}} + \DeltaL_{\bot}\right)\right] \\
-                        &= K \times \hat{I}\left[f\left(\Theta\right) \left(\bar{L_{\bot}} + \DeltaL_{\bot}\right)\right] \\
-                        &= K \times \left[\hat{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \hat{I}\left(f\left(\Theta\right)\DeltaL_{\bot}\right)\right] \\
-                        &= K \times \hat{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + K \times \hat{I}\left(f\left(\Theta\right) \DeltaL_{\bot}\right) \\
-                        &= \tilde{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \tilde{I}\left(f\left(\Theta\right) \DeltaL_{\bot}\right) \\
-                        &= I\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \tilde{I}\left(f\left(\Theta\right) \DeltaL_{\bot}\right)
+\tilde{I}(f(\Theta)L_{\bot}) &= \tilde{I}\left[f\left(\Theta\right) \left(\bar{L_{\bot}} + \Delta L_{\bot} \right)\right] \\
+                        &= K \times \hat{I}\left[f\left(\Theta\right) \left(\bar{L_{\bot}} + \Delta L_{\bot} \right)\right] \\
+                        &= K \times \left[\hat{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \hat{I}\left(f\left(\Theta\right)\Delta L_{\bot} \right)\right] \\
+                        &= K \times \hat{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + K \times \hat{I}\left(f\left(\Theta\right) \Delta L_{\bot} \right) \\
+                        &= \tilde{I}\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \tilde{I}\left(f\left(\Theta\right) \Delta L_{\bot} \right) \\
+                        &= I\left(f\left(\Theta\right)\bar{L_{\bot}}\right) + \tilde{I}\left(f\left(\Theta\right) \Delta L_{\bot} \right)
 \end{align*}
 $$
+
 
 The above result shows that the average irradiance is computed correctly, i.e.: $I(f(\Theta)\bar{L_{\bot}})$.
 
