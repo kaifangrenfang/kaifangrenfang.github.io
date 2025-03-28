@@ -24,7 +24,7 @@ const EXTERNALHREFREGEX = /https?:\/\//
 export const AnchorLink = ({ href = "", className, ...props }) => (
     <Link
         to={href}
-        newWindow={EXTERNALHREFREGEX.test(href)}
+        // newwindow={EXTERNALHREFREGEX.test(href)}
         className={cn("text-primary-600 underline decoration-from-font [text-underline-position:from-font]", className)}
         {...props}
     />
