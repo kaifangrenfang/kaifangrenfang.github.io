@@ -11,6 +11,7 @@ import { SidebarBottom } from "@/components/layout/sidebar-bottom"
 
 import Home from "./routes/table/page.mdx"
 const About = lazy(() => import("./routes/about/page.mdx"))
+const BRDF = lazy(() => import("./routes/brdf/page.mdx"))
 const Contact = lazy(() => import("./routes/contact/page.mdx"))
 const Markdown = lazy(() => import("./routes/markdown/page.mdx"))
 const Sample = lazy(() => import("./routes/sample/page.mdx"))
@@ -56,6 +57,7 @@ function App() {
                             <Routes>
                                 <Route index path="/" element={<Home />} />
                                 <Route path="/about" element={<About />} />
+                                <Route path="/brdf" element={<BRDF />} />
                                 <Route path="/contact" element={<Contact />} />
                                 <Route path="/markdown" element={<Markdown />} />
                                 <Route path="/sample" element={<Sample />} />
