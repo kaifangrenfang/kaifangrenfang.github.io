@@ -1918,10 +1918,10 @@ Using the Lambertian BRDF[7](#endnote-ibldiffuse1), we get the radiance:
 $$
 \begin{align*}
    f_d(\sigma) &= \frac{\sigma}{\pi} \\
-L_d(n, \sigma) &= \int_{\Omega} f_d(\sigma) L_{\bot}(l) \left< \NoL \right> dl \\
-               &= \frac{\sigma}{\pi} \int_{\Omega} L_{\bot}(l) \left< \NoL \right> dl \\
+L_d(n, \sigma) &= \int_{\Omega} f_d(\sigma) L_{\bot}(l) \left< n \cdot l \right> dl \\
+               &= \frac{\sigma}{\pi} \int_{\Omega} L_{\bot}(l) \left< n \cdot l \right> dl \\
                &= \frac{\sigma}{\pi} E_d(n) \quad \text{with the irradiance} \;
-        E_d(n) = \int_{\Omega} L_{\bot}(l) \left< \NoL \right> dl
+        E_d(n) = \int_{\Omega} L_{\bot}(l) \left< n \cdot l \right> dl
 \end{align*}
 $$
 
@@ -2166,24 +2166,25 @@ $$
 
 $$
 \begin{equation}
-I(f(n, v, \alpha))  \equiv \frac{4}{N}\sum_i^N \left[\color{green}{f_0 (1 - F_c(\left<\VoH\right>)) + f_{90} F_c(\left<\VoH\right>)}\right] V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
+I(f(n, v, \alpha))  \equiv \frac{4}{N}\sum_i^N \left[\color{green}{f_0 (1 - F_c(\left<\VoH\right>)) + f_{90} F_c(\left<\VoH\right>)}\right] V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<n \cdot l\right> \\
 \end{equation}
 $$
 
 $$
-
-I(f(n, v, \alpha)) \equiv & \color{green}{f_0 } \frac{4}{N}\sum_i^N \color{green}{(1 - F_c(\left<v \cdot h\right>))} V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\ + & \color{green}{f_{90}} \frac{4}{N}\sum_i^N \color{green}{ F_c(\left<v \cdot h\right>) } V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right>
-
-
+\begin{align*}
+I(f(n, v, \alpha))  \equiv & \color{green}{f_0   } \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left<\VoH\right>))} V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
+                    +      & \color{green}{f_{90}} \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left<\VoH\right>) } V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right>
+\end{align*}
 $$
 
 And finally, we extract the equations that can be calculated off-line (i.e.: the part that doesn't depend on the runtime parameters $f_0$ and $f_{90}$):
 
 $$
-
- DFG_1(\alpha, \left<n \cdot v\right>) = \frac{4}{N}\sum_i^N \color{green}{(1 - F_c(\left<v \cdot h\right>))} V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\ DFG_2(\alpha, \left<n \cdot v\right>) = \frac{4}{N}\sum_i^N \color{green}{ F_c(\left<v \cdot h\right>) } V(l_i, v, \alpha)\frac{\left<v \cdot h\right>}{\left<n \cdot h\right>} \left<n \cdot l\right> \\ I(f(n, v, \alpha)) \equiv \color{green}{f_0} \color{red}{DFG_1(\alpha, \left<n \cdot v\right>)} + \color{green}{f_{90}} \color{red}{DFG_2(\alpha, \left<n \cdot v\right>)}
-
-
+\begin{equation}
+DFG_1(\alpha, \left<\NoV\right>) = \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left<\VoH\right>))} V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
+DFG_2(\alpha, \left<\NoV\right>) = \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left<\VoH\right>) } V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
+I(f(n, v, \alpha))  \equiv   \color{green}{f_0} \color{red}{DFG_1(\alpha, \left<\NoV\right>)} + \color{green}{f_{90}} \color{red}{DFG_2(\alpha, \left<\NoV\right>)}
+\end{equation}
 $$
 
 Notice that $DFG_1$ and $DFG_2$ only depend on $n \cdot v$, that is the angle between the normal $n$ and the view direction $v$. This is true because the integral is symmetrical with respect to $n$. When integrating, we can choose any $v$ we please as long as it satisfies $n \cdot v$ (e.g.: when calculating $v \cdot h$).
@@ -2192,10 +2193,10 @@ Putting everything back together:
 
 $$
 \begin{align*}
-\Lout(n,v,\alpha,f_0,f_{90})     &\simeq \big[ f_0 \color{red}{DFG_1(\NoV, \alpha)} + f_{90} \color{red}{DFG_2(\NoV, \alpha)} \big] \times LD(n, \alpha) \\
-DFG_1(\alpha, \left<\NoV\right>) &=      \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left<\VoH\right>))} V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
-DFG_2(\alpha, \left<\NoV\right>) &=      \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left<\VoH\right>) } V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<\NoL\right> \\
-LD(n, \alpha)                    &=      \frac{\sum_i^N V(l_i, n, \alpha)\left<\NoL\right>\Lt(l_i) }{\sum_i^N \left<\NoL\right>}
+\Lout(n,v,\alpha,f_0,f_{90})     &\simeq \big[ f_0 \color{red}{DFG_1( n \cdot v , \alpha)} + f_{90} \color{red}{DFG_2( n \cdot v , \alpha)} \big] \times LD(n, \alpha) \\
+DFG_1(\alpha, \left< n \cdot v \right>) &=      \frac{4}{N}\sum_i^N  \color{green}{(1 - F_c(\left<\VoH\right>))} V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<n \cdot l\right> \\
+DFG_2(\alpha, \left< n \cdot v \right>) &=      \frac{4}{N}\sum_i^N  \color{green}{     F_c(\left<\VoH\right>) } V(l_i, v, \alpha)\frac{\left<\VoH\right>}{\left<\NoH\right>} \left<n \cdot l\right> \\
+LD(n, \alpha)                    &=      \frac{\sum_i^N V(l_i, n, \alpha)\left<n \cdot l\right>\Lt(l_i) }{\sum_i^N \left<n \cdot l\right>}
 \end{align*}
 $$
 

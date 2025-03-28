@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { Anchor } from "@/mdxui/anchor"
+// import { Anchor } from "@/mdxui/anchor"
 import {
     Tr,
     Th,
@@ -21,14 +21,14 @@ import { MDXProvider } from "@mdx-js/react"
 
 const EXTERNALHREFREGEX = /https?:\/\//
 
-export const AnchorLink = ({ href = "", className, ...props }) => (
-    <Anchor
-        href={href}
-        newWindow={EXTERNALHREFREGEX.test(href)}
-        className={cn("text-primary-600 underline decoration-from-font [text-underline-position:from-font]", className)}
-        {...props}
-    />
-)
+// export const AnchorLink = ({ href = "", className, ...props }) => (
+//     <Anchor
+//         href={href}
+//         newWindow={EXTERNALHREFREGEX.test(href)}
+//         className={cn("text-primary-600 underline decoration-from-font [text-underline-position:from-font]", className)}
+//         {...props}
+//     />
+// )
 
 // const A = ({ href = "", ...props }) => <Anchor href={href} newWindow={EXTERNALHREFREGEX.test(href)} {...props} />
 
@@ -57,7 +57,7 @@ const components = {
         />
     ),
     hr: (props) => <hr className="my-8 border-neutral-200/70 contrast-more:border-neutral-400 dark:border-primary-100/10 contrast-more:dark:border-neutral-400" {...props} />,
-    a: AnchorLink,
+    a: Link,
     table: (props) => <Table className="openhuman-scrollbar mt-6 p-0 first:mt-0" {...props} />,
     p: (props) => <p className="mt-6 leading-7 first:mt-0" {...props} />,
     tr: Tr,

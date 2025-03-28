@@ -12,7 +12,7 @@ export function Header() {
         //     </div>
         //     <nav className="mx-auto flex h-[var(--openhuman-navbar-height)] max-w-[90rem] items-center justify-end gap-4 pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)]">
         <Navbar>
-            <Link className="flex items-center hovesr:opacity-75 ltr:mr-auto rtl:ml-auto" href="/">
+            <Link className="flex items-center hovesr:opacity-75 ltr:mr-auto rtl:ml-auto" to="/">
                 <Logo height="40" width="40" className="h-10" />
                 <span className="max-md:hidden select-none font-extrabold ltr:ml-2 rtl:mr-2" title="mattergen.github.io: Gesture Generation Research Community">
                     MatterGen
